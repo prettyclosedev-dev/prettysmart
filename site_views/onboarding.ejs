@@ -1,0 +1,341 @@
+<%- include('partials/header', {async: true}); %>
+<link rel="stylesheet" href="/static/css/onboarding.css?<%=Date.now()%>">
+<link rel="stylesheet" href="/static/css/jquery.fontpicker.css?<%=Date.now()%>">
+<div class="container onboarding-page pb-5">
+    <div class="">
+
+        <div class="column justify-content-between" style="align-items: center; justify-content: center; display: flex; flex-direction: column;">
+            <div class="col-12 col-lg-6 position-relative" style="margin-top: 30px">
+
+                <div class="text-right onboarding-help d-none">
+                    Dont have it handy?
+                    <a href="/brand" class="btn btn-sm badge-pill px-4 btn-outline-dark ml-3">Ask for help</a>
+                </div>
+
+                <% if(user.master){ %>
+
+                    <div class="mb-2 d-none">
+                        <a href="/onboarding/transfer" class="btn btn-primary btn-sm px-4 badge-pill">Transfer from design huddle to prettysmart</a>
+                    </div>
+
+                <% } %>
+
+                <div class="onboarding-section onboarding-logos">
+                    <div class="d-flex justify-content-between">
+                        <div class="onboarding-section-title">
+                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 18.7 18.7" xml:space="preserve">
+                                <g id="LOGO_7_">
+                                  <path class="st0" d="M14 13.5H6.7c-.1 0-.2-.1-.2-.2V12c0-.1.1-.2.2-.2H14c1.4 0 2.5-1.1 2.5-2.5S15.4 6.8 14 6.8h-.7c-.1 0-.2-.1-.2-.2V5.3c0-.1.1-.2.2-.2h.7c2.3 0 4.2 1.9 4.2 4.2s-1.9 4.2-4.2 4.2zm-7.2-.3H14c2.1 0 3.8-1.7 3.8-3.8S16.1 5.5 14 5.5h-.5v1h.5c1.6 0 2.8 1.3 2.8 2.8s-1.3 2.8-2.8 2.8H6.8v1.1z"/>
+                                  <path class="st0" d="M5.3 13.5h-.6C2.4 13.5.5 11.6.5 9.3s1.9-4.2 4.2-4.2H12c.1 0 .2.1.2.2v1.3c0 .1-.1.2-.2.2H4.7C3.3 6.8 2.2 8 2.2 9.3s1.1 2.5 2.5 2.5h.7c.1 0 .2.1.2.2v1.3c-.1.1-.2.2-.3.2zm-.6-8C2.6 5.5.9 7.2.9 9.3s1.7 3.8 3.8 3.8h.5v-1h-.5c-1.6 0-2.8-1.3-2.8-2.8s1.3-2.8 2.8-2.8h7.2v-1H4.7z"/>
+                                  <path class="st0" d="M13.3 12.2H12c-.1 0-.2-.1-.2-.2V4.7c0-1.4-1.1-2.5-2.5-2.5-1.3 0-2.5 1.1-2.5 2.5v.7c0 .1-.1.2-.2.2H5.3c-.1 0-.2-.1-.2-.2v-.7C5.1 2.4 7 .5 9.3.5c2.3 0 4.2 1.9 4.2 4.2V12c0 .1-.1.2-.2.2zm-1.1-.4h1V4.7c0-2.1-1.7-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8v.5h1v-.5c0-1.6 1.3-2.8 2.8-2.8s2.8 1.3 2.8 2.8v7.1z"/>
+                                  <path class="st0" d="M9.3 18.2c-2.3 0-4.2-1.9-4.2-4.2V6.7c0-.1.1-.2.2-.2h1.3c.1 0 .2.1.2.2V14c0 1.4 1.1 2.5 2.5 2.5s2.5-1.1 2.5-2.5v-.7c0-.1.1-.2.2-.2h1.3c.1 0 .2.1.2.2v.7c0 2.3-1.9 4.2-4.2 4.2zM5.5 6.8V14c0 2.1 1.7 3.8 3.8 3.8 2.1 0 3.8-1.7 3.8-3.8v-.5h-1v.5c0 1.6-1.3 2.8-2.8 2.8S6.5 15.6 6.5 14V6.8h-1zM0 0h.3v.3H0zM1.3 0h.3v.3h-.3zM0 1.3h.3v.3H0zM0 2.7h.3V3H0zM1.3 1.3h.3v.3h-.3zM2.7 0H3v.3h-.3z"/>
+                                  <g>
+                                    <path class="st0" d="M18.3 18.3h.3v.3h-.3zM17 18.3h.3v.3H17zM18.3 17h.3v.3h-.3zM17 17h.3v.3H17zM15.7 18.3h.3v.3h-.3zM15.7 17h.3v.3h-.3zM18.3 15.7h.3v.3h-.3zM17 15.7h.3v.3H17zM15.7 15.7h.3v.3h-.3z"/>
+                                  </g>
+                                </g>
+                            </svg>
+                            Logo
+                        </div>
+                        
+                    </div>
+                    <div class="upload-primary-wrapper">
+                        <div class="onboarding-section-subtitle mt-1">
+                        Upload your logos. The more the merrier 😎
+                        </div>
+                        <label for="upload-assets" class="df acc upload-wrapper">
+                            <i class="fa-light fa-upload"></i>
+                            <div>
+                                <p class="fs14">Drop here to upload</p>
+                                <p class="fs10 mb-0 text-underline">Or click to browse</p>
+                            </div>
+                        </label>
+                        <input onchange="getFiles(event)" hidden type="file" id="upload-assets" multiple/>
+                        <div class="file-list"><div id="selected-files-list"></div></div>
+                    </div>
+                    <div class="upload-btn-wrapper d-none">
+                        <button onclick="uploadAssets()" style="margin-top: 1rem;" class="btn btn-primary px-4 upload-assets-btn"><i class="fas fa-arrow-right"></i>Upload your logos</button>
+                    </div>
+                </div>
+
+                <div class="onboarding-section onboarding-colors">
+                    <div class="onboarding-section-title">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 17.7 19" xml:space="preserve">
+                            <g id="COLOR_PALETTE_6_">
+                              <path class="st0" d="M4.5 17.8s-.1 0 0 0C1.7 16.2 0 13.3 0 10.2c0-.1.1-.2.2-.2h2.7s.1.1.1.2c0 2.1 1.1 4 2.9 5.1.1 0 .1.1.1.2l-1.3 2.3h-.2zM.3 10.3c.1 2.9 1.6 5.6 4.1 7.1l1.2-2c-1.8-1.1-2.9-3-2.9-5.1H.3z"/>
+                              <path class="st0" d="M2.8 10.3H.2c-.1 0-.2-.1-.2-.2 0-3.1 1.7-6 4.4-7.6h.1s.1 0 .1.1L6 4.9c0 .1 0 .2-.1.2-1.8 1-2.9 3-2.9 5.1 0 .1-.1.1-.2.1zM.3 10h2.3c.1-2.1 1.2-4 2.9-5.1l-1.2-2C2 4.4.4 7.1.3 10zM17.5 10.3h-2.7c-.1 0-.2-.1-.2-.2 0-2.1-1.1-4-2.9-5.1-.1 0-.1-.1-.1-.2L13 2.6l.1-.1h.1c2.7 1.6 4.4 4.5 4.4 7.7.1.1 0 .1-.1.1zM15 10h2.3c-.1-2.9-1.6-5.6-4.1-7.1l-1.2 2c1.8 1.1 2.9 3 3 5.1z"/>
+                              <path class="st0" d="M13.2 17.8s-.1 0 0 0c-.1 0-.1 0-.1-.1l-1.3-2.3c0-.1 0-.2.1-.2 1.8-1 2.9-3 2.9-5.1 0-.1.1-.2.2-.2h2.7c.1 0 .2.1.2.2-.2 3.2-1.9 6.1-4.7 7.7zm-1.1-2.4l1.2 2c2.5-1.5 4.1-4.2 4.1-7.1H15c-.1 2.1-1.2 4-2.9 5.1zM10.8 9h-4c-.4 0-.8-.4-.8-.8 0-.5.4-.8.8-.8h4c.5 0 .8.4.8.8.1.4-.3.8-.8.8zm-4-1.3c-.3 0-.5.2-.5.5s.2.5.5.5h4c.3 0 .5-.2.5-.5s-.2-.5-.5-.5h-4z"/>
+                              <path class="st0" d="M8.8 17.7c-.3 0-.5-.2-.5-.5v-.9c-.6-.2-1-.8-1-1.4v-6c0-.1.1-.2.2-.2h2.7c.1 0 .2.1.2.2v6c0 .6-.4 1.2-1 1.4v.9c-.1.2-.3.5-.6.5zM7.7 9v5.8c0 .5.4 1 .9 1.1.1 0 .1.1.1.2v1c0 .1.1.2.2.2s.2-.1.2-.2v-1c-.1 0 0-.1 0-.1.5-.1.9-.6.9-1.1V9H7.7z"/>
+                              <path class="st0" d="M8.8 19c-1.5 0-3.1-.4-4.4-1.2-.1 0-.1-.1-.1-.2l1.3-2.3.1-.1h.1c.8.5 1.7.7 2.6.8.1 0 .2.1.2.2v1c0 .1.1.2.2.2s.2-.1.2-.2v-1c0-.1.1-.2.2-.2.9-.1 1.8-.3 2.6-.8h.1s.1 0 .1.1l1.3 2.3c0 .1 0 .2-.1.2-1.3.8-2.8 1.2-4.4 1.2zm-4.1-1.4c1.3.7 2.7 1.1 4.1 1.1s2.9-.4 4.1-1.1l-1.2-2c-.7.4-1.6.7-2.4.7v.9c0 .3-.2.5-.5.5s-.5-.2-.5-.5v-.9c-.9-.1-1.7-.3-2.4-.7l-1.2 2zM10.2 7.7H7.5c-.1 0-.2-.1-.2-.2v-6C7.3.7 8 0 8.8 0s1.5.7 1.5 1.5v6c0 .1 0 .2-.1.2zm-2.5-.4H10V1.5C10 .9 9.5.3 8.8.3c-.6 0-1.2.5-1.2 1.2v5.8z"/>
+                              <path class="st0" d="M5.8 5.1c-.1 0-.1 0-.1-.1L4.4 2.7c0-.1 0-.2.1-.2.9-.5 2-.9 3.1-1.1h.1l.1.1v2.7c0 .1-.1.1-.1.2-.7.2-1.3.4-1.9.7.1 0 .1 0 0 0zM4.7 2.7l1.2 2c.5-.2.9-.4 1.4-.6V1.8c-.9.2-1.8.5-2.6.9zM11.8 5.1c-.6-.3-1.1-.5-1.7-.7-.1 0-.1-.1-.1-.2V1.6s0-.1.1-.1h.1c1.1.2 2.1.5 3.1 1.1.1 0 .1.1.1.2L12 5.1h-.2c.1 0 0 0 0 0zm-1.5-.9c.5.1 1 .3 1.4.6l1.2-2c-.8-.4-1.7-.8-2.6-.9v2.3zM8.2 14.3h.3v.5h-.3zM8.2 9.5h.3V14h-.3zM1.8.2h.3v.3h-.3zM1.8 2.2h.3v.3h-.3zM2.8 1.2h.3v.3h-.3zM.8 1.2h.3v.3H.8z"/>
+                              <g>
+                                <path class="st0" d="M15.5.2h.3v.3h-.3zM15.5 2.2h.3v.3h-.3zM16.5 1.2h.3v.3h-.3z"/>
+                              </g>
+                            </g>
+                          </svg>
+                        Colors
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-4">
+                            <div class="onboarding-color-outer">
+                                <input class="onboarding-color-inner" type="color" name="primary" value="<%= user.account.brand.colors.primary || '#1A428A' %>" data-primary-color="<%= user.account.brand_primary || '#1A428A' %>">
+                            </div>
+                            <div class="onboarding-label mt-1">Primary Color</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="onboarding-color-outer">
+                                <input class="onboarding-color-inner" type="color" name="secondary" value="<%= user.account.brand.colors.secondary || '#D5BA8C' %>" data-secondary-color="<%= user.account.brand_secondary || '#D5BA8C' %>">
+                            </div>
+                            <div class="onboarding-label mt-1">Secondary Color</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="onboarding-section onboarding-fonts">
+                    <div class="onboarding-section-title">
+                        <div class="d-flex align-items-center justify-content-between w-100">
+                            <div class="">
+                                <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 17.7 16.3" xml:space="preserve">
+                                    <g id="TYPOGRAPHY_5_">
+                                    <path class="st0" d="M10.8 16.3H8.2c-.1 0-.2-.1-.2-.2V11H3v5.2c0 .1-.1.2-.2.2H.2c-.1 0-.2-.1-.2-.2V5.5C0 2.5 2.5 0 5.5 0S11 2.5 11 5.5v10.7c0 .1-.1.1-.2.1zM8.3 16h2.3V5.5C10.6 2.7 8.3.3 5.4.3 2.6.3.2 2.6.2 5.5V16h2.3v-5.2c0-.1.1-.2.2-.2H8c.1 0 .2.1.2.2V16zm-.1-7.7H2.8c-.1 0-.2-.1-.2-.2V5.5c0-1.6 1.3-2.8 2.8-2.8S8.2 4 8.2 5.5v2.7c.1.1.1.1 0 .1zM3 8h5V5.5C8 4.1 6.9 3 5.5 3S3 4.1 3 5.5V8zM12.8 15.8h4v.3h-4zM12.8 0h4v.3h-4z"/>
+                                    <path class="st0" d="M14.7.2h.3V16h-.3zM13.3 8h.3v.3h-.3zM12 8h.3v.3H12zM13.3 6.7h.3V7h-.3zM13.3 9.3h.3v.3h-.3z"/>
+                                    <g>
+                                        <path class="st0" d="M16 8h.3v.3H16zM17.3 8h.3v.3h-.3zM16 9.3h.3v.3H16zM16 6.7h.3V7H16z"/>
+                                    </g>
+                                    <g>
+                                        <path class="st0" d="M1.3 14.8h.3v.3h-.3zM1.3 13.5h.3v.3h-.3zM1.3 12.2h.3v.3h-.3z"/>
+                                    </g>
+                                    </g>
+                                </svg>
+                                Fonts
+                            </div>
+                        </div>
+                    </div>
+                    <div class="onboarding-section-subtitle mt-1">
+                        Upload your own fonts or leave the defaults.
+                    </div>
+                    <div class="mt-4">
+
+                        <div class="onboarding-font-row border-top py-4">
+                            <div class="row align-items-center">
+                                <div class="col-3">
+                                    Regular Font
+                                </div>
+                                <div class="col">
+                                    <div class="<% if(brand.fonts.Regular && brand.fonts.Regular.name){ %>d-none<% } %>" data-font-form="Regular">
+                                        <div class="row">
+                                            <div class="col-7">
+                                                <input name="Regular" class="google_font" value="<%= brand.fonts && brand.fonts.Regular ? brand.fonts.Regular.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
+                                            </div>
+                                            <div class="col-5">
+                                                <label class="btn btn-primary btn-block badge-pill">
+                                                    Upload Local Font
+                                                    <input type="file" data-file-type="font" accept=".ttf" name="Regular" hidden>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="<% if(!brand.fonts.Regular || !brand.fonts.Regular.name){ %>d-none<% } %>" data-font-saved="Regular">
+                                        <div class="row align-items-center">
+                                            <div class="col-7">
+                                                <span class="font-name"><%=brand.fonts.Regular.name%></span>
+                                                <br>
+                                                <% if(brand.fonts.Regular.google){ %>
+                                                    <small>Google</small>
+                                                <% }else{ %>
+                                                    <small>Custom</small>
+                                                <% } %>
+                                            </div>
+                                            <div class="col-5">
+                                                <button class="btn btn-primary btn-block badge-pill">
+                                                    Update
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="onboarding-font-row border-top py-4">
+                            <div class="row align-items-center">
+                                <div class="col-3">
+                                    <i>Italic Font</i>
+                                </div>
+                                <div class="col">
+                                    <div class="<% if(brand.fonts.Italic && brand.fonts.Italic.name){ %>d-none<% } %>"  data-font-form="Italic">
+                                        <div class="row">
+                                            <div class="col-7">
+                                                <input name="Italic" class="google_font" value="<%= brand.fonts && brand.fonts.Italic ? brand.fonts.Italic.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
+                                            </div>
+                                            <div class="col-5">
+                                                <label class="btn btn-primary btn-block badge-pill">
+                                                    Upload Local Font
+                                                    <input type="file" data-file-type="font" accept=".ttf" name="Italic" hidden>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="<% if(!brand.fonts.Italic || !brand.fonts.Italic.name){ %>d-none<% } %>"  data-font-saved="Italic">
+                                        <div class="row align-items-center">
+                                            <div class="col-7">
+                                                <i><span class="font-name"><%=brand.fonts.Italic.name%></span></i>
+                                                <br>
+                                                <% if(brand.fonts.Italic.google){ %>
+                                                    <small>Google</small>
+                                                <% }else{ %>
+                                                    <small>Custom</small>
+                                                <% } %>
+                                            </div>
+                                            <div class="col-5">
+                                                <button class="btn btn-primary btn-block badge-pill">
+                                                    Update
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="onboarding-font-row border-top py-4">
+                            <div class="row align-items-center">
+                                <div class="col-3">
+                                    <strong>Bold Font</strong>
+                                </div>
+                                <div class="col">
+                                    <div class="<% if(brand.fonts.Bold && brand.fonts.Bold.name){ %>d-none<% } %>"  data-font-form="Bold">
+                                        <div class="row">                                                                        
+                                            <div class="col-7">
+                                                <input name="Bold" class="google_font" value="<%= brand.fonts && brand.fonts.Bold ? brand.fonts.Bold.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
+                                            </div>
+                                            <div class="col-5">
+                                                <label class="btn btn-primary btn-block badge-pill">
+                                                    Upload Local Font
+                                                    <input type="file" data-file-type="font" accept=".ttf" name="Bold" hidden>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="<% if(!brand.fonts.Bold || !brand.fonts.Bold.name){ %>d-none<% } %>"  data-font-saved="Bold">
+                                        <div class="row align-items-center">
+                                            <div class="col-7">
+                                                <strong><span class="font-name"><%=brand.fonts.Bold.name%></span></strong>
+                                                <br>
+                                                <% if(brand.fonts.Bold.google){ %>
+                                                    <small>Google</small>
+                                                <% }else{ %>
+                                                    <small>Custom</small>
+                                                <% } %>
+                                            </div>
+                                            <div class="col-5">
+                                                <button class="btn btn-primary btn-block badge-pill">
+                                                    Update
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="onboarding-font-row border-top py-4">
+                            <div class="row align-items-center">
+                                <div class="col-3">
+                                    <strong class="text-nowrap">
+                                        <i>
+                                            Bold Italic font
+                                        </i>
+                                    </strong>
+                                </div>
+                                <div class="col">
+                                    <div class="<% if(brand.fonts.BoldItalic && brand.fonts.BoldItalic.name){ %>d-none<% } %>"  data-font-form="BoldItalic">
+                                        <div class="row">
+                                            <div class="col-7">
+                                                <input name="BoldItalic" class="google_font" value="<%= brand.fonts && brand.fonts.BoldItalic ? brand.fonts.BoldItalic.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
+                                            </div>
+                                            <div class="col-5">
+                                                <label class="btn btn-primary btn-block badge-pill">
+                                                    Upload Local Font
+                                                    <input type="file" data-file-type="font" accept=".ttf" name="BoldItalic" hidden>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="<% if(!brand.fonts.BoldItalic || !brand.fonts.BoldItalic.name){ %>d-none<% } %>"  data-font-saved="BoldItalic">
+                                        <div class="row align-items-center">
+                                            <div class="col-7">
+                                                <strong><i>
+                                                    <span class="font-name"><%=brand.fonts.BoldItalic.name%></span>
+                                                </i></strong>
+                                                <br>
+                                                <% if(brand.fonts.BoldItalic.google){ %>
+                                                    <small>Google</small>
+                                                <% }else{ %>
+                                                    <small>Custom</small>
+                                                <% } %>
+                                            </div>
+                                            <div class="col-5">
+                                                <button class="btn btn-primary btn-block badge-pill">
+                                                    Update
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-primary badge-pill px-4" data-save-brand>Submit Brand</button>
+                </div>
+            </div>
+            <div class="col-12 col-lg-5 position-relative pl-xl-5 d-none">
+                <div class="onboarding-templates-preview">
+
+                 
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-4">
+                                <%- include('partials/template', {async: true,onboarding:true, template:templates[5]}); %>
+                            </div>
+                            <%- include('partials/template', {async: true,onboarding:true, template:templates[2]}); %>
+                        </div>
+                        <div class="col-6 mb-4">
+                            <div class="mb-4">
+                                <%- include('partials/template', {async: true,onboarding:true, template:templates[1]}); %>
+                            </div>
+                            <%- include('partials/template', {async: true,onboarding:true, template:templates[3]}); %>
+                        </div>
+                    </div>
+                      <div class="text-center">
+                        <button class="btn btn-primary badge-pill px-4" data-save-brand>Update Brand</button>
+                      </div>
+                </div>
+
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer', {async: true}); %>
+
+<script>
+    var TOKEN = '<%=user.token.access_token%>';
+    var draft_brand = <%- JSON.stringify(brand) %>;
+
+    function getFiles(e) {
+
+        let $container = $("#selected-files-list")
+        
+        $container.empty()
+
+        Array.from(e.target.files).map(file=> {
+            $container.append(`<p>${file.name}</p>`)
+        })
+        $(".file-list").append('<span class="fa-stack"><i style="color:#EBB221;" class="fas fa-circle fa-stack-2x"></i><i class="fas fa-info fa-xs fa-stack-1x fa-inverse"></i></span>')
+    }
+</script>
+
+<script src="/static/js/jquery.fontpicker.js?<%=Date.now()%>"></script>
+<script src="/static/js/templates.js?<%=Date.now()%>"></script>
+<script src="/static/js/onboarding.js?<%=Date.now()%>"></script>
+

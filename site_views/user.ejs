@@ -1,0 +1,150 @@
+<%- include('partials/header', {async: true}); %>
+
+<div class="container account-page pb-5">
+    <div class="border-top pt-5">
+
+        <h1 class="text-primary mb-5">
+            Account settings
+        </h1>
+
+        <div class="row justify-content-between">
+            <div class="col-12 col-lg-3">
+                <%- include('partials/account-menu', {async: true,tab:'users'}); %>
+            </div>
+
+            <div class="col-12 col-lg-8">
+                <h2 class="text-grey">
+                    <% if(user_form._id){ %>
+                        <%= user_form.name %>
+                    <% }else{ %>
+                        New User
+                    <% } %>
+                </h2>
+                <form class="user-form" action="/account/users/<%=user_form._id ? user_form._id : 'new'%>" method="post">
+                    <div class="text-danger text-center" data-field="user"></div> 
+                    <div class="row">
+                        <div class="col-12 col-lg-6">
+                            <div class="my-3">
+                                <div class="text-primary">
+                                    First Name
+                                </div>
+                                <div class="fs22 font-weight-light">                            
+                                    <input type="text" name="first_name" class="form-control" value="<%= user_form.first_name %>">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6">
+                            <div class="my-3">
+                                <div class="text-primary">
+                                    Last Name
+                                </div>
+                                <div class="fs22 font-weight-light">                            
+                                    <input type="text" name="last_name" class="form-control" value="<%= user_form.last_name %>">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-lg-6">
+                            <div class="my-3">
+                                <div class="text-primary">
+                                    Email
+                                </div>
+                                <div class="fs22 font-weight-light">                            
+                                    <input type="email" name="email" class="form-control" value="<%= user_form.email %>" <%= user_form._id ? 'readonly' : '' %>>
+                                </div>
+                                <div class="text-danger" data-field="email"></div> 
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6">
+                            <div class="my-3">
+                                <div class="text-primary">
+                                    Phone
+                                </div>
+                                <div class="fs22 font-weight-light">                            
+                                    <input type="tel" name="phone" class="form-control" value="<%= user_form.phone %>">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% if(user.role === 'owner'){ %>
+                        <div class="row">
+                            <div class="col-12 col-lg-6">
+                                <div class="my-3">
+                                    <div class="text-primary">
+                                        Role
+                                    </div>
+                                    <div class="fs22 font-weight-light">    
+                                        <select name="role" class="custom-select" value="<%= user_form.role %>">
+                                            <option value="owner" <%= user_form.role === 'owner' ? 'selected' : '' %>>Owner</option>
+                                            <option value="admin" <%= user_form.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                                            <option value="user" <%= user_form.role === 'user' ? 'selected' : '' %>>User</option>
+                                        </select>            
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                    <% if(!user_form._id){ %>
+                        <div class="row">
+                            <div class="col-12 col-lg-6">
+                                <div class="my-3">
+                                    <div class="text-primary">
+                                        Password
+                                    </div>
+                                    <div class="fs22 font-weight-light">                            
+                                        <input type="password" name="password" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary badge-pill px-5 mt-4">Save User</button>
+                    </div>
+
+                    <div class="form-loader">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                            viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+                            <rect fill="none" stroke="#F7176D" stroke-width="4" x="25" y="25" width="50" height="50">
+                                <animateTransform attributeName="transform" dur="0.5s" from="0 50 50" to="180 50 50" type="rotate"
+                                    id="strokeBox" attributeType="XML" begin="rectBox.end" />
+                            </rect>
+                            <rect x="27" y="27" fill="#F7176D" width="46" height="50">
+                                <animate attributeName="height" dur="1.3s" attributeType="XML" from="50" to="0" id="rectBox"
+                                    fill="freeze" begin="0s;strokeBox.end" />
+                            </rect>
+                        </svg>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer', {async: true}); %>
+
+<script>
+    $(document).on('submit', '.user-form', function(){
+        var $form = $(this),
+            data = $form.serialize();
+
+            $form.find('.form-loader').addClass('d-flex');
+        $.post($form.attr('action'), data, function(res){
+            window.location.href = res;
+        }).fail(function(res){
+            if(res.responseJSON && res.responseJSON.errors){
+                res.responseJSON.errors.forEach(function(error){
+                    $('[data-field="'+ error.param +'"]').text(error.msg);
+                })
+            }else if(res.responseJSON && res.responseJSON.error){
+                $('[data-field="user"]').text(res.responseJSON.error.message);
+            }else{                
+                $('[data-field="user"]').text(res.responseText);
+            }
+            $form.find('.form-loader').removeClass('d-flex');
+        })
+
+        return false;
+    })
+</script>

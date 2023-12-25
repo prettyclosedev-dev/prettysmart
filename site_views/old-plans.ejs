@@ -1,0 +1,77 @@
+<%- include('partials/header', {async: true,fixed_header:true}); %>
+<div class="plans-page d-flex align-items-center justify-content-center">
+    <div>
+        <div class="login-title">
+            <h1 class="text-center">
+                Choose your plan.
+            </h1>
+        </div>
+
+        <div class="d-flex justify-content-center">
+            <% plans.forEach(plan => { %>
+
+                <div class="plan">
+                    <div class="plan-name text-center fs32"><%=plan.name%></div>
+
+                    <div class="plan-price">
+                        <div class="d-flex align-items-end justify-content-center">
+                            <div class="fs55 mb-n4">
+                                $<%=plan.price%>
+                            </div>
+                            <div class="">
+                                /month
+                            </div>
+                        </div>
+                        <div class="text-grey text-center mt-2 fs16">
+                            <%=plan.description%>
+                        </div>
+                    </div>
+
+                    <div class="text-center px-lg-3">
+                        <a href="/plans/<%=plan._id%>" class="btn btn-outline-primary btn-block badge-pill">
+                            Start 7 day free trial
+                        </a>
+                    </div>
+                    
+
+                    <div class="plan-features">
+                        <div class="d-flex align-items-center my-2">                            
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13.41" height="10.706" viewBox="0 0 13.41 10.706"><path d="M0,70.252l4.592,4.9,8.818-9.377-1.266-1.329-7.552,8.03L1.248,68.913Z" transform="translate(0 -64.443)" fill="#3db538"/></svg>
+                            <span class="ml-2">
+                                Get unlimited designs in seconds
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center my-2">                            
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13.41" height="10.706" viewBox="0 0 13.41 10.706"><path d="M0,70.252l4.592,4.9,8.818-9.377-1.266-1.329-7.552,8.03L1.248,68.913Z" transform="translate(0 -64.443)" fill="#3db538"/></svg>
+                            <span class="ml-2">
+                                Social Media scheduler with Buffer
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center my-2">                            
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13.41" height="10.706" viewBox="0 0 13.41 10.706"><path d="M0,70.252l4.592,4.9,8.818-9.377-1.266-1.329-7.552,8.03L1.248,68.913Z" transform="translate(0 -64.443)" fill="#3db538"/></svg>
+                            <span class="ml-2">
+                                Unlimited stock images
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center my-2">                            
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13.41" height="10.706" viewBox="0 0 13.41 10.706"><path d="M0,70.252l4.592,4.9,8.818-9.377-1.266-1.329-7.552,8.03L1.248,68.913Z" transform="translate(0 -64.443)" fill="#3db538"/></svg>
+                            <span class="ml-2">
+                                Unlimited saved projects
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center my-2">                            
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13.41" height="10.706" viewBox="0 0 13.41 10.706"><path d="M0,70.252l4.592,4.9,8.818-9.377-1.266-1.329-7.552,8.03L1.248,68.913Z" transform="translate(0 -64.443)" fill="#3db538"/></svg>
+                            <span class="ml-2">
+                                Unlimited downloads
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            <% }) %>
+        </div>
+
+    </div>
+</div>        
+<%- include('partials/footer', {async: true}); %>
+

@@ -1,0 +1,54 @@
+.login-primary-wrapper {
+  height: 100%;
+}
+.login-primary-wrapper .login-sub-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.login-primary-wrapper .login-sub-wrapper .new-popup-header {
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+  max-height: 90px;
+  padding-top: 5px;
+  margin: 20px 28px;
+  margin-bottom: 0px;
+}
+.login-primary-wrapper .login-sub-wrapper .a-button {
+  border: none;
+  background-color: transparent;
+  color: #db3965;
+}
+.login-primary-wrapper .login-sub-wrapper .login-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+}
+.login-primary-wrapper .login-sub-wrapper .login-wrapper h1 {
+  font-size: 65px;
+}
+.login-primary-wrapper .login-sub-wrapper .login-wrapper form {
+  margin-top: 10px;
+  width: 400px;
+  max-width: 85vw;
+}
+.login-primary-wrapper .login-sub-wrapper .login-wrapper form .form-control {
+  font-size: 18px;
+}
+.login-primary-wrapper .login-sub-wrapper .login-wrapper form .form-control:placeholder {
+  font-weight: normal;
+  color: #b7b9c5;
+}
+.login-primary-wrapper .login-sub-wrapper .login-wrapper .text-center.px-3 {
+  margin-bottom: 35px;
+  font-size: 9px;
+  padding-top: 5px;
+}
+@media only screen and (max-width: 768px) {
+  .login-primary-wrapper .login-sub-wrapper .login-wrapper h1 {
+    font-size: 48px;
+    margin-bottom: 0;
+  }
+}/*# sourceMappingURL=login-popup.css.map */

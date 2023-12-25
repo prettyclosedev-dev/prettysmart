@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#db3965">
+    <meta name="facebook-domain-verification" content="zlaeu6fmgfkjgbb89xfuaru9ipf8y5" />
+    <title>Prettysmart</title>
+    <script src="/site_static/js/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="/site_static/js/script.js?4"></script>
+    <script src="/site_static/js/slick.min.js"></script>
+    <link rel="shortcut icon" href="/site_static/images/favicon.ico" />
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"></link>
+    <link rel="stylesheet" href="/site_static/css/style.css?<%=Date.now()%>" />
+    <link rel="stylesheet" href="/static/css/landing.css?<%=Date.now()%>" />
+    <script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script>
+    <script
+      src="https://kit.fontawesome.com/f383a529e7.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Meta Pixel Code -->
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '764688944910044');
+      fbq('track', 'PageView');
+      </script>
+      <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=764688944910044&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code -->
+
+    <!-- Start of Microsoft Clarity Embed Code -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "b1kgmz3fir");
+    </script>
+    <!-- End of Microsoft Clarity Embed Code -->
+
+    <style>
+      @import url("https://fonts.googleapis.com/css?family=Poppins:400,500,600");
+    </style>
+
+    <script type="text/javascript">
+      window.__lo_site_id = 277591;
+
+      (function () {
+        var wa = document.createElement("script");
+        wa.type = "text/javascript";
+        wa.async = true;
+        wa.src = "https://d10lpsik1i8c69.cloudfront.net/w.js";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(wa, s);
+      })();
+    </script>
+
+    <script>
+
+      let swiper;
+      setTimeout(() => {
+        let showPerView
+        if (window.innerWidth > 1200) {
+          showPerView = 3;
+         } else if (window.innerWidth > 800) {
+          showPerView = 2;
+        } else {
+          showPerView = 1;
+        }
+         swiper = new Swiper('.swiper', {
+                slidesPerView: showPerView,
+                spaceBetween:14,
+                mousewheel: true,
+                loop: true,
+            });
+      }, 0);
+
+      
+
+      window.addEventListener("resize", () => {
+        console.log("RESIZING",swiper.params.slidesPerView);
+        if (window.innerWidth > 1200) {
+          swiper.params.slidesPerView = 3;
+          swiper.update();
+         } else if (window.innerWidth > 800) {
+          swiper.params.slidesPerView = 2;
+          swiper.update();
+        } else {
+          swiper.params.slidesPerView = 1;
+          swiper.update();
+        }
+      });
+          //  swiper = new Swiper('.swiper', {
+          //       slidesPerView: 3,
+          //       spaceBetween:14,
+          //       mousewheel: true,
+          //       loop: true,
+          //   });
+      
+    </script>
+
+<script>
+  function setMobileNav() {
+    if (window.innerWidth < 840) {
+    console.log("mobile nav",document.getElementById("navs-wrpr"));
+    $("#navs-wrpr").toggleClass("show");
+    $(".navs-overlay").toggleClass("show");
+    }
+  }
+</script>
+  </head>
+
+  <% const renderSignUp = (inverted) => { %>
+  <a href='<%= authenticated ? "templates" :  "signup" %>' class="fs14 menu-button button-text <%= inverted ? 'sign-up-inverted' : 'sign-up' %>">
+    <i class="fa-regular <%= authenticated ? 'fa-icons' : 'fa-plus'%>"></i><%= authenticated ? "Go to App" :  "Sign Up" %>
+  </a>
+  <% } %>
+
+  <% const renderDash = () => { %>
+  <hr class="dash" />
+  <% } %>
+
+  <% const renderHowItem = (icon, title, desc, inverted) => { %>
+  <div class="<%= inverted ? 'how-item-inverted' : 'how-item' %>">
+    <%= inverted ? renderDash() : null %>
+    <i class="<%= icon %> fa-xl" style="<%= inverted ? 'color:  white;' : 'color: #db3965;' %>"></i>
+    <p class="semi-large-text how-title" style="<%= inverted ? 'color:  white;' : 'color: black;' %>"><%= title %></p>
+    <p class="plain-text how-text" style="<%= inverted ? 'color:  white;' : 'color: black;' %>"><%= desc %></p>
+  </div>
+  <% } %>
+
+  <% const renderBanner = (text, imgId, imgSource) => { %>
+  <section class="section back-red custom-banner">
+      <div class="section-content" style="border-bottom: none;">
+        <div class="row-space wowo fadeInUp inner-content" style="width: 100%;">
+          <div class="text-btn-wrpr">
+            <p class="large-text huge-text" style="color: white; margin-bottom: 7vh;">
+              <%- text %>
+            </p>
+            <%= renderSignUp(true); %>
+          </div>
+          <img id="<%= imgId %>" src="<%= imgSource %>" />
+        </div>
+      </div>
+    </section>
+  <% } %>
+
+<% const renderTestimonial = (text, testifier, brand) => { %>
+  <div class="testimonial">
+    <p class="plain-text"><%= text %></p>
+    <p class="plain-text" style="font-weight: 600; margin-top: 1vw"><%= testifier %><br><%= brand %></p>
+  </div>
+<% } %>
+
+  <body id="landing-page">
+    <section id="header" class="row-space padding-horizontal">
+      <a href="/"><img id="logo" src="/site_static/images/logo.svg" alt="Prettysmart"/></a>
+      <i onclick="setMobileNav()" class="fa-solid fa-ellipsis mobile-nav-open" style="color: #db3965; font-size: 18px;"></i>
+      <div class="row-space navs-wrpr" id="navs-wrpr">
+        <div class="close-wrpr">
+          <i onclick="setMobileNav()" class="fa-solid fa-xmark"></i>
+        </div>
+        <!-- <div id="pricing-anchor" class="anchor"></div> -->
+        <a href="#why-anchor" class="menu-button-text button-text" onclick="setMobileNav()"><p>Why</p></a>
+        <a href="#pricing-anchor" class="menu-button-text button-text" onclick="setMobileNav()"><p>Pricing</p></a>
+        <a href="#faq-anchor" class="menu-button-text button-text" onclick="setMobileNav()"><p>FAQ</p></a>
+        <div id="sign-up-in" class="row-space login-btns-wrpr">
+          <div class="margin-horizontal-10"><%= renderSignUp(); %></div>
+          <% if (!authenticated) { %>
+            <div class="margin-horizontal-10">
+              <a href="login" class="fs14 menu-button button-text sign-in">
+                <i class="fa-regular fa-sign-in"></i>Sign In
+              </a>
+            </div>
+          <% } %>
+        </div>
+      </div>
+      <div class="navs-overlay"></div>
+    </section>
+    <section id="intro" class="row-space padding-horizontal">
+      <div id="intro-text" class="wowo fadeInUp">
+        <p class="tiny-red">Get your copy and design in seconds.</p>
+        <p class="large-text margin-vertical-2">
+          The fastest social&nbsp;media<br/>creator in the&nbsp;world.
+        </p>
+        <br/>
+        <p class="plain-text margin-bottom-2">
+          We use artificial intelligence to write your copy and use your brand collateral to create the design.
+        </p>
+        <br/>
+        <%= renderSignUp(); %>
+      </div>
+      <img
+        id="img-1"
+        class="wowo fadeInRight"
+        src="/site_static/images/landing/1.png"
+      />
+    </section>
+    <section id="works" class="section works-with">
+      <div class="section-content">
+        <p class="tiny-red section-title">Works With</p>
+        <img
+          id="img-2"
+          class="wowo fadeInUp"
+          src="/site_static/images/landing/2.png"
+        />
+      </div>
+    </section>
+    <section id="why" class="section">
+      <div id="why-anchor" class="anchor"></div>
+      <div class="section-content">
+        <p class="tiny-red section-title">Why Prettysmart?</p>
+        <div class="grid wowo fadeInUp why-pretty-smart-grid">
+          <div class="sec">
+            <img src="/site_static/images/landing/seamless-design.svg" style="z-index: 1;" />
+            <h5 class="ffp">Seamless Design</h5>
+            <p class="ffp">Upload your brand collateral, and prettysmart will design your posts according to your brand.</p>
+          </div>
+          
+          <div class="sec">
+            <img src="/site_static/images/landing/ai-copywriter.svg" style="z-index: 1;" />
+            <h5 class="ffp">A.I. Copywriter</h5>
+            <p class="ffp">Just tell us what you want to say, and the AI will write the posts in literally seconds.</p>
+          </div>
+
+          <div class="sec">
+            <img src="/site_static/images/landing/tons-of-templates.svg" style="z-index: 1;" />
+            <h5 class="ffp">Tons of Templates</h5>
+            <p class="ffp">Whether it's a holiday greeting or a sale, choose a template and write your copy.</p>
+          </div>
+
+          <div class="sec">
+            <img src="/site_static/images/landing/super-scalable.svg" style="z-index: 1;" />
+            <h5 class="ffp">Super scalable</h5>
+            <p class="ffp">With the fastest tool on earth, you can create hundreds of posts a day.</p>
+          </div>
+
+          <div class="sec">
+            <img src="/site_static/images/landing/free-stock-photos.svg" style="z-index: 1;" />
+            <h5 class="ffp">Free stock photos</h5>
+            <p class="ffp">Get access to thousands of free stock photos when creating your posts.</p>
+          </div>
+
+          <div class="sec">
+            <img src="/site_static/images/landing/easy-editor.svg" style="z-index: 1;" />
+            <h5 class="ffp">Easy Editor</h5>
+            <p class="ffp">Our editor is easy and enjoyable, from minor to major changes.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="see" class="section">
+      <div class="section-content" style="position: relative">
+        <p class="tiny-red section-title">See what we can do</p>
+        <div class="row-no-space">
+          <div class="video-mask wowo fadeInUp">
+            <video id="video" controls>
+              <source
+                src="/static/videos/explainer.mp4"
+                type="video/mp4"
+                frameborder="0" 
+                allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen 
+                allow="autoplay"
+              />
+              Your browser does not support HTML video.
+            </video>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="how" class="section d-none">
+       <div id="how-anchor" class="anchor"></div>
+      <div class="section-content">
+        <p class="tiny-red section-title">How it works</p>
+        <div class="wowo fadeInLeft" id="how-it-works">
+          <%= renderHowItem("fa-light fa-upload", "Upload your brand", "Upload your logo, font, and colors when you create your account"); %>
+          <%= renderHowItem("fa-light fa-keyboard", "Tell us what you need", "Then, tell us what you're looking for whenever you need a new post."); %>
+          <%= renderHowItem("fa-light fa-face-explode", "Create your post", "You'll get fresh copy and design in seconds!", true); %>
+        </div>
+      </div>
+    </section>
+
+    <section id="testimonials" class="section">
+      <div id="testimonials-anchor" class="anchor"></div>
+      <div class="section-content" style="border-bottom: none;">
+        <p class="tiny-red section-title">Testimonials</p>
+        <div class="row-space wowo fadeInUp" style="width: 100%">
+          <div class="swiper wowo fadeInUp" style="width: 100%;">
+              <div class="swiper-wrapper">
+                <div class="swiper-slide" style="width: 35%;">
+                    <% renderTestimonial("I used a fantastic agency for my social media posts. However, I waited days for every stupid post. I was ready to hire an in-house designer to get my design done fast - when a friend recommended prettysmart. I now spend under 3 minutes per post, do it myself, and truthfully they are just as nice.", "P. Schwartz", "Castling"); %>
+                </div>
+                <div class="swiper-slide" style="width: 35%;">
+                    <% renderTestimonial("Time in business is money. That is why I love PrettySmart, and I get beautiful designs done in seconds. The copy and design are impressive; it took my brand to the next level.", "Ari Greenfeld", "GreenTouch Media"); %>
+                </div>
+                <div class="swiper-slide" style="width: 35%;">
+                    <% renderTestimonial("As a business owner, I really, really appreciate prettysmart. There is absolutely no reason to hire a designer or copywriter when you can get it done for a fraction of the time and price.", "Mel Schlesinger", ""); %>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <% renderBanner("PrettySmart<br>is absolute<br>genius.", "img-4", "/site_static/images/landing/4.png") %>
+    <section id="pricing" class="section">
+      <div id="pricing-anchor" class="anchor"></div>
+      <div class="section-content">
+        <p class="tiny-red section-title">Pricing</p>
+        <p class="large-text section-title wowo fadeInLeft">It's a small price to pay.</p>
+        <div class="wowo fadeInRight" style="display: flex; flex-direction: column; width: 100%; align-items: center;">
+          <script>
+            var authenticated = <%= authenticated  %>;
+            $(document).on('click', "#plan-button", function(e) {
+              window.location.href = authenticated ? "generator" : "signup"
+            });
+            $(document).on('change', '[type="radio"]', function(e) {
+                  var new_interval = $(this).attr("id").includes("month") ? 'month' : 'year'
+                  $.post(`/landing/interval/${new_interval}`, function(data) {
+                      $('.price-items').html($(data).find('.price-items').html());
+                  });
+              });
+          </script>
+          <% if (typeof products != "undefined") { %>
+            <div class="seg-wrapper" style="display: flex; align-self: center;">
+              <%- include('partials/segment-control', {async: true, options: [{value: "Monthly", id: "month", selected: interval === "month"}, {value: "Yearly 20% off", id: "year", selected: interval === "year"}], inverted: false, segmentID: "land-seg"}); %>
+            </div>
+            <%- include('partials/plans-items', {async: true, onGray: false, products: products.data, interval}); %>
+          <% } %>
+        </div>
+      </div>
+    </section>
+    <section id="faq" class="section">
+      <div id="faq-anchor" class="anchor"></div>
+      <div class="section-content" style="border-bottom: none;">
+        <p class="tiny-red section-title">Frequently asked questions</p>
+        <div class="faq-content wowo fadeInLeft">
+          <%
+            const faqs = [{
+              title: "What are credits?", 
+              desc: "Each time you generate a post you use one credit."
+            },
+            {
+              title: "Can I change my logo, font or color once it’s uploaded?", 
+              desc: "Go to My Brand page and feel free to change your brand."
+            }, 
+            {
+              title: "I want the AI to write better copy. What can I do?", 
+              desc: "The AI write the copy according to your business description, if the A.I is not accurate you might want to change your description."
+            }]
+          %>
+          <% faqs.map(faq => { %>
+            <details class="details">
+              <summary class="summary"><%= faq.title %></summary>
+              <p><%= faq.desc %></p>
+            </details>
+            <br />
+            <br />
+          <% }) %>
+        </div>
+      </div>
+    </section>
+    <% renderBanner("We're Pretty<br>Smart, if we<br>may say so.", "img-5", "/site_static/images/landing/5.png") %>
+    <%- include('partials/footer', {async: true, authenticated}); %>
+  </body>
+</html>

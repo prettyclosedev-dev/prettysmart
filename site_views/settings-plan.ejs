@@ -1,0 +1,151 @@
+<%- include('partials/header', {async: true}); %>
+<link rel="stylesheet" href="/static/css/settings.css?<%=Date.now()%>">
+<!-- <link rel="stylesheet" href="/static/css/settings.css?1" /> -->
+<script src="https://js.stripe.com/v3/"></script>
+<div class="df page-wrapper df ffp">
+  <%- include('partials/nav', {async: true}); %>
+
+    <div class="page-content">
+
+        <div class="settings-page">
+            <div class="page-content-wrapper">
+                <h2 class="page-title" style="z-index:150;">Settings<span class="text-primary">.</span></h2>
+                <div class="df inner-content-wrapper ">
+                    <%- include('partials/settings-nav', {async: true}); %>
+                    <div class="content-wrapper">
+                        <p class="label-text mb-20 fs16">CURRENT PLAN</p>
+                        <div class="df aic current-plan-wrapper">
+                            <div>
+                                <p class="fs22 mb-0" style="font-weight: 600">
+                                PrettySmart <%= currentPlan.name %>
+                                </p>
+                                <a href="/plans" style="color: black;"><p style="padding-left: 1px;" class="ttuc fs12 text-underline mb-0">All Plans</p></a>
+                            </div>
+                            <%
+                                function getIntervalAbbrev(interval) {
+                                    switch(interval) {
+                                        case "month":
+                                            return "mo";
+                                        case "year":
+                                            return "yr";
+                                    }
+                                }
+                            %>
+                            <div class="mla" >
+                                <div style="font-weight: 600;">$<%= subscription.plan.amount / 100 %>/<span style="font-weight: 400;"><%= getIntervalAbbrev(subscription.plan.interval) %></span></div>
+                                <a href="/settings/plan/subscription" style="color: black;"><p style="padding-left: 1px;" class="ttuc fs12 text-underline mb-0">Plan details</p></a>
+                            </div>
+                        </div>
+                        <p class="label-text mb-20 fs16">CURRENT CARDS</p>
+                        <div class="df payment-types">
+                            <% if (paymentMethods && paymentMethods.length) { %>
+                                <% paymentMethods.forEach(pm => { %>
+                                    <div class="df ffc card-wrapper">
+                                        <div class="df ffc inner-card-wrapper <%-pm.card.brand%>">
+                                            <div class="df aic  cc-header">
+                                                <% if(pm.isDefault || paymentMethods.length == 1) {%>
+                                                    <div class="default-icon">
+                                                        <i class="fa-solid fa-check-circle"></i>
+                                                    </div>
+                                                <%} else {%>
+                                                    <div onclick="defaultCard('<%= pm.id %>')" class="df aic default-icon hover-only pointer">
+                                                        <i class="fa-regular fa-circle"></i>
+                                                        <span class="fs10 ml-2">Make default</span>
+                                                    </div>
+                                                <%}%>
+                                                <div onclick="deleteCard('<%= pm.id %>')" class="mla delete-button text-underline fs10 hover-only pointer">Delete</div>
+                                            </div>
+                                        
+                                            <div class="mta df cc-footer"> 
+                                                <p class="mb-0"><%-pm.card.last4 %></p>
+                                                <div class="mla brand-icon"><i class="fa-brands fa-cc-<%-pm.card.brand%>"></i></div>
+                                            </div>
+                                        </div>
+                                        <p class="text-center card-details mb-0 text-uppercase"><%-pm.card.brand%> card ending in <%-pm.card.last4 %></p>
+                                    </div>
+                                <% }) %>
+                            <% } %>
+                            <div class="df ffc card-wrapper" onclick="location.href='/settings/plan/?add-card=true'">
+                                <div class="df acc inner-card-wrapper add">
+                                    <i class="fa-solid fa-circle-plus"></i>
+                                </div>
+                                <p class="text-center card-details mb-0 text-uppercase">Add card</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="<%-showAddCard ? '' : 'd-none'  %> add-card-popup new-popup-wrapper">  
+        <div class="overlay"></div>
+        <div class="new-popup">
+            <div class="df aic new-popup-header">
+                <p class="fs30 title">Add Card</p>
+                <div class="df acc mla close-button pointer" onclick="location.href='/settings/plan'">
+                    <i class="fa-regular fa-xmark"></i>
+                </div>
+            </div>
+
+            <div class="new-popup-content">
+                <div class="card-element" id="card-element">
+                    <!-- Elements will create input elements here -->
+                </div>
+                
+                <!-- We'll put the error messages in this element -->
+                <div id="card-errors" role="alert"></div>
+                  
+            </div>
+
+            <div class="text-center new-popup-footer">
+                <button class="btn btn-primary badge-pill px-5 mt-4" onclick="submitCard()">Save Card</button>
+            </div>
+        </div>
+
+        <script>
+            var stripe = Stripe('<%=stripe_pub_key%>');
+            var elements = stripe.elements();
+            var card = elements.create("card");
+            card.mount("#card-element");
+
+            function submitCard() {
+                stripe
+                    .createPaymentMethod({
+                            type: 'card',
+                            card: card,
+                            // billing_details: {
+                            //     name: 'Jenny Rosen',
+                            // },
+                        })
+                        .then(function(result) {
+                            $.post(`/settings/add-card`, { token: result.paymentMethod.id })
+                            if (result.paymentMethod) {
+                                console.log(result.paymentMethod)
+                                window.location.href = '/settings/plan';
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 500);
+                            }
+
+                            if (result.error) {
+
+                            }
+                        });
+            }
+        </script>
+        <script>
+            function deleteCard(id) {
+                $.post(`/settings/plan/${id}/delete`)
+                window.location.reload();
+            }
+
+            function defaultCard(id) {
+                $.post(`/settings/plan/${id}/default`)
+                window.location.reload();
+            }
+        </script>
+    </div>
+</div>
+</body>
+</html>

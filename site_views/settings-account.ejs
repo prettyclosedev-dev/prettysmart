@@ -1,0 +1,213 @@
+<%- include('partials/header', {async: true}); %>
+<link rel="stylesheet" href="/static/css/settings.css?<%=Date.now()%>">
+<div class="df page-wrapper df ffp">
+  <%- include('partials/nav', {async: true}); %>
+
+  <div class="page-content">
+
+
+    <div class="settings-page">
+      <div class="page-content-wrapper">
+        <h2 class="page-title" style="z-index:150;">Settings<span class="text-primary">.</span></h2>
+        <div class="df inner-content-wrapper ">
+          <%- include('partials/settings-nav', {async: true}); %>
+          <div class="content-wrapper account-page">
+
+            <p class="label-text mb-20 fs16">COMPANY NAME</p>
+            <input type="text" name="name" value="<%= user.account.name %>" class="form-control" required />
+
+            <p class="label-text mb-20 fs16 users">USERS</p>
+            <div class="user-list">
+              <% users.forEach(usr => { %>
+              <div class="df aic user-line">
+                <% if (usr.avatar) { %> <img class="avatar" src="<%= usr.avatar + '?' + Date.now() %>" /> <% } %>
+                <div>
+                  <p class="fs18 mb-0">
+                    <%-usr.first_name %> <%-usr.last_name %>
+                  </p>
+                  <p class="fs13 mb-0" style="font-size: 1rem;font-weight: 400;line-height: 1.5;color: #495057;">
+                    <%-usr.user_title %> <%-usr.user_title && usr.user_additional ? "•" : ""  %> <%-usr.user_additional %>
+                  </p>
+                </div>
+                <div class="df mla buttons-wrapper">
+                  <p class="fs12 mb-0 ttuc" style="align-self: center;"><%-usr.role %></p>
+                  <a href="/settings/account/<%=usr._id%>" class="df acc pointer button edit">
+                    <i class="fa-solid fa-pen"></i>
+                  </a>
+                  <% if(users.length > 1 && usr._id.toString() !== locals.user._id.toString()){ %>
+                  <a href="/settings/account/users/<%=usr._id%>/delete" class="df acc pointer button delete">
+                    <i class="fa-solid fa-trash"></i>
+                  </a>
+                  <% } else { %>
+                  <div class="df acc pointer button delete disabled">
+                    <i class="fa-solid fa-trash"></i>
+                  </div>
+                  <% }%>
+                </div>
+              </div>
+              <%})%>
+            </div>
+            <button onclick="location.href='/settings/account/new-user'" class="my-button my-primary-button medium add-user-button">
+              <i class="fa-light fa-user-plus"></i> Add User<% if (reachedUsersLimit) { %>*<% } %>
+            </button>
+            <% if (reachedUsersLimit) { %>
+              <p class="fs10" style="padding: 10px">*Fee of 10$ monthly applies for each individual additional user.</p>
+            <% } %>
+
+            <p class="label-text mb-20 fs16 users">OTHER ACCOUNTS</p>
+            <div class="user-list">
+              <% user.multiAccounts.forEach(act => { %>
+              <div class="df aic user-line">
+                <% if (act.brand.logos.logo) { %> <img class="avatar" src="<%= act.brand.logos.logo + '?' + Date.now() %>" /> <% } %>
+                <div>
+                  <p class="fs18 mb-0">
+                    <%-act.name %>z
+                  </p>
+                  <p class="fs13 mb-0" style="font-size: 1rem;font-weight: 400;line-height: 1.5;color: #495057;">
+                    <%-act.industry %>
+                  </p>
+                </div>
+                <div class="df mla buttons-wrapper">
+                  <% if(user.multiAccounts.length > 1 && act._id.toString() !== locals.user.account._id.toString()){ %>
+                  <a href="/settings/account/accounts/<%=act._id%>/delete" class="df acc pointer button delete">
+                    <i class="fa-solid fa-trash"></i>
+                  </a>
+                  <% } else { %>
+                  <div class="df acc pointer button delete disabled">
+                    <i class="fa-solid fa-trash"></i>
+                  </div>
+                  <% }%>
+                </div>
+              </div>
+              <%})%>
+            </div>
+            <button onclick="location.href='/settings/account/new-account'" class="my-button my-primary-button medium add-user-button">
+              <i class="fa-light fa-user-plus"></i> Add Account*
+            </button>
+            <p class="fs10" style="padding: 10px">*Fee of 15$ monthly applies for each individual additional account.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if(showAddUser) {%>
+    <%- include('./partials/add-user.ejs',{async:true})%>
+  <%}%>
+
+  <% if(typeof showAddAccount !== "undefined" && showAddAccount) {%>
+    <%- include('./partials/add-account.ejs',{async:true})%>
+  <%}%>
+</div>
+
+<!-- paymethod -->
+<% if (typeof stripe_pub_key !== "undefined") { %>
+<div class="new-popup-wrapper brand-payment d-none" id="cards-popup">
+  <div class="overlay"></div>
+  <div class="new-popup">
+      <div class="df aic new-popup-header">
+          <p class="fs30 title">Payment</p>
+
+          <div class="df acc mla close-button pointer" onclick='$("#cards-popup").addClass("d-none");'><i class="fa-regular fa-xmark"></i></div>
+      </div>
+
+      <div class="new-popup-content">
+          <% if (typeof paymentMethods !== "undefined" && paymentMethods.length) { %>
+              <% paymentMethods.map(pm => {%>  
+                  <div class="df aic c-card">
+                      <input type="radio" name="selected-card" value="<%-pm.id%>" id="card-<%-pm.id%>"/>
+                      <label class="df aic mb-0" style="padding-left: 10px;" for="card-<%-pm.id%>">
+                          <i class="fa-brands fa-cc-<%-pm.card.brand%>"></i>
+                          <span class="df aic mb-0"><span style="margin: 0px 6px;">&bullet;&bullet;&bullet;&bullet;&bullet;</span><%-pm.card.last4 %></span>
+                      </label>
+                  </div>
+              <%})%>
+
+              <div class="text-center new-popup-footer">
+                  <button class="btn btn-primary badge-pill px-5 mt-4" onclick="processPayment()">Process Payment</button>
+              </div>
+          <% } else { %>
+                  <div class="card-element" id="card-element">
+                      <!-- Elements will create input elements here -->
+                  </div>
+                  
+                  <!-- We'll put the error messages in this element -->
+                  <div id="card-errors" role="alert"></div>
+
+                  <div class="text-center new-popup-footer">
+                      <button class="btn btn-primary badge-pill px-5 mt-4" onclick="submitCard()">Submit</button>
+                  </div>
+
+
+                  <script>
+                      var stripe = Stripe('<%=stripe_pub_key%>');
+                      var elements = stripe.elements();
+                      var card = elements.create("card");
+                      card.mount("#card-element");
+
+                      function submitCard() {
+                          stripe
+                              .createPaymentMethod({
+                                      type: 'card',
+                                      card: card,
+                                      // billing_details: {
+                                      //     name: 'Jenny Rosen',
+                                      // },
+                                  })
+                                  .then(function(result) {
+                                      $.post(`/brand/add-card`, { token: result.paymentMethod.id })
+                                      if (result.paymentMethod) {
+                                          console.log(result.paymentMethod)
+                                          // window.location.href = '/settings/plan';
+                                          processPayment(result.paymentMethod.id);
+                                          // setTimeout(() => {
+                                          //     window.location.reload();
+                                          // }, 500);
+                                      }
+
+                                      if (result.error) {
+                                          alert(JSON.stringify(result.error))
+                                      }
+                                  }).catch(function(error) {
+                                       alert(JSON.stringify(error))
+                                  });
+                      }
+                  </script>
+          <% } %>
+
+      </div>
+  </div>
+</div>
+<% } %>
+
+<script>
+  function processPayment(dirPM, type, skipPayment) { // type = user | account based on url?
+  let pmId = dirPM || $('input[name="selected-card"]:checked').val();
+  if (!pmId && !skipPayment) return;
+
+  let data = new FormData();
+  data.append("skipPayment", skipPayment);
+
+  $.ajax({
+    url: `/settings/payment${
+      skipPayment ? "" : "?paymethod=" + pmId
+    }${type ? skipPayment ? "&type=" + type : "?type=" + type : ""}`,
+    data: data,
+    type: "POST",
+    contentType: false,
+    processData: false,
+    success: function (res) {
+      console.log("SUCCESS");
+      $("#cards-popup").addClass("d-none");
+      // cleanup open poups
+    },
+    error: function (err) {
+      console.log("ERROR");
+      alert(JSON.stringify(err));
+    },
+  });
+}
+</script>
+
+</body>
+</html>

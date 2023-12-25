@@ -1,0 +1,22 @@
+<%- include('partials/header', {async: true}); %>
+
+<div class="container account-page pb-5">
+    <div class="border-top pt-5">
+
+        <h1 class="text-primary mb-5">
+            Account settings
+        </h1>
+
+        <div class="row">
+            <div class="col-12 col-lg-3">
+                <%- include('partials/account-menu', {async: true,tab:'brand'}); %>
+            </div>
+
+            <div class="col-12 col-lg-9">
+                <%- include('embed-brand', {async: true}); %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer', {async: true}); %>

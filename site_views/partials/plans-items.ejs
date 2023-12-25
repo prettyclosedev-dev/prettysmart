@@ -1,0 +1,121 @@
+<link rel="stylesheet" href="/static/css/plans-items.css?<%=Date.now()%>" />
+<script src="https://kit.fontawesome.com/f383a529e7.js" crossorigin="anonymous"></script>
+
+<style>
+  @import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
+  @import url("https://fonts.googleapis.com/css?family=Poppins:400,500,600");
+</style>
+
+<% const renderPriceItem = (id, primeColor, secondColor, title, button, children, darkText, price, canceled) => { %>
+<div class="price-item" style="background-color: <%= primeColor %>; color: <%= darkText || secondColor %>;">
+  <div style="margin-bottom: 1.5rem;">
+    <p class="price-item-title" style="color: <%= darkText || secondColor %>;"><%= title %><% if (canceled) { %> <span style="margin-left: 10px; color: 'gray'; font-size: 9px;">Canceled</span> <% } %></p>
+    <div style="background-color: <%= darkText || secondColor %>; height: 1px; width: 100%; opacity: 0.3;"></div>
+    <div class="stats-container">
+      <% children.forEach(function(child) { %>
+      <div class="stats tiny-text df aic">
+        <div class="df acc icon-wrapper"><i class="fa-regular fa-<%= child.icon %>"></i></div>
+        <p style="color: <%= darkText || secondColor %>;"><%= child.text %></p>
+      </div>
+      <% }); %>
+    </div>
+  </div>
+  <button onclick="fbq('track', 'AddToCart', {currency: 'USD', value: <%- price || 0 %>}); location.href='<%= price ? `/payment/update/` + id : `/payment/free` %>';" id="plan-button" class="price-button tiny-text" style="background-color: <%= secondColor %>;">
+    <p style="color: <%= darkText || primeColor %>;"><%= button %></p>
+  </button>
+</div>
+<% } %>
+
+<div class="price-items row-no-space">
+  <%
+        function getFirstColor(index) {
+            switch(index) {
+                case 0:
+                    return onGray ? "white" : "#f5f5f5";
+                case 1:
+                    return "#FFEAF0";
+                case 2:
+                    return "#DB3965";
+            }
+        }
+
+        function getSecondColor(index) {
+            switch(index) {
+                case 0:
+                    return "#D7D7D7";
+                case 1:
+                    return "#DB3965";
+                case 2:
+                    return "#FFFFFF";
+            }
+        }
+
+        function getPrice(prices) {
+            var priceType = prices[interval];
+            if (priceType && priceType.amount) {
+                var finalAmount = priceType.amount;
+                if (finalAmount) {
+                    return interval === "month" ? `${finalAmount / 100}.00` : `${(finalAmount / 100) / 12}.00`;
+                }
+            }
+        }
+
+        function getIntervalAbbrev() {
+            return "mo";
+            switch(interval) {
+                case "month":
+                    return "mo";
+                case "year":
+                    return "yr";
+            }
+        }
+
+        function getPreText(product) {
+            if (typeof current === "undefined") {
+                return product.name === "Free" ? "" : "7 Days Free Trial";
+            }
+
+            let isCurrentPrice = product.prices[interval].id === current;
+
+            if (isCurrentPrice || (!current && product.name === "Free") || (plan_name === "Basic" && product.name === "Pro")) {
+                return getCanceledStatus(product) ? "Renew Plan" : "Current Plan"
+            } else {
+                const currentProd = products.find(prod => {
+                    return Object.keys(prod.prices).find(price => {
+                        return prod.prices[price].id === current
+                    })
+                })
+                
+                return currentProd ? currentProd.prices[interval].amount > product.prices[interval].amount ? "Change Plan" : "7 Days Free Trial" : product.name !== "Free" ? "7 Days Free Trial" : "Change Plan";
+            }
+        }
+
+        function getCanceledStatus(product) {
+            if (typeof current === "undefined") {
+                return false;
+            }
+
+            let isCurrentPrice = product.prices[interval].id === current;
+            return (isCurrentPrice || (!current && product.name === "Free") || (plan_name === "Basic" && product.name === "Pro")) && typeof status != "undefined" && status === "canceled"
+        }
+
+        if (typeof products != "undefined" && products && products.length) {
+            products.map((product, index) => {
+                var {name, metadata, prices} = product;
+                var price = getPrice(prices);
+                if (price) {
+                    var icons;
+                    if (metadata && Object.keys(metadata).length) {
+                        icons = Object.keys(metadata).map((md) => {
+                            return {icon: md, text: metadata[md]};
+                        });
+
+                        if (product.prices[interval] && product.prices[interval].id) {
+                            renderPriceItem(product.prices[interval].id, getFirstColor(index), getSecondColor(index), "PrettySmart " + name, getPreText(product) + " • " + (price ? "$" + price + "/" + getIntervalAbbrev() : "Free Forever" ), icons, index === 0 ? "black" : undefined, price, getCanceledStatus(product))
+                        }
+                    }
+                }
+            })
+        }
+    %>
+</div>

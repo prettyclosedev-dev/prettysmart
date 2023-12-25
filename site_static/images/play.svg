@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="222" height="222" viewBox="0 0 222 222">
+  <defs>
+    <filter id="椭圆_14" x="0" y="0" width="222" height="222" filterUnits="userSpaceOnUse">
+      <feOffset dy="8" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="20" result="blur"/>
+      <feFlood flood-color="#7b68ee" flood-opacity="0.341"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="多边形_1" x="83" y="71.5" width="65" height="70" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="6" result="blur-2"/>
+      <feFlood flood-color="#a301e8" flood-opacity="0.302"/>
+      <feComposite operator="in" in2="blur-2"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="组件_1_1" data-name="组件 1 – 1" transform="translate(60 52)">
+    <g transform="matrix(1, 0, 0, 1, -60, -52)" filter="url(#椭圆_14)">
+      <circle id="椭圆_14-2" data-name="椭圆 14" cx="51" cy="51" r="51" transform="translate(60 52)" fill="#fff"/>
+    </g>
+    <g transform="matrix(1, 0, 0, 1, -60, -52)" filter="url(#多边形_1)">
+      <path id="多边形_1-2" data-name="多边形 1" d="M14.412,4.415a3,3,0,0,1,5.176,0L31.352,24.483A3,3,0,0,1,28.764,29H5.236a3,3,0,0,1-2.588-4.517Z" transform="translate(130 86.5) rotate(90)" fill="#a301e8"/>
+    </g>
+  </g>
+</svg>

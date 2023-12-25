@@ -1,0 +1,64 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('fonts/icomoon.eot?np7yaf');
+  src:  url('fonts/icomoon.eot?np7yaf#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?np7yaf') format('truetype'),
+    url('fonts/icomoon.woff?np7yaf') format('woff'),
+    url('fonts/icomoon.svg?np7yaf#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-arrow-prev:before {
+  content: "\e908";
+  color: #f7176d;
+}
+.icon-arrow-next:before {
+  content: "\e909";
+  color: #f7176d;
+}
+.icon-banner-email:before {
+  content: "\e904";
+  color: #f7176d;
+}
+.icon-message:before {
+  content: "\e905";
+  color: #f7176d;
+}
+.icon-name:before {
+  content: "\e906";
+  color: #f7176d;
+}
+.icon-phone:before {
+  content: "\e907";
+  color: #f7176d;
+}
+.icon-facebook:before {
+  content: "\e900";
+}
+.icon-ins:before {
+  content: "\e901";
+}
+.icon-link:before {
+  content: "\e902";
+}
+.icon-tw:before {
+  content: "\e903";
+  color: #fff;
+}

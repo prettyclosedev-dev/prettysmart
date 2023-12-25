@@ -1,0 +1,166 @@
+.support-page {
+  // width: 1120px;
+  // max-width: 100%;
+  // height: 100%;
+  // padding: 0px;
+  // background-color: green;
+
+  // .content-wrapper {
+  // background-color: #f5f5f5;
+  // width: 100%;
+  // padding: 62px 68px 0px;
+  // border-bottom-right-radius: 26px;
+
+  .inner-content-wrapper {
+    background-color: white;
+    border-radius: 26px;
+    height: 760px;
+
+    .content-wrapper {
+      width: 100%;
+      padding: 50px 40px;
+    }
+  }
+
+  .label-text {
+    letter-spacing: 0.5px;
+
+    &.users {
+      margin-top: 60px;
+    }
+  }
+
+  input {
+    border: none;
+    border-radius: 14px;
+    height: 48px;
+    padding: 0px 22px;
+    background-color: #f5f5f5;
+  }
+
+  .user-list {
+    padding: 10px;
+    border-radius: 14px;
+    background-color: #fff;
+
+    .user-line {
+      background-color: #f5f5f5;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      padding: 18px 24px;
+
+      &:last-child {
+        margin-bottom: 0px;
+      }
+
+      .buttons-wrapper {
+        .button {
+          height: 40px;
+          width: 40px;
+          background-color: #fff;
+          border-radius: 50%;
+          margin-left: 14px;
+          transition: 0.25s;
+
+          &.disabled {
+            cursor: no-drop;
+            filter: grayscale(100%);
+            opacity: 0.5;
+          }
+
+          &:not(.disabled):hover {
+            transform: scale(1.15);
+          }
+
+          &.edit {
+            i {
+              color: rgba(107, 82, 250, 0.5);
+            }
+          }
+
+          &.delete {
+            i {
+              color: rgba(242, 32, 32, 0.5);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .add-user-button {
+    margin-top: 16px;
+    margin-left: 10px;
+  }
+
+  .current-plan-wrapper {
+    background-color: #f5f5f5;
+    border-radius: 14px;
+    padding: 16px 32px;
+    margin-bottom: 40px;
+  }
+
+  .payment-types {
+    overflow: hidden;
+    background-color: #f5f5f5;
+    border-radius: 14px;
+    padding: 16px 16px;
+    display: grid;
+    grid-template-columns: repeat(3, 33fr);
+    gap: 12px;
+
+    .card-wrapper {
+      aspect-ratio: 1.65/1;
+      border-radius: 8px;
+      // border: 1px solid white;
+      position: relative;
+
+      &.amex {
+        background-color: #e3ebff;
+        color: #3042df;
+      }
+
+      &.visa {
+        background-color: #ffefe3;
+        color: #e46d3a;
+      }
+
+      .default-icon {
+      }
+
+      .cc-header,
+      .cc-footer {
+        width: 100%;
+        padding: 10px 18px;
+      }
+
+      .cc-header {
+        padding-top: 14px;
+      }
+
+      .hover-only {
+        display: none;
+      }
+
+      &:hover {
+        .hover-only {
+          display: block;
+
+          &.df {
+            display: flex;
+          }
+        }
+      }
+
+      .brand-icon {
+        // position: absolute;
+        // right: 18px;
+        // bottom: 8px;
+        i {
+          font-size: 22px;
+        }
+      }
+    }
+  }
+}
+// }

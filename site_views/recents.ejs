@@ -1,0 +1,74 @@
+<%- include('partials/header', {async: true}); %>
+<link rel="stylesheet" href="/static/css/recents.css?<%=Date.now()%>" />
+<!-- <link rel="stylesheet" href="/static/css/settings.css?1" /> -->
+<div class="df page-wrapper df ffp">
+  <%- include('partials/nav', {async: true}); %>
+
+    <div class="page-content">
+        <div class="recents-page">
+            <div class="page-content-wrapper">
+                <h2 class="page-title">Recents<span class="text-primary">.</span></h2>
+                <div class="content-wrapper">
+                    <% if (todayProjects.length) { %>
+                        <div class="section-wrapper">
+                            <div class="df aic  section-header">
+                                <p class="section-title">Today</p>   
+                            </div>
+                            <div class="square section-list">
+                                <% todayProjects.forEach(project => { %>
+                                <div class="item template">
+                                    <%- include('partials/project', {async: true, project:project}); %>
+                                </div>
+                                <% }) %>
+                            </div>
+                        </div>
+                    <% } %>
+                    <% if (earlierProjects.length) { %>
+                        <div class="section-wrapper">
+                            <div class="df aic  section-header">
+                                <p class="section-title">Earlier this week</p>   
+                            </div>
+                            <div class="square section-list">
+                                <% earlierProjects.forEach(project => { %>
+                                <div class="item template">
+                                    <%- include('partials/project', {async: true, project:project}); %>
+                                </div>
+                                <% }) %>
+                            </div>
+                        </div>
+                    <% } %>
+                    <% if (!todayProjects.length && !earlierProjects.length) { %>
+                        <div class="section-wrapper">
+                            <div class="upgrade-wrapper">
+                                <p>
+                                Your recent templates will appear here.
+                                </p>
+                                <a onclick="navClicked()" href="/templates" class="upgrade-btn">Templates</a>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include('partials/export-template', {async: true}); %>
+</div>
+
+<script>
+    var TOKEN = '<%=user.token.access_token%>';
+    function navClicked() {
+         topbar.config({
+            barThickness : 7,
+            barColors    : {
+              '0'        : '#db3965',
+              '1.0'      : '#db3965'
+            },
+          })
+          
+          topbar.show()
+        }
+</script>
+<script src="/static/js/templates.js?<%=Date.now()%>"></script>
+
+</body>
+</html>

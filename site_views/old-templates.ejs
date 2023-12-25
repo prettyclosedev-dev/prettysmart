@@ -1,0 +1,96 @@
+<%- include('partials/header', {async: true}); %>
+
+    <div class="templates-page">
+
+         <div class="container">
+            <div class="banner">
+               <h1 class="text-secondary text-center"><%= locals.row ? locals.row.name : 'Ready to use designs' %></h1>
+             
+            </div>
+         </div>
+
+        <div class="container">
+            <div class="d-flex mb-3">
+                  <% if(locals.sizes && locals.sizes.length > 1){ %>
+                     <% sizes.forEach((size, index) => { %>
+                        <a href="/templates/<%=locals.category%>?size=<%=size._id%>&search=<%=locals.default_tag%>&row=<%=locals.row._id%>" class="ready-size <%= size._id === locals.default_size ? 'active' : '' %>" data-size="<%=size._id%>" data-tag="<%=locals.default_tag%>" data-row="<%=locals.row._id%>"  data-category="<%=locals.category%>" data-page="<%=locals.current%>">                                
+                              <%=size.dashboard_name ? size.dashboard_name : size.name%>
+                        </a>
+                     <% }) %>
+                  <% } %>
+                  <% if(locals.tags && locals.tags.length > 1){ %>
+                     <a href="/templates/<%=locals.category%>?search=&size=<%=locals.default_size%>&row=<%=locals.row._id%>" class="ready-size <%= locals.default_tag ? '' : 'active' %>" data-tag="" data-size="<%=locals.default_size%>" data-row="<%=locals.row._id%>"  data-category="<%=locals.category%>" data-page="<%=locals.current%>">                                
+                        All
+                    </a>
+                     <% tags.forEach((tag, index) => { %>
+                        <a href="/templates/<%=locals.category%>?search=<%=tag%>&size=<%=locals.default_size%>&row=<%=locals.row._id%>" class="ready-size <%= tag === locals.default_tag ? 'active' : '' %>" data-tag="<%=tag%>" data-size="<%=locals.default_size%>" data-row="<%=locals.row._id%>"  data-category="<%=locals.category%>" data-page="<%=locals.current%>">                                
+                              <%=tag%>
+                        </a>
+                     <% }) %>
+                  <% } %>
+            </div>
+
+            <div class="templates-row-container">
+
+               <div class="templates-row">
+                  <div class="row  mx-n1">
+                     <% templates.forEach(template => { %>
+                        <div class="col-6 col-lg-3 col-xl-3 px-1 pb-4">
+                        <%- include('partials/template', {async: true, template:template}); %>
+                        </div>
+                     <% }) %>
+                  </div>
+                  <% if (locals.pages > 1 && locals.limit > 6) { %>
+                     <br>
+      
+                     <div class="row justify-content-md-center">
+                        <nav>
+                           <ul class="pagination">
+                                 <% if (current == 1) { %>
+                                    
+                                 <% } else { %>
+                                    <li class="mx-2"><a class="btn btn-sm px-3 btn-light" data-page="1" href="/templates/<%=locals.category%>?page=1&size=<%=locals.default_size%>&search=<%=locals.default_tag%>&row=<%=locals.row._id%>">First</a></li>
+                                 <% } %>
+   
+                                 <% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %>
+                                 <% if (i !== 1) { %>
+                                    <li class="mx-2 disabled"><a class="btn btn-sm px-3 btn-light">...</a></li>
+                                 <% } %>
+   
+                                 <% for (; i <= (Number(current) + 4) && i <= pages; i++) { %>
+                                    <% if (i == current) { %>
+                                       <li class="mx-2 active"><a class="btn btn-sm px-3 btn-primary" data-page="<%=i%>" href="/templates/<%=locals.category%>?page=<%= i %>&size=<%=locals.default_size%>&search=<%=locals.default_tag%>&row=<%=locals.row._id%>"><%= i %></a></li>
+                                    <% } else { %>
+                                       <li class="mx-2"><a class="btn btn-sm px-3 btn-light" data-page="<%=i%>" href="/templates/<%=locals.category%>?page=<%= i %>&size=<%=locals.default_size%>&search=<%=locals.default_tag%>&row=<%=locals.row._id%>"><%= i %></a></li>
+                                    <% } %>
+   
+                                    <% if (i == Number(current) + 4 && i < pages) { %>
+                                       <li class="mx-2 disabled"><a class="btn btn-sm px-3 btn-light">...</a></li>
+                                    <% } %>                                
+                                 <% } %>
+   
+                                 <% if (current == pages) { %>
+                                    
+                                 <% } else { %>
+                                    <li class="mx-2"><a class="btn btn-sm px-3 btn-light" data-page="<%=pages%>" href="/templates/<%=locals.category%>?page=<%= pages %>&size=<%=locals.default_size%>&search=<%=locals.default_tag%>&row=<%=locals.row._id%>">Last</a></li>
+                                 <% } %>
+                           </ul>
+                        </nav>
+                     </div>
+      
+                  <% } %>
+               </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/export-template', {async: true}); %>
+<%- include('partials/footer', {async: true}); %>
+
+<script>
+
+    var TOKEN = '<%=user.token.access_token%>';
+ 
+ </script>
+
+<script src="/static/js/templates.js?<%=Date.now()%>"></script>

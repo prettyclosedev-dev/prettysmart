@@ -1,0 +1,205 @@
+<%- include('partials/header', {async: true}); %>
+    <link rel="stylesheet" href="/static/css/jquery-ui.min.css">
+    <link rel="stylesheet" href="/static/css/templates-page.css?<%=Date.now()%>">
+    <script src="/static/js/jquery-ui.min.js"></script>
+    <style>
+    .ui-autocomplete-loading {
+        background: white url("/static/images/ui-anim_basic_16x16.gif") right center no-repeat;
+    }
+    </style>
+    <div class="df page-wrapper df ffp">
+        <%- include('partials/nav', {async: true}); %>
+        <div class="page-content">
+            <div class="templates-page"><div class="page-content-wrapper">
+                <h2 class="ffp page-title"><%= typeof pageTitle !== "undefined" ? pageTitle : "Templates" %><span class="text-primary">.</span></h2>
+                <p style="font-size: 16px; font-weight: 500;" class="page-title-sub">
+                    Post informative Questions and Answers about your industry and beyond.
+                </p>
+                <details style="padding-bottom: 32px; ">
+                    <summary>Input Options</summary>
+                    <p style="font-size: 16px; font-weight: 500;" class="page-title-sub">
+                    Enter information one of the following ways and get 5 questions and answers that will excite your audience.
+                    </p>
+                    <ol style="font-size: 15px; font-weight: 400; margin-top: 10px; padding-top: 10px;">
+                        <li>
+                            URL of an article - Paste a url of an article that contains helpful information. If your url does not work try the next option.
+                        </li>
+                            <li>
+                            Copy of an article - Type or paste the copy of an informative article.
+                        </li>
+                        <li>
+                            Write a question and answer -  The AI will use that as a starting point to create similar questions and answers.
+                        </li>
+                        <li>
+                            Write a topic - Choose a topic and get random questions and answers generated. It’s not highly recommended as it’s not always perfectly accurate or helpful. But, hey, it’s definitely fun.
+                        </li>
+                    </ol>
+                </details>
+                <div class="orientation-selection-wrapper" style="margin-bottom: 32px; flex-direction: row; display: flex;">
+                    <textarea style="margin-right: 20px; text-align:center;" type="text" class="ui-widget ai_field" placeholder="Enter a url, free text, or topic" name="tips"></textarea>
+                    <a href="#" class="refresh-link px-lg-3 badge-pill text-white" onclick="generateTips()">
+                        <span class="">
+                            Generate
+                        </span>                                                
+                    </a>
+                </div>
+                <%
+                    function isAllowedDownload(file_name) {
+                        return (
+                            (plan_name && plan_name !== "Free" && !payment_failed) ||
+                            file_name.includes("_free")
+                        );
+                    }
+                %>
+                <div class="list-wrapper">
+                    <div id="templates_container">
+                        <% templates.forEach((templateType, index) => { %>
+                            <div id="<%= templateType._id %>" class="item-wrapper">
+                                <div class="df aic item-header">
+                                    <p><%-templateType.name%></p>
+                                </div>
+                                
+                                <div class="swiper" style="width: 100%;">
+                                    <div class="swiper-wrapper">
+                                    <!-- Slides -->
+                                        <% templateType.templates.forEach((template,idx) => {%>
+                                            <div class="swiper-slide">
+                                                <div class="template">
+                                                <%- include('partials/template', {async: true, template:template}); %>
+                                                <div class="favorite-wrapper">
+                                                    <span class="like-icon">
+                                                        <div class="heart-animation-1"></div>
+                                                        <div class="heart-animation-2"></div>
+                                                    </span>
+                                                    Favorite
+                                                </div>
+                                                <% if (template.template_title.includes("_free")) { %>
+                                                    <div class="tag fs14 ttuc" style="background-color: #db3965;">Free!</div>
+                                                <% } %>
+
+                                                <div class="download-wrapper">
+
+                                                    <!--  -->
+                                                    <div class="download-button primary-btn btn-group dropup" style="display: inline-flex;">
+                                                        <button class="btn btn-med download-button-item" value="jpg" type="button" <% if (!isAllowedDownload(template.template_title)) { %> style="justify-content: center;" onclick="location.href='/plans';" <% } %>>
+                                                        <%= isAllowedDownload(template.template_title) ? 'Download JPG' : 'Upgrade plan' %>
+                                                        </button>
+                                                        <% if (isAllowedDownload(template.template_title)) { %>
+                                                            <button type="button" class="btn btn-med  dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                <span class="sr-only">Select download type</span>
+                                                                <i class="fa-regular fa-chevron-down"></i>
+                                                            </button>
+                                                            <div class="dropdown-menu dropdown-menu-right">
+                                                            <button class="dropdown-item download-button-item" value="png">Download PNG</button>
+                                                            <button class="dropdown-item download-button-item" value="pdf">Download PDF</button>
+                                                            <button class="dropdown-item download-button-item" value="pdf_flattened">Download PDF Flattened</button>
+                                                            </div>
+                                                        <% } %>
+                                                    </div>
+                                                    <!--  -->
+                                                </div>
+                                                </div>
+                                            </div>
+                                        <%})%>
+                                    </div>
+                                    <div class="swiper-button-prev hidden"></div>
+                                    <div class="swiper-button-next hidden"></div>
+                                </div>
+                            </div>
+                        <%})%>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <%- include('partials/export-template', {async: true}); %>
+    </div>
+    
+    <script>
+        var swiper = new Swiper('.swiper', {
+            slidesPerView: 'auto',
+            spaceBetween: 14,
+            mousewheel: true,
+            observer: true, 
+            observeParents: true,
+            rebuildOnUpdate: true,
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+        });
+
+        $( ".item-wrapper" ).hover(function() {
+            $( ".swiper-button-prev" ).removeClass( "hidden" );
+            $( ".swiper-button-next" ).removeClass( "hidden" );
+            }, function() {
+            $( ".swiper-button-prev" ).addClass( "hidden" );
+            $( ".swiper-button-next" ).addClass( "hidden" );
+        });
+
+        $('.favorite-wrapper').on('click', function(e) {
+            var user = <%- JSON.stringify(user) %>;
+            if (!user.account.plan_id) {
+                alert("You need a paid account to save your favorite templates.")
+            } else {
+                $(this).toggleClass('liked');
+                if ($(this).hasClass("liked")) {
+                    onAddFavorite($(this))
+                } else {
+                     onRemoveFavorite($(this))
+                }
+            }
+            
+            // setTimeout(() => {
+            //   $(e.target).removeClass('liked')
+            // }, 1000)
+        });
+
+        function isAllowedDownload(file_name) {
+            var plan_name = <%- JSON.stringify(plan_name) %>
+            var payment_failed = <%- JSON.stringify(payment_failed) %>
+
+            return (plan_name && plan_name !== "Free" && !payment_failed) || file_name.includes("_free");
+        }
+
+        function generateTips() {
+            $('.list-wrapper').load('/tips' +  ' #templates_container', function() {
+                getCustomization({ runAI: true, row_class_name: 'tips' }, null, function(opts) {
+                    if (opts.success) {
+                        $(".list-wrapper").removeClass("d-none")
+                        // swiper.update()
+                        swiper = new Swiper(".swiper", {
+                            slidesPerView: "auto",
+                            spaceBetween: 14,
+                            mousewheel: true,
+                            observer: true,
+                            observeParents: true,
+                            rebuildOnUpdate: true,
+                            navigation: {
+                                nextEl: ".swiper-button-next",
+                                prevEl: ".swiper-button-prev",
+                            },
+                        });
+
+                        $( ".item-wrapper" ).hover(function() {
+                            $( ".swiper-button-prev" ).removeClass( "hidden" );
+                            $( ".swiper-button-next" ).removeClass( "hidden" );
+                            }, function() {
+                            $( ".swiper-button-prev" ).addClass( "hidden" );
+                            $( ".swiper-button-next" ).addClass( "hidden" );
+                        });
+                    }
+                });
+            });
+        }
+    </script>
+
+    <script>
+        var TOKEN = '<%=user.token.access_token%>';
+    </script>
+    <script src="/static/js/templates.js?<%=Date.now()%>"></script>
+    <script src="/static/js/loader.js"></script>
+
+    </body>
+</html>

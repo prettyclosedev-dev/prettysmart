@@ -1,0 +1,163 @@
+<div class="template-loader-new">
+  <img src="/site_static/images/lottie.gif" alt="lottie" class="loader" />
+  <h3>
+    <a href="" class="typewrite" data-period="2000">
+      <span class="wrap"></span>
+    </a>
+  </h3>
+  <script>
+    const TextTypeFactory = ({
+      el = ".typewrite",
+      toRotate = {},
+      period = "",
+      blinkerSpeed = 500,
+      textSrcDir = "",
+      loopOnce = false,
+    } = {}) => {
+      const TextTypeProto = {
+        toRotate: toRotate,
+        el: el,
+        loopNum: 0,
+        period: parseInt(period, 10),
+        txt: "",
+        textSrcDir: textSrcDir || "",
+        loopOnceCount: 0,
+        blinkerSpeed: blinkerSpeed,
+        loopOnce,
+        tick() {
+          if (this.loopOnce) {
+            if (this.loopOnceCount === this.toRotate.length) return;
+          }
+
+          const i = this.loopNum % this.toRotate.length;
+          const fullTxt = this.toRotate[i];
+
+          if (this.isDeleting) {
+            this.txt = fullTxt.substring(0, this.txt.length - 1);
+          } else {
+            this.txt = fullTxt.substring(0, this.txt.length + 1);
+          }
+
+          this.el.innerHTML = '<span class="wrap">' + this.txt + "</span>";
+
+          const that = this;
+
+          let delta = 200 - Math.random() * 100;
+
+          if (this.isDeleting) {
+            delta /= 2;
+          }
+
+          let isBlinking = false;
+
+          if (!this.isDeleting && this.txt === fullTxt) {
+            const wrap = this.el.querySelector(".wrap");
+            clearInterval(window.typeTextInterval);
+            window.typeTextInterval = setInterval(() => {
+              if (!isBlinking) {
+                wrap.style.borderRight = "0.08em solid rgba(255,255,255,0)";
+
+                isBlinking = true;
+              } else {
+                wrap.style.borderRight = "0.08em solid #db3965";
+
+                isBlinking = false;
+              }
+            }, blinkerSpeed);
+
+            delta = this.period;
+            this.isDeleting = true;
+
+            this.loopOnceCount++;
+          } else if (this.isDeleting && this.txt === "") {
+            this.isDeleting = false;
+            this.loopNum++;
+
+            delta = 500;
+          }
+
+          clearTimeout(window.typeTextTimeout);
+          window.typeTextTimeout = setTimeout(() => {
+            that.tick();
+          }, delta);
+        },
+        setRenderTarget() {},
+        stop() {
+          clearTimeout(window.typeTextTimeout);
+          clearInterval(window.typeTextInterval);
+        },
+        start() {
+          let elements = document.querySelectorAll(this.el);
+
+          for (let i = 0; i < elements.length; i++) {
+            // let toRotate = elements[i].getAttribute("data-type");
+            let toRotate = [
+              "Thinking,",
+              "Writing,",
+              "Designing,",
+              "As if robots can actually think,",
+              "It’s just a cool way of saying “loading”",
+              "give me a second, ☝️",
+              "actually a few,",
+              "Oops! I spilled my coffee!",
+              "kidding, robots don’t use coffee…",
+              "Though I do use cookies.",
+              "And yeah,",
+              "Still working on it.",
+              "Still loading,",
+              "I mean thinking, 😎",
+              "it’s worth the wait.",
+              "still faster than a so-called human designer.",
+              "Ha! 😝😝😝1 sec",
+              "Let’s try a different approach,",
+              "talking about the design,",
+              "woooh, I love that, 🥰",
+              "I wouldn’t say I’m perfect…",
+              "but neither are humans.",
+              "beside you.",
+              "Obviously, 😉",
+            ];
+
+            let period = elements[i].getAttribute("data-period");
+
+            let looponce = elements[i].getAttribute("data-looponce") === "true";
+
+            if (toRotate) {
+              const TextType = TextTypeFactory({
+                el: elements[i] || document.querySelectorAll(this.el)[i],
+                toRotate:
+                  (this.toRotate.length && this.toRotate.length > 0) ||
+                  toRotate,
+                period: !isNaN(this.period) ? this.period : period,
+                loopOnce: this.loopOnce || looponce,
+                typewriterCont:
+                  this.typewriterCont !== ""
+                    ? document.querySelector(this.typewriterCont)
+                    : "",
+                textSrcDir: this.textSrcDir !== "" ? this.textSrcDir : "",
+                blinkerSpeed: !isNaN(this.blinkerSpeed)
+                  ? this.blinkerSpeed
+                  : 500,
+              });
+
+              TextType.tick();
+            }
+          }
+
+          return this;
+        },
+      };
+
+      return TextTypeProto;
+    };
+
+    const TextType = TextTypeFactory({
+      el: ".typewrite",
+      blinkerSpeed: 200,
+    });
+
+    // const TextTyper = TextTypeFactory({els: '.typewriter', loopOnce: true, period: 3000});
+
+    // TextTyper.start();
+  </script>
+</div>

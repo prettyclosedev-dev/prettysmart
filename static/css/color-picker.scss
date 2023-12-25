@@ -1,0 +1,80 @@
+.colors-primary-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+
+  .colors-wrapper {
+    margin: 0px 28px;
+    justify-content: space-around;
+
+    .color-wrapper {
+      .label {
+        opacity: 0.5;
+        margin-bottom: 24px;
+      }
+    }
+
+    .color {
+      width: 164px;
+      height: 164px;
+      max-width: 180px;
+      display: block;
+      // padding: 3px;
+      border-radius: 12px;
+      border: none;
+      // background-color: white;
+      box-sizing: border-box;
+      position: relative;
+      z-index: 55;
+
+      &::after {
+        content: "";
+        display: block;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        right: 6px;
+        top: 7px;
+        z-index: -1;
+        background-color: inherit;
+        opacity: 0.8;
+        border-radius: 12px;
+        -webkit-transform: rotate(-3deg);
+        transform: rotate(-4deg);
+      }
+
+      &::before {
+        content: "";
+        display: block;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        right: 14px;
+        top: 14px;
+        z-index: -2;
+        background-color: inherit;
+        opacity: 0.5;
+        border-radius: 12px;
+        -webkit-transform: rotate(-8deg);
+        transform: rotate(-8deg);
+      }
+
+      &::-webkit-color-swatch-wrapper {
+        padding: 0;
+        border: none;
+        outline: none;
+      }
+      &::-webkit-color-swatch {
+        border: none;
+        border: none;
+        outline: none;
+        border-radius: 10px;
+      }
+    }
+  }
+
+  .save-brand {
+    margin: 0px auto 22px;
+  }
+}

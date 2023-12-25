@@ -1,0 +1,9 @@
+<svg id="组_95" data-name="组 95" xmlns="http://www.w3.org/2000/svg" width="126.872" height="36" viewBox="0 0 126.872 36">
+  <text id="Flyers" transform="translate(33.872 28)" fill="#bab6c3" font-size="31" font-family="Axiforma-Bold, Axiforma" font-weight="700"><tspan x="0" y="0">Flyers</tspan></text>
+  <g id="flyer" transform="translate(0)">
+    <path id="路径_15" data-name="路径 15" d="M190.98,19.133v5.711h6.184Z" transform="translate(-181.256 -17.863)" fill="#bab6c3"/>
+    <path id="路径_16" data-name="路径 16" d="M44.483,135.173v25.014H61.942V135.173Zm8.834,2.868a4.247,4.247,0,1,1-4.247,4.247A4.252,4.252,0,0,1,53.317,138.041Zm3.733,19.045H49.584v-1.994h7.465Zm0-4.019H49.584v-1.994h7.465Z" transform="translate(-44.483 -126.2)" fill="#bab6c3"/>
+    <path id="路径_17" data-name="路径 17" d="M145.879,212.933a2.252,2.252,0,1,0-2.252-2.252A2.255,2.255,0,0,0,145.879,212.933Z" transform="translate(-137.046 -194.593)" fill="#bab6c3"/>
+    <path id="路径_18" data-name="路径 18" d="M231.278,0h-16.8l8.166,7.541v8.945h4.015v1.994h-4.015V20.5h4.015V22.5h-4.015v3.557h8.631Z" transform="translate(-203.197)" fill="#bab6c3"/>
+  </g>
+</svg>

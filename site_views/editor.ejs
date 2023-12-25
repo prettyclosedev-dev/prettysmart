@@ -1,0 +1,78 @@
+<%- include('partials/header', {async: true}); %>
+<link rel="stylesheet" href="/static/css/editor.css?<%=Date.now()%>" />
+<div style="display: flex; flex-direction: row; width: 100%; height: 100%">
+  <%- include('partials/nav', {async: true}); %>
+  <div id="editor">
+    <div class="page-title-container">
+      <h2 class="page-title" style="z-index: 150">
+        Editor<span class="text-primary">.</span>
+      </h2>
+      <button
+        class="btn btn-primary px-5 mr-3 badge-pill"
+        onclick="exportEdit('<%= project %>', '<%= template %>', '<%= hash %>')"
+      >
+        Export
+      </button>
+    </div>
+  </div>
+
+  <script>
+    DSHDEditorLib.configure({
+      access_token: "<%=user.token.access_token%>",
+      domain: "prettysmart.designhuddle.com",
+    });
+  </script>
+
+  <script>
+    // DSHDEditorLib.createProject({
+    //     template_id: '<%= template %>',
+    //     customizations_hash: '<%= hash %>'
+    // }, function(error, data){
+    //     console.log(data)
+    //     if (!error) {
+    //         var editor = DSHDEditorLib.insert("editor", {
+    //             project_id: data.project_id
+    //         });
+    //     }
+    // });
+
+    var editor = DSHDEditorLib.insert("editor", {
+      project_id: "<%= project %>",
+    });
+
+    // function getClasses(callback) {
+    //   editor.getProjectData({}, function (err, data) {
+    //     if (err) {
+    //       callback(err);
+    //       return;
+    //     }
+    //     var classes = {};
+    //     for (var p in data.pages) {
+    //       var page = data.pages[p];
+    //       for (var e in page.elements) {
+    //         var element = page.elements[e];
+    //         for (var c in element.element_classes)
+    //           classes[element.element_classes[c]] = true;
+    //       }
+    //     }
+    //     callback(null, Object.keys(classes));
+    //   });
+    // }
+
+    // getClasses(function (err, classes) {
+    //   console.log(JSON.stringify(classes));
+    // });
+
+    function exportEdit(project_id, template_id, object_hash) {
+      editor.showExport();
+
+      $.post("/projects/update/" + project_id).then(function (success) {
+        // console.log(success)
+      });
+    }
+  </script>
+  <script>
+    var TOKEN = "<%=user.token.access_token%>";
+  </script>
+  <script src="/static/js/templates.js?<%=Date.now()%>"></script>
+</div>

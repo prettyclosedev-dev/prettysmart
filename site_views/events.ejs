@@ -1,0 +1,30 @@
+<%- include('partials/header', {async: true, fixed_header:true}); %>
+<div class="events-page d-flex align-items-center justify-content-center">
+    <div class="w-100">
+        <h1 class="fs55 text-center">
+            What's on for today?
+        </h1>
+        <p class="text-center fs25 light px-4">
+            Humans Have More than 6,000 Thoughts per Day, talk to me about one.
+        </p>
+
+        <div class="container">
+            <div class="col-lg-7 mx-auto">
+                <div class="events row justify-content-lg-around">
+                    <% events.forEach(event_chunk => { %>
+                        <div class="event-type fs30">
+                            <% event_chunk.forEach(event => { %>
+                                <a class="d-flex align-items-center" href="/sizes/<%= event._id %>">
+                                    <%= event.name %>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="8.403" height="15.979" viewBox="0 0 10.403 17.979"><path d="M1816.17,365.826l7.575,7.575-7.575,7.575" transform="translate(-1814.755 -364.412)" fill="none" stroke="#f7176d" stroke-linecap="round" stroke-width="2"/></svg>
+                                </a>
+                            <% }) %>
+                        </div>
+                    <% }) %>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>        
+<%- include('partials/footer', {async: true}); %>

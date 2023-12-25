@@ -1,0 +1,113 @@
+<div class="new-popup-wrapper d-none gt">
+  <%
+    function hexToRgb(hex) {
+      var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+      hex = hex.replace(shorthandRegex, function (m, r, g, b) {
+        return r + r + g + g + b + b;
+      });
+
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result
+        ? [
+            parseInt(result[1], 16),
+            parseInt(result[2], 16),
+            parseInt(result[3], 16),
+          ]
+        : null;
+    }
+
+    function luminance(rgb) {
+      var a = rgb.map(function (v) {
+        v /= 255;
+        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+      });
+      return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+    }
+
+    function getDarkerColor(primary, secondary) {
+      let topLuminance = luminance(hexToRgb(primary));
+      let bottomLuminance = luminance(hexToRgb(secondary));
+      return topLuminance < bottomLuminance ? primary : secondary;
+    }
+  %>
+  <% var primaryColor = getDarkerColor(user.account.brand.colors.primary, user.account.brand.colors.secondary) %>
+  <div class="overlay"></div>
+  <div id="exportModal" class="new-popup">
+    <form name="export_form" class="export-form" action="">
+      <div class="df aic new-popup-header" style="border-bottom: none">
+        <% if (typeof backButton != "undefined" && backButton) { %>
+        <div
+          class="back-button d-none pointer close"
+          data-step="template"
+          data-dismiss="modal"
+        >
+          <i style="color: <%= primaryColor %>" class="fa-regular fa-chevron-left"></i>
+        </div>
+        <% } %>
+        <p name="file_name" class="fs30 title">Title</p>
+        <div
+          class="df acc mla close-button pointer close"
+          style="--bg-color: #84b9e01a %>; --bg-color-hover: #84b9e033 %>"
+          data-dismiss="modal"
+        >
+          <i class="fa-regular fa-xmark" style="color: <%= primaryColor %>"></i>
+        </div>
+      </div>
+      <div class="new-popup-content generator-popup">
+        <div data-step="template" class="template-sec template d-block rounded">
+          <img class="blur-template" />
+          <img />
+          <%- include('./template-loader-new', {async: true}); %>
+        </div>
+        <div class="export-proggress d-none">
+          <div>
+            <div class="export-proggress-title">
+              Exporting
+              <div class="export-proggress-title-inner">Exporting</div>
+            </div>
+            <div
+              class="export-progress-cancel text-primary fs14 text-center mt-4"
+            >
+              Cancel
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="df acc new-popup-footer">
+        <button
+          data-editor
+          class="edit-button secondary-btn fs16"
+          style="background-color: rgba(132, 186, 224, 0.1); color: <%= primaryColor %>"
+        >
+          <i class="fa-regular fa-pen"></i>Edit
+        </button>
+        <div
+          data-step="template"
+          class="download-button primary-btn btn-group"
+          style="background-color: <%= primaryColor %>; display: inherit;"
+        >
+          <button class="btn btn-med submit" type="submit" value="jpg">
+            Download JPG
+          </button>
+          <button
+            type="button"
+            class="btn btn-med dropdown-toggle dropdown-toggle-split"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            <span class="sr-only">Select download type</span>
+            <i class="fa-regular fa-chevron-down"></i>
+          </button>
+          <div class="dropdown-menu dropdown-menu-right">
+            <button class="dropdown-item export-dropdown-item" value="png">Download PNG</button>
+            <button class="dropdown-item export-dropdown-item" value="pdf">Download PDF</button>
+            <button class="dropdown-item export-dropdown-item" value="pdf_flattened">
+              Download PDF Flattened
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

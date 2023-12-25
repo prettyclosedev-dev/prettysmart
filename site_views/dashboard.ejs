@@ -1,0 +1,179 @@
+<%- include('partials/old-header', {async: true}); %>
+
+    <div class="dashboard-page">
+
+         <div class="container-fluid px-lg-5">
+            <div class="banner" >
+               <h1 class="text-white text-center">
+                   Welcome, <%=user.first_name ? user.first_name : user.email%>
+                </h1>
+               <p class="text-white text-center mb-0">
+                  The world always seems brighter when you've just made something 
+                  <br class="d-none d-lg-block">
+                  that wasn't there before.
+               </p>
+            </div>
+         
+
+            <div class="dashboard-content">
+
+                <% if(dashboard_events && dashboard_events.length){ %>
+                <div class="dashboard-events">
+                    <div class="row">
+                        <% dashboard_events.forEach(event => { %>
+                            <div class="col-12 col-md-6 col-lg-3 px-lg-4 mb-3 mb-lg-0">
+                                <a href="/sizes/<%=event._id%>" class="dashboard-event-box h-100 d-flex flex-column align-items-center justify-content-between">
+                                    <div class="dashboard-event-img w-100">
+                                        <img src="<%=event.indecator%>" alt="">
+                                    </div>
+                                    <div class="dashboard-event-name w-100">
+                                        <%=event.sub_name ? event.sub_name.split('+')[0] : ''%>
+                                        <div><%=event.sub_name ? event.sub_name.split('+').slice(1, 4).join(' + ') : ''%></div>
+                                    </div>
+                                </a>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+                <% } %>
+                <div class="popular-events px-lg-2">
+                    <h3 class="">
+                        Popular Categories:
+                    </h3>
+                    <div class="d-flex flex-wrap">
+                        <% popular_events.forEach(event => { %>
+                            <a href="/sizes/<%=event._id%>" class="popular-event">
+                                <% if(event.color || event.icon){ %>
+                                    <span class="popular-event-icon" style="background-color: <%=event.color%>;">
+                                        <img src="<%=event.icon%>" alt="">
+                                    </span>
+                                <% } %>
+                                <span class="popular-event-name"><%=event.name%></span>
+                            </a>
+                        <% }) %>
+                    </div>
+                </div>
+
+            </div>
+
+            <% rows.forEach(row => { %>
+            <div class="dashboard-category">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-lg-flex align-items-center">
+                        <h3 class="mb-0 mr-4">
+                            <%=row.name%>
+                        </h3>
+
+                        <div class="d-flex">
+                            <% if(row.sizes && row.sizes.length > 1){ %>
+                                <% row.sizes.forEach((size, index) => { %>
+                                    <a href="/old-templates/<%=row.category%>?size=<%=size._id%>&limit=4&search=<%=row.default_tag%>&row=<%=row._id%>" data-ready-size class="ready-size <%= size._id === row.default_size ? 'active' : '' %>" data-size="<%=size._id%>" data-tag="<%=row.default_tag%>" data-row="<%=row._id%>" data-category="<%=row.category%>">                                
+                                        <%=size.dashboard_name ? size.dashboard_name : size.name%>
+                                    </a>
+                                <% }) %>
+                            <% } %>
+                            <% if(row.tags && row.tags.length > 1){ %>
+                                <a href="/old-templates/<%=row.category%>?search=&limit=4&size=<%=row.default_size%>&row=<%=row._id%>"  data-ready-size class="ready-size <%= row.default_tag ? '' : 'active' %>" data-tag="" data-size="<%=row.default_size%>" data-row="<%=row._id%>" data-category="<%=row.category%>">                                
+                                    All
+                                </a>
+                                <% row.tags.forEach((tag, index) => { %>
+                                    <a href="/old-templates/<%=row.category%>?search=<%=tag%>&limit=4&size=<%=row.default_size%>&row=<%=row._id%>"  data-ready-size class="ready-size <%= tag === row.default_tag ? 'active' : '' %>" data-tag="<%=tag%>" data-size="<%=row.default_size%>" data-row="<%=row._id%>" data-category="<%=row.category%>">                                
+                                        <%=tag%>
+                                    </a>
+                                <% }) %>
+                            <% } %>
+                            
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <% if(row.ai_field){ %>
+                            <input type="text" class="ai_field" placeholder="<%= row.ai_field_placeholder || 'Add some details, full name, assistant, grate pay, etc..' %>" name="<%= row.ai_field %>"/>
+                        <% } %>
+                    
+
+                        <!-- <a href="/old-templates/<%=row.category%>?row=<%=row._id%>&size=<%=row.default_size%>&search=<%=row.default_tag%>" class="arrow-link" data-category="<%=row.category%>" data-row="<%=row._id%>">
+                            <span class="d-none d-lg-inline">
+                                See more
+                            </span>
+                            <span class="arrow">                          
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15.547" height="9.58" viewBox="0 0 15.547 9.58"><g transform="translate(-1074.383 -1004.001)"><path d="M1089.572,1009.149h-14.831a.358.358,0,0,1,0-.716h14.831a.358.358,0,1,1,0,.716Z" fill="currentColor"/><path d="M1085.129,1013.581a.358.358,0,0,1-.253-.612l4.179-4.178-4.179-4.179a.358.358,0,0,1,.507-.506l4.431,4.432a.357.357,0,0,1,0,.506l-4.431,4.432A.358.358,0,0,1,1085.129,1013.581Z" fill="currentColor"/></g></svg>
+                            </span>
+                        </a> -->
+                        <% if(row.sizes && row.sizes.length > 1){ %>
+
+                            <a href="#" class="refresh-link px-lg-3 badge-pill text-white">
+                                <span class="">
+                                    Generate
+                                </span>
+                                
+                                <!-- <svg height="28" viewBox="0 0 512 512" width="28" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1"><path d="m420.837 140.209-57.17-1.885 55.285-55.285zm-354.165 111.591h-15.755a205.053 205.053 0 0 1 337.483-152.35l-11.236 11.236a189.269 189.269 0 0 0 -121.164-43.545c-102.761 0-186.669 82.382-189.328 184.659z"/><path d="m91.164 371.068 57.17 1.886-55.285 55.286zm309.9 30.3c-38.519 38.507-90.034 59.717-145.064 59.717a204.625 204.625 0 0 1 -132.93-48.724l11.13-11.135a189.387 189.387 0 0 0 311.128-139.426h15.755a203.189 203.189 0 0 1 -60.024 139.563z"/></svg> -->
+                            </a>
+
+                        <% } else{ %>
+                            <a href="/old-templates/<%=row.category%>?row=<%=row._id%>&size=<%=row.default_size%>&search=<%=row.default_tag%>&limit=4" data-ready-size class="ready-size active" hidden></a>
+                            <a href="#" class="refresh-link  px-lg-3 badge-pill text-white">
+                                <span class="">
+                                    Generate
+                                </span>
+                                
+                                <!-- <svg height="28" viewBox="0 0 512 512" width="28" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1"><path d="m420.837 140.209-57.17-1.885 55.285-55.285zm-354.165 111.591h-15.755a205.053 205.053 0 0 1 337.483-152.35l-11.236 11.236a189.269 189.269 0 0 0 -121.164-43.545c-102.761 0-186.669 82.382-189.328 184.659z"/><path d="m91.164 371.068 57.17 1.886-55.285 55.286zm309.9 30.3c-38.519 38.507-90.034 59.717-145.064 59.717a204.625 204.625 0 0 1 -132.93-48.724l11.13-11.135a189.387 189.387 0 0 0 311.128-139.426h15.755a203.189 203.189 0 0 1 -60.024 139.563z"/></svg> -->
+                            </a>
+                        <% } %>
+                    </div>                    
+                </div>
+
+                
+
+                
+                <div class="templates-row-container">
+                    <div class="row mx-n1">
+                        <% row.templates.forEach(template => { %>
+                        <div class="col-6 col-lg-3 col-xl-3 px-1 pb-4">
+                            <%- include('partials/template', {async: true, template:template}); %>
+                        </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+
+            <% }) %>
+
+            <div class="dashboard-projects">
+               
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h3 class="mb-0">
+                        Your recent projects:
+                    </h3>
+                    <a href="/projects" class="arrow-link">
+                        <span class="d-none d-lg-inline">
+                            See more
+                        </span>
+                        <span class="arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15.547" height="9.58" viewBox="0 0 15.547 9.58"><g transform="translate(-1074.383 -1004.001)"><path d="M1089.572,1009.149h-14.831a.358.358,0,0,1,0-.716h14.831a.358.358,0,1,1,0,.716Z" fill="currentColor"/><path d="M1085.129,1013.581a.358.358,0,0,1-.253-.612l4.179-4.178-4.179-4.179a.358.358,0,0,1,.507-.506l4.431,4.432a.357.357,0,0,1,0,.506l-4.431,4.432A.358.358,0,0,1,1085.129,1013.581Z" fill="currentColor"/></g></svg>
+                        </span>
+                    </a>
+                </div>
+
+                <div class="row">
+                    <% recent_projects.forEach(project => { %>
+                       <div class="col-6 col-lg-3 col-xl-2 px-3 pb-4">
+                        <%- include('partials/project', {async: true, project:project}); %>
+                       </div>
+                    <% }) %>
+                 </div>
+            </div>
+
+        </div>
+    </div>
+
+<%- include('partials/old-export-template', {async: true}); %>
+<%- include('partials/footer', {async: true}); %>
+
+<script>
+
+    var TOKEN = '<%=user.token.access_token%>';
+ 
+ </script>
+
+<script src="/static/js/old-templates.js?<%=Date.now()%>"></script>

@@ -1,0 +1,287 @@
+.settings-page .nav-wrapper .links-wrapper {
+  padding: 38px 26px;
+}
+.settings-page .inner-content-wrapper {
+  background-color: white;
+  border-radius: 26px;
+  height: 760px;
+  overflow: hidden;
+}
+.settings-page .inner-content-wrapper .content-wrapper {
+  width: 100%;
+  padding: 50px 40px;
+  overflow: auto;
+}
+.settings-page .label-text {
+  letter-spacing: 0.5px;
+}
+.settings-page .label-text.users {
+  margin-top: 60px;
+}
+.settings-page input {
+  border: none;
+  border-radius: 14px;
+  height: 48px;
+  padding: 0px 22px;
+  background-color: #f5f5f5;
+}
+.settings-page .user-list {
+  padding: 10px;
+  border-radius: 14px;
+  background-color: #fff;
+}
+.settings-page .user-list .user-line {
+  background-color: #f5f5f5;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  padding: 18px 24px;
+}
+.settings-page .user-list .user-line .avatar {
+  height: 40px;
+  width: 40px;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+.settings-page .user-list .user-line:last-child {
+  margin-bottom: 0px;
+}
+.settings-page .user-list .user-line .buttons-wrapper .button {
+  height: 40px;
+  width: 40px;
+  background-color: #fff;
+  border-radius: 50%;
+  margin-left: 14px;
+  transition: 0.25s;
+}
+.settings-page .user-list .user-line .buttons-wrapper .button.disabled {
+  cursor: no-drop;
+  filter: grayscale(100%);
+  opacity: 0.5;
+}
+.settings-page .user-list .user-line .buttons-wrapper .button:not(.disabled):hover {
+  transform: scale(1.15);
+}
+.settings-page .user-list .user-line .buttons-wrapper .button.edit i {
+  color: rgba(107, 82, 250, 0.5);
+}
+.settings-page .user-list .user-line .buttons-wrapper .button.delete i {
+  color: rgba(242, 32, 32, 0.5);
+}
+.settings-page .add-user-button {
+  margin-top: 16px;
+  margin-left: 10px;
+}
+.settings-page .current-plan-wrapper {
+  background-color: #f5f5f5;
+  border-radius: 14px;
+  padding: 16px 32px;
+  margin-bottom: 40px;
+}
+.settings-page .payment-types {
+  overflow: hidden;
+  background-color: #f5f5f5;
+  border-radius: 14px;
+  padding: 16px 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 33fr);
+  gap: 12px;
+  overflow: auto;
+  max-height: calc(100% - 194px);
+}
+.settings-page .payment-types .inner-card-wrapper {
+  aspect-ratio: 1.65/1;
+  border-radius: 8px;
+  position: relative;
+}
+.settings-page .payment-types .inner-card-wrapper.amex {
+  background-color: #e3ebff;
+  color: #3042df;
+}
+.settings-page .payment-types .inner-card-wrapper.visa {
+  background-color: #ffefe3;
+  color: #e46d3a;
+}
+.settings-page .payment-types .inner-card-wrapper.add {
+  background-color: #fff;
+  cursor: pointer;
+}
+.settings-page .payment-types .inner-card-wrapper.add i {
+  font-size: 30px;
+  color: rgba(0, 0, 0, 0.2);
+}
+.settings-page .payment-types .inner-card-wrapper .cc-header,
+.settings-page .payment-types .inner-card-wrapper .cc-footer {
+  width: 100%;
+  padding: 10px 18px;
+}
+.settings-page .payment-types .inner-card-wrapper .cc-header {
+  padding-top: 14px;
+}
+.settings-page .payment-types .inner-card-wrapper .hover-only {
+  display: none;
+}
+.settings-page .payment-types .inner-card-wrapper:hover .hover-only {
+  display: block;
+}
+.settings-page .payment-types .inner-card-wrapper:hover .hover-only.df {
+  display: flex;
+}
+.settings-page .payment-types .inner-card-wrapper .brand-icon i {
+  font-size: 32px;
+}
+.settings-page .payment-types .card-details {
+  margin-top: 10px;
+  font-size: 0.8vw;
+}
+.settings-page .reset-p {
+  margin-top: 50px;
+}
+.settings-page .password-btns-wrapper button {
+  margin-right: 16px;
+}
+
+.brand-payment .new-popup {
+  aspect-ratio: initial;
+}
+.brand-payment .new-popup .new-popup-content {
+  overflow: auto;
+  padding: 26px 28px;
+}
+.brand-payment .new-popup .new-popup-content .c-card {
+  padding: 8px 6px;
+}
+
+.add-user.new-popup-wrapper .new-popup {
+  aspect-ratio: initial;
+}
+.add-user.new-popup-wrapper .new-popup-content {
+  overflow: auto;
+  padding: 20px 28px;
+}
+.add-user.new-popup-wrapper .new-popup-content .input-wrapper {
+  margin-bottom: 18px;
+}
+.add-user.new-popup-wrapper .new-popup-content .input-wrapper .label {
+  letter-spacing: 1px;
+  font-size: 12px;
+  opacity: 0.5;
+  text-transform: uppercase;
+}
+.add-user.new-popup-wrapper .new-popup-content .input-wrapper input {
+  height: 52px;
+  border-radius: 14px;
+  padding: 0px 20px;
+  background-color: #f5f5f5;
+  border-color: #f5f5f5;
+}
+.add-user.new-popup-wrapper .new-popup-content .upload-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  border-radius: 14px;
+  padding: 0px 20px;
+  background-color: #f5f5f5;
+  border-color: #f5f5f5;
+  font-weight: normal;
+  font-size: 1rem;
+}
+.add-user.new-popup-wrapper .new-popup-content .file-label {
+  font-weight: normal;
+  font-size: 1rem;
+}
+
+.new-popup-wrapper.add-card-popup .new-popup .new-popup-content {
+  overflow: auto;
+  padding: 30px 28px 0px;
+}
+.new-popup-wrapper.add-card-popup .new-popup .new-popup-content .card-element {
+  border-radius: 14px;
+  background-color: #f5f5f5;
+  border-color: #f5f5f5;
+  padding: 18px 16px;
+}
+
+.new-popup-wrapper.reset-password-popup .new-popup-content {
+  overflow: auto;
+  padding: 20px 28px 10px;
+}
+.new-popup-wrapper.reset-password-popup .new-popup-content .input-wrapper {
+  margin-bottom: 18px;
+}
+.new-popup-wrapper.reset-password-popup .new-popup-content .input-wrapper .brand-label {
+  letter-spacing: 1px;
+  font-size: 12px;
+  opacity: 0.5;
+}
+.new-popup-wrapper.reset-password-popup .new-popup-content .input-wrapper input {
+  height: 52px;
+  border-radius: 14px;
+  padding: 0px 20px;
+  background-color: #f5f5f5;
+  border-color: #f5f5f5;
+}
+
+@media screen and (max-width: 768px) {
+  .settings-page .inner-content-wrapper {
+    height: initial;
+    align-items: stretch;
+  }
+  .settings-page .inner-content-wrapper .content-wrapper {
+    padding: 30px 24px;
+  }
+  .settings-page .inner-content-wrapper .content-wrapper .user-list {
+    padding: 0px;
+  }
+  .settings-page .current-plan-wrapper {
+    flex-flow: column;
+    align-items: flex-start;
+  }
+  .settings-page .current-plan-wrapper .mla {
+    margin-left: initial;
+    margin-top: 20px;
+  }
+  .settings-page .payment-types {
+    display: flex;
+    flex-flow: column;
+  }
+  .settings-page .payment-types .card-details {
+    font-size: 10px;
+    margin-bottom: 6px !important;
+    margin-top: 5px;
+  }
+  .settings-page .user-list .user-line {
+    flex-flow: column;
+    align-items: flex-start;
+  }
+  .settings-page .user-list .user-line .mla {
+    margin-left: initial;
+    margin-top: 20px;
+  }
+  .settings-page .user-list .user-line .buttons-wrapper .button:nth-child(1) {
+    margin-left: 0px;
+  }
+  .settings-page .password-btns-wrapper {
+    margin-bottom: 24px;
+  }
+  .settings-page .logout {
+    background-color: transparent;
+  }
+  .reset-password-popup .text-right.new-popup-footer {
+    display: flex;
+    flex-flow: column-reverse;
+    height: initial;
+    padding-bottom: 16px;
+  }
+  .reset-password-popup .text-right.new-popup-footer input {
+    flex-shrink: 0;
+    margin-top: 0 !important;
+  }
+  .reset-password-popup .text-right.new-popup-footer button {
+    background-color: transparent;
+    color: #162d3d;
+    margin-top: 10px !important;
+    font-size: 16px;
+  }
+}/*# sourceMappingURL=settings.css.map */

@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Prettysmart</title>
+    <link rel="stylesheet" href="/site_static/css/style.css?<%=Date.now()%>">
+    <script src="/site_static/js/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="/site_static/js/script.js?4"></script>
+    <script src="/site_static/js/slick.min.js"></script>
+    <link rel="shortcut icon" href="/site_static/images/favicon.ico">
+
+    <script type='text/javascript'>
+        window.__lo_site_id = 277591;
+        
+        (function() {
+            var wa = document.createElement('script'); wa.type = 'text/javascript'; wa.async = true;
+            wa.src = 'https://d10lpsik1i8c69.cloudfront.net/w.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(wa, s);
+            })();
+        </script>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-main">
+                    <div class="logo">
+                        <a href="<%=signup_root%>" title="Prettysmart"><img src="/site_static/images/logo.svg" alt="Prettysmart"></a>
+                    </div>
+                    <nav>
+                        <div class="menu-c">
+                            <ul>
+                                <li><a href="#about">About</a></li>
+                                <li><a href="#features">Features</a></li>
+                                <li><a href="#pricing">Pricing</a></li>
+                                <li><a href="/login">Login</a></li>
+                                <li><a href="#" class="btn-form" data-link="<%=signup_link%>"><%=signup_text%></a> </li>
+                            </ul>
+                        </div>
+                    </nav>
+                    <div class="burger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <section class="banner">
+        <div class="container">
+            <div class="content">
+                <div class="text-main">
+                    <h1 class="wowo fadeInUp delay-in-1">Branded Design fast.</h1>
+                    <div class="wowo fadeInUp delay-in-2"><p class="pb-lg-5">Enter your text and the app will create a design according to your brand, in literally seconds.</p></div>
+                 
+                    <form action="" class="wowo fadeInUp delay-in-3">
+                        <div class="email">
+                            <input type="email" name="email" placeholder="Enter your email address">
+                        </div>
+                        <div class="btn-main">
+                            <input type="submit" value="<%=signup_text%>" class="btn-a btn-form"  data-link="<%=signup_link%>">
+                            <a href="#" class="btn-a btn-email video-link embed">Watch video</a>
+                        </div>
+                        <!-- <p>*Graphic artists need not apply.</p> -->
+                    </form>
+                </div>
+                <div class="img-box wowo fadeInUp">
+                    <div class="video">
+                        <div class="video-bg" style="background-image: url(/site_static/images/banner-img.png?1);">
+                            <a href="javascript:void(0)" class="video-link embed">
+                                <span class="play" style="background-image: url(/site_static/images/play.svg);"></span>
+                                
+                            </a>
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="design">
+        <div class="container">
+            <h2 class="wowo fadeInUp"><span>Design everything.</span></h2>
+            <div class="design-slider wowo fadeInUp" id="design-slider">
+                <div class="slider-item">
+                    <div class="slider-list">
+                        <img src="/site_static/images/design-list-01.svg" alt="">
+                    </div>
+                </div>
+                <div class="slider-item">
+                    <div class="slider-list">
+                        <img src="/site_static/images/design-list-02.svg" alt="">
+                    </div>
+                </div>
+                <div class="slider-item">
+                    <div class="slider-list">
+                        <img src="/site_static/images/design-list-03.svg" alt="">
+                    </div>
+                </div>
+                <!-- <div class="slider-item">
+                    <div class="slider-list">
+                        <img src="/site_static/images/design-list-04.svg" alt="">
+                    </div>
+                </div> -->
+                <div class="slider-item">
+                    <div class="slider-list">
+                        <img src="/site_static/images/design-list-05.svg" alt="">
+                    </div>
+                </div>
+                <!-- <div class="slider-item">
+                    <div class="slider-list">
+                        <img src="/site_static/images/design-list-06.svg" alt="">
+                    </div>
+                </div> -->
+                <!-- <div class="slider-item">
+                    <div class="slider-list">
+                        <img src="/site_static/images/design-list-07.svg" alt="">
+                    </div>
+                </div> -->
+                <!-- <div class="slider-item">
+                    <div class="slider-list">
+                        <img src="/site_static/images/design-list-03.svg" alt="">
+                    </div>
+                </div> -->
+            </div>
+            <div class="design-bottom wowo fadeInUp">
+                <a href="#" class="btn-design btn-form" data-link="<%=signup_link%>"><%=signup_text%></a>
+            </div>
+        </div>
+    </section>
+    <section class="features" id="features">
+        <div class="container">
+            <div class="features-content">
+                <div class="slider-content">
+                    <div class="slide-left wowo fadeInUp">
+                        <div class="sub-title">FEATURES</div>
+                        <h2>This is the future of design. </h2>
+                        <ul>
+                            <li class="active"><span class="num">01.</span>Fastest design tool</li>
+                            <li><span class="num">02.</span>Branded</li>
+                            <li><span class="num">03.</span>Ready to use posts</li>
+                            <li><span class="num">04.</span>Free photos</li>
+                            <li><span class="num">05.</span>Easy editor</li>
+                            <li><span class="num">06.</span>All sizes</li>
+                            <li><span class="num">07.</span>All events</li>
+                            <li><span class="num">08.</span>Social Media Scheduling </li>
+                            <!-- <li><span class="num">09.</span>Two easy ways</li> -->
+                        </ul>
+                    </div>
+                    <div class="slide-right wowo fadeInUp">
+                        <div class="features-slider-box" id="slider">
+                            <div class="item">
+                                <div class="img-box">
+                                    <img src="/site_static/images/features/fast.jpg?1" alt="">
+                                </div>
+                                <p>Type text and the bot spits out beautiful designs based on your brand.</p>
+                            </div>
+                            <div class="item">
+                                <div class="img-box">
+                                    <img src="/site_static/images/features/branded.jpg?1" alt="">
+                                </div>
+                                <p>All designs are created uniquely for your brand, using your logo, colors, and fonts.</p>
+                            </div>
+                            <div class="item">
+                                <div class="img-box">
+                                    <img src="/site_static/images/features/tamplates.jpg?1" alt="">
+                                </div>
+                                <p>Choose a ready to use branded post, just download it and post it.</p>
+                            </div>
+                            <div class="item">
+                                <div class="img-box">
+                                    <img src="/site_static/images/features/unsplash.jpg?1" alt="">
+                                </div>
+                                <p>Free photos-With Unsplash integrated, you get a world of royalty-free stock and lifestyle photos at your fingertips</p>
+                            </div>
+                            <div class="item">
+                                <div class="img-box">
+                                    <img src="/site_static/images/features/editor.jpg?1" alt="">
+                                </div>
+                                <p>Easy editor-Zero design or graphic skills necessary. All you need is 18 seconds or less.</p>
+                            </div>
+                            <div class="item">
+                                <div class="img-box">
+                                    <img src="/site_static/images/features/sizes.jpg?2" alt="">
+                                </div>
+                                <p>All sizes- Get the same look across multiple platforms, for seamless marketing.</p>
+                            </div>
+                            <div class="item">
+                                <div class="img-box">
+                                    <img src="/site_static/images/features/events.jpg?1" alt="">
+                                </div>
+                                <p>All events - Tell the bot exactly what you need, whether it’s a  sale, a birthday greeting, or a new blog post.</p>
+                            </div>
+                            <div class="item">
+                                <div class="img-box">
+                                    <img src="/site_static/images/features/buffer.jpg?1" alt="">
+                                </div>
+                                <p>Social Media Scheduling - Schedule with buffer without leaving Prettysmart. It really is that easy to start getting likes.</p>
+                            </div>
+                            <!-- <div class="item">
+                                <div class="img-box">
+                                    <img src="/site_static/images/features/easyway.jpg" alt="">
+                                </div>
+                                <p>Two easy ways- Either customize an existing template or let the bot start from scratch. Either way it’s all about your brand.</p>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="features-bottom wowo fadeInUp">
+                    <a href="#" class="btn-a"><%=signup_text%></a>
+                    <div class="dividing-line"></div>
+                    <div class="slick-arrow">
+                        <a href="#" class="icon-arrow-right2 icon-arrow-prev arrow-prev"></a>
+                        <a href="#" class="icon-arrow-right2 icon-arrow-next arrow-next"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="works">
+        <div class="container">
+            <h2 class="wowo fadeInUp">How It Works</h2>
+            <div class="content">
+                
+                <div class="item wowo fadeInUp">
+                    <div class="img-box">
+                        <img src="/site_static/images/works-list-02.svg" alt="">
+                    </div>
+                    <div class="text">
+                        <h3>Upload your brand.</h3>
+                        <p>Upload your brand logo and colors when you create your account.</p>
+                    </div>
+                </div>
+                <div class="item wowo fadeInUp">
+                    <div class="img-box">
+                        <img src="/site_static/images/works-list-01.svg" alt="">
+                    </div>
+                    <div class="text">
+                        <h3>Tell us what you need.</h3>
+                        <p>Then, whenever you need a new graphic, just tell us what you’re looking for.</p>
+                    </div>
+                </div>
+                <div class="item wowo fadeInUp">
+                    <div class="img-box">
+                        <img src="/site_static/images/works-list-03.svg" alt="">
+                    </div>
+                    <div class="text">
+                        <h3>Design in seconds.</h3>
+                        <p>You'll get custom branded posts designed in seconds!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="btn-main wowo fadeInUp">
+                <a href="javascript:void(0)" class="video-link embed btn-a">Watch video <i></i></a>
+               
+            </div>
+        </div>
+    </section>
+    <section class="design-philosophy">
+        <h2 class="wowo fadeInUp">Facts we proved false.</h2>
+        <div class="content">
+            <div class="slider-box">
+                <div class="item wowo fadeInUp">
+                    <div class="item-main">
+                        <div class="item-bg">
+                            <h3>01</h3>
+                            <h4>Good design takes a long times.</h4>
+                            <p>Create high quality design within 18 seconds.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="item wowo fadeInUp">
+                    <div class="item-main">
+                        <div class="item-bg">
+                            <h3>02</h3>
+                            <h4>Businesses that post quality posts daily have an inhouse design team.</h4>
+                            <p>No, it might actually be the CEO during her morning commute.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="item wowo fadeInUp">
+                    <div class="item-main">
+                        <div class="item-bg">
+                            <h3>03</h3>
+                            <h4>Professional design is expensive.</h4>
+                            <p>Or it can cost you $36</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="item wowo fadeInUp">
+                    <div class="item-main">
+                        <div class="item-bg">
+                            <h3>04</h3>
+                            <h4>It's either boring, reused templates or expensive, unique content.</h4>
+                            <p>Nope, our designs and templates are branded so well that you will constantly stick in people’s minds.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="item wowo fadeInUp">
+                    <div class="item-main">
+                        <div class="item-bg">
+                            <h3>05</h3>
+                            <h4>You will always see a difference between a template and a design agency.</h4>
+                            <p>Hundreds of businesses testify that there is no difference between a Pretty Smart template and work designed by a professional designer.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="cta">
+        <div class="content">
+            <div class="text wowo fadeInUp">
+                <h2>Branded. Beautiful. Boom!</h2>
+                <div class="btn-main">
+                    <a href="#" class="btn-a btn-form" data-link="<%=signup_link%>"><%=signup_text%>.</a>
+                </div>
+            </div>
+            <div class="img-box wowo fadeInUp">
+                <img src="/site_static/images/acrco-01.svg?1" alt="">
+            </div>
+        </div>
+    </section>
+    <section id="about" class="text-and-images-group">
+        <div class="container">
+            <div class="content-list">
+                <div class="text-box wowo fadeInUp animated">
+                    <h2>Pretty</h2>
+                    <p>Design school is about to go out of business. With the help of our bot you can create
+                        professional-looking content from your couch, no equipment or experience needed.</p>
+                </div>
+                <div class="img-box wowo fadeInUp animated">
+                    <img src="/site_static/images/text-and-images-group-01.svg?1" alt="">
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="text-and-images-group overturn">
+        <div class="container">
+            <div class="content-list">
+                <div class="text-box wowo fadeInUp animated">
+                    <h2>Smart</h2>
+                    <p>Your new bot friend is a color expert, layout whiz, and creative genius all in one. You tell her
+                        what you need, and you’ll get it perfectly designed and ready to go. Your posts always match
+                        your brand and are like none other. This is lightyears ahead of a DIY template.</p>
+                </div>
+                <div class="img-box wowo fadeInUp animated">
+                    <img src="/site_static/images/text-and-images-group-02.png?2" alt="">
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content-module">
+        <div class="container">
+            <div class="content">
+                <div class="content-list wowo fadeInUp">
+                    <h2>Smart Bot</h2>
+                    <p>Tell us what you need and the bot will make it for you instantly, perfectly customized to fit
+                        your brand!</p>
+                    <a href="#" class="btn-a btn-form" data-link="<%=signup_link%>">
+                        <span class="hide-on-hover">Go Pretty, go!</span>
+                        <span class="show-on-hover"><%=signup_text%>.</span>
+                    </a>
+                </div>
+                <div class="dividing-line"><span>or</span></div>
+                <div class="content-list wowo fadeInUp">
+                    <h2>Ready to use </h2>
+                    <p>
+                        Choose a ready to use branded post,  just download it and post it.
+                        <br>
+                        &nbsp;
+                    </p>
+                    <a href="#" class="btn-a btn-form">
+                        <span class="hide-on-hover">Pretty Templates!</span>
+                        <span class="show-on-hover"><%=signup_text%>.</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <h2 class="wowo fadeInUp">See Our Pricing</h2>
+            <div class="content">
+                <div class="item wowo fadeInUp">
+                    <h3>Monthly</h3>
+                    <div class="pricing-title"><span>$36</span>/month</div>
+                    <div class="small">*When paid monthly</div>
+                    <div class="btn-main">
+                        <a class="more btn-form" data-link="<%=signup_link%>"><%=signup_text%></a>
+                    </div>
+                    <div class="text">
+                        <ul>
+                            <li>Get unlimited designs in seconds</li>
+                            <li>Social Media scheduler with Buffer</li>
+                            <li>Unlimited stock images</li>
+                            <li>Unlimited saved projects</li>
+                            <li>Unlimited downloads</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="item wowo fadeInUp">
+                    <h3>Annually</h3>
+                    <div class="pricing-title"><span>$28</span>/month</div>
+                    <div class="small">*When paid annually</div>
+                    <div class="btn-main">
+                        <a class="more btn-form" data-link="<%=signup_link%>"><%=signup_text%></a>
+                    </div>
+                    <div class="text">
+                        <ul>
+                            <li>Get unlimited designs in seconds</li>
+                            <li>Social Media scheduler with Buffer</li>
+                            <li>Unlimited stock images</li>
+                            <li>Unlimited saved projects</li>
+                            <li>Unlimited downloads</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="cta  cta-two">
+        <div class="content">
+            <div class="text wowo fadeInUp">
+                <h2>Do it before your competitor.</h2>
+                <div class="btn-main">
+                    <a href="#" class="btn-a btn-form" data-link="<%=signup_link%>"><%=signup_text%>.</a>
+                </div>
+            </div>
+            <div class="img-box wowo fadeInUp">
+                <img src="/site_static/images/acrco-02.svg?2" alt="">
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+        <div class="footer-top">
+            <div class="container">
+                <div class="logo-left">
+                    <div class="logo" title="Prettysmart">
+                        <img src="/site_static/images/logo.svg" alt="Prettysmart">
+                    </div>
+                    <p>Enter your text and the app will create a design according to your brand, in literally seconds.</p>
+                    <div class="email-us">
+                        <div class="title"><i></i>Email us:</div>
+                        <a href="mailto:hi@prettysmart.co">hi@prettysmart.co</a>
+                        <br>
+                        <a href="tel:+1800-707-7170">1800-707-7170</a>
+                    </div>
+                </div>
+                <div class="footer-menu">
+                    <div class="item">
+                        <h3>Pages</h3>
+                        <ul>
+                            <li><a href="#features">Features</a></li>
+                            <li><a href="#about">About</a></li>
+                            <li><a href="#pricing">Pricing</a></li>
+                            <li><a href="#" class="btn-form" data-link="<%=signup_link%>"><%=signup_text%></a></li>
+                        </ul>
+                    </div>
+                    <div class="item">
+                        <h3>Features</h3>
+                        <ul>
+                            <li><a href="">Fastest design tool</a></li>
+                            <li><a href="">Branded</a></li>
+                            <li><a href="">Ready to use posts</a></li>
+                            <li><a href="">Free photos</a></li>
+                            <li><a href="">Easy editor</a></li>
+                            <li><a href="">All events</a></li>
+                            <li><a href="">Social Media Scheduling</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="subscribe">
+                    <h3>Subscribe to our Newsletter</h3>
+                    <form action="">
+                        <div class="form-subscribe">
+                            <input type="email" placeholder="Email address" class="email" name="email">
+                            <input type="text" name="newsletter" value="Yes" class="d-none">
+                            <input type="submit" value="Submit" class="submit">
+                        </div>
+                    </form>
+                    <% if (false) { %>
+                    <div class="footer-link">
+                        <a href="#" class="active" title="Twitter" target="_blank"
+                            ><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#" title="LinkedIn" target="_blank"
+                            ><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#" title="facebook" target="_blank"
+                            ><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#" title="Instagram" target="_blank"
+                            ><i class="fa-brands fa-instagram"></i></a>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p> &copy; 2020 Prettysmart <a href="/pages/privacy-policy">Your Privacy </a> | <a href="/pages/term-of-use">Terms</a></p>
+            </div>
+        </div>
+    </footer>
+    <section class="video-light-box">
+        <div class="video-box">
+            <button class="close" title="Close"></button>
+            <div class="play-iframe-video">
+                <script src="https://fast.wistia.com/embed/medias/47cu161uz9.jsonp" async></script><script src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_47cu161uz9 videoFoam=true" style="height:100%;position:relative;width:100%"><div class="wistia_swatch" style="height:100%;left:0;opacity:0;overflow:hidden;position:absolute;top:0;transition:opacity 200ms;width:100%;"><img src="https://fast.wistia.com/embed/medias/47cu161uz9/swatch" style="filter:blur(5px);height:100%;object-fit:contain;width:100%;" alt="" aria-hidden="true" onload="this.parentNode.style.opacity=1;" /></div></div></div></div>
+            </div>
+        </div>
+    </section>
+    <section class="pop-up form-c" id="subscribe-form">
+        <div class="box close-btn"></div>
+        <div class="contact-form-main">
+            <div class="contact-form-outer">
+                <div class="contact-form">
+                    <div class="title-c">
+                        <h2><%=signup_text%> now.</h2>
+                        <h2 class="success-message">
+                            Thank you for joining the early adopters waiting list!
+                        </h2>
+                        <p class="close-btn"></p>
+                    </div>
+                    <div class="form">
+                        <div class="success-message text-center">
+                            We will save you a spot and reach out to you as soon as Prettysmart goes live.
+                        </div>
+                        <form action="/" method="get">
+                            <input type="hidden" name="form" value="join">
+                            <div class="form-item two-columns">
+                                <div class="form-list">
+                                    <input type="text" name="first_name" placeholder="First Name" required>
+                                </div>
+                                <div class="form-list">
+                                    <input type="text" name="last_name" placeholder="Last Name" required>
+                                </div>
+                            </div>
+                            <div class="form-item">
+                                <div class="form-list">
+                                    <input type="email" name="email" placeholder="Email Address" required>
+                                </div>
+                            </div>
+                            <div class="form-item">
+                                <div class="form-list">
+                                    <input type="text" name="phone" placeholder="Phone Number" required>
+                                </div>
+                            </div>
+                            <div class="form-item">
+                                <div class="form-textarea">
+                                    <textarea name="message" cols="30" rows="10" placeholder="Smart questions?"></textarea>
+                                </div>
+                            </div>
+                            <div class="submit-outer"><input type="submit" value="SUBMIT NOW" class="submit" /></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    </section>
+
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/44142094.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+
+</body>
+</html>

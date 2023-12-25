@@ -1,0 +1,12 @@
+<%- include('partials/header', {async: true}); %>
+<div class="container py-5">
+   <h1>Categories</h1>
+   <a href="/app/templates/" class="btn btn-primary mr-3 mt-3">All</a>
+   <% categories.forEach(category => { %>
+        <% category.template_category_items.forEach(item => { %>
+            <a href="/app/templates/<%=item.template_category_item_id%>" class="btn btn-primary mr-3 mt-3"><%=item.item_name%></a>
+        <% }) %>
+   <% }) %>
+</div>     
+
+<%- include('partials/footer', {async: true}); %>

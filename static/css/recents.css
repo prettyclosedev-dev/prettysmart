@@ -1,0 +1,102 @@
+.recents-page .content-wrapper {
+  background-color: white;
+  border-radius: 26px;
+  height: 760px;
+  padding: 3vw;
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+}
+.recents-page .content-wrapper .upgrade-wrapper {
+  margin-top: 26px;
+  background-color: #ffeaf0;
+  border-radius: 22px;
+  padding: 22px 22px 22px;
+  color: #000000;
+  transition: opacity 0.6s ease;
+}
+.recents-page .content-wrapper .upgrade-wrapper p {
+  padding: 0px 16px;
+  margin-bottom: 24px;
+}
+.recents-page .content-wrapper .upgrade-wrapper .upgrade-btn {
+  display: block;
+  background: #db3965;
+  border-radius: 15px;
+  color: white;
+  text-align: center;
+  height: 50px;
+  line-height: 50px;
+}
+.recents-page .content-wrapper .section-wrapper {
+  padding: 14px 18px 36px;
+}
+.recents-page .content-wrapper .section-header .section-title {
+  margin-top: 20px;
+  font-weight: 500;
+  font-size: 18px;
+}
+.recents-page .content-wrapper .section-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  -moz-column-gap: 20px;
+       column-gap: 20px;
+  row-gap: 20px;
+  margin-top: 20px;
+}
+.recents-page .content-wrapper .section-list .item {
+  border-radius: 18px;
+}
+.recents-page .content-wrapper .section-list.horizontal {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.recents-page .content-wrapper .section-list.horizontal .item {
+  aspect-ratio: 1/0.65;
+}
+.recents-page .content-wrapper .section-list.vertical .item {
+  aspect-ratio: 0.65/1;
+}
+.gt .download-button {
+  margin-left: 20px;
+  text-align: left;
+  padding: 0px;
+}
+.gt .download-button > button {
+  height: 100%;
+  color: #ffffff;
+}
+.gt .download-button > button:hover {
+  color: white;
+}
+.gt .download-button > button:nth-child(1) {
+  flex: 8;
+  text-align: left;
+  justify-content: flex-start;
+  padding-left: 18px;
+  border-radius: 10px 0px 0px 10px;
+}
+.gt .download-button > button:nth-child(2) {
+  border-radius: 0px 10px 10px 0px;
+}
+.gt .download-button > button:nth-child(2)::before {
+  content: "";
+  height: 80%;
+  width: 1px;
+  background-color: rgba(255, 255, 255, 0.2);
+  position: absolute;
+  left: -2px;
+}
+.gt .download-button > button:nth-child(2)::after {
+  border-width: 0px;
+}
+.gt .download-button .dropdown-menu button {
+  color: #000000;
+}
+.gt .download-button .opener {
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  padding-left: 14px;
+  height: 100%;
+}
+.gt .download-button .more-options {
+  position: absolute;
+}/*# sourceMappingURL=recents.css.map */

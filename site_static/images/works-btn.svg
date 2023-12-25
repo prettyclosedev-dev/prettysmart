@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="48" height="51" viewBox="0 0 48 51">
+  <defs>
+    <filter id="多边形_3" x="0" y="0" width="48" height="51" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feFlood flood-color="#a301e8" flood-opacity="0.302"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g transform="matrix(1, 0, 0, 1, 0, 0)" filter="url(#多边形_3)">
+    <path id="多边形_3-2" data-name="多边形 3" d="M6.652,1.357a1,1,0,0,1,1.7,0l5.7,9.113A1,1,0,0,1,13.2,12H1.8a1,1,0,0,1-.848-1.53Z" transform="translate(30 15) rotate(90)" fill="#fff"/>
+  </g>
+</svg>

@@ -1,0 +1,160 @@
+<%- include('partials/header', {async: true}); %>
+<link rel="stylesheet" href="/static/css/jquery-ui.min.css">
+<link rel="stylesheet" href="/static/css/settings.css?<%=Date.now()%>">
+<script src="/static/js/jquery-ui.min.js"></script>
+<style>
+.ui-autocomplete-loading {
+    background: white url("/static/images/ui-anim_basic_16x16.gif") right center no-repeat;
+}
+</style>
+<div class="df page-wrapper df ffp">
+  <%- include('partials/nav', {async: true}); %>
+
+  <div class="page-content">
+
+
+    <div class="settings-page">
+      <div class="page-content-wrapper">
+        <h2 class="page-title" style="z-index:150;">Settings<span class="text-primary">.</span></h2>
+        <div class="df inner-content-wrapper ">
+          <%- include('partials/settings-nav', {async: true}); %>
+          <div class="content-wrapper account-page">
+            <p class="label-text mb-20 fs16">User access</p>               
+            <div class="orientation-selection-wrapper" style="margin-bottom: 32px; flex-direction: row; display: flex;">
+                <input style="margin-right: 20px; text-align:center; height: inherit;" type="text" id="user_id_field" class="ui-widget ai_field" placeholder="Search for user name, email or company" name="users" />
+                <a href="#" class="d-none refresh-link px-lg-3 badge-pill text-white" onclick="searchUser()">
+                    <span class="">
+                        Search
+                    </span>                                                
+                </a>
+            </div>
+            <div class="user-main-wrapper">
+                <div class="user-secondary-wrapper">
+                    <% if(typeof currentUser !== "undefined" && currentUser) { %>
+                        <div class="user-wrapper">
+                            <p class="label-text mb-20 fs16">COMPANY NAME</p>
+                            <input type="text" name="name" value="<%= currentUser.account.name %>" class="form-control" required />
+            
+                            <p class="label-text mb-20 fs16 users">USER</p>
+                            <div class="user-list">
+                                <div class="df aic user-line">
+                                    <% if (currentUser.avatar) { %> <img class="avatar" src="<%= currentUser.avatar + '?' + Date.now() %>" /> <% } %>
+                                    <div>
+                                        <p class="fs18 mb-0">
+                                            <%-currentUser.first_name %> <%-currentUser.last_name %>
+                                        </p>
+                                        <p class="fs13 mb-0" style="font-size: 1rem;font-weight: 400;line-height: 1.5;color: #495057;">
+                                            <%-currentUser.user_title %> <%-currentUser.user_title && currentUser.user_additional ? "•" : ""  %> <%-currentUser.user_additional %>
+                                        </p>
+                                        </div>
+                                        <div class="df mla buttons-wrapper">
+                                        <p class="fs12 mb-0 ttuc" style="align-self: center;"><%-currentUser.role %></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="label-text mb-20 fs16">GENERATORS</p>
+                            <div class="user-list">
+                                <% generators.forEach(gen => { %>
+                                    <div class="df aic user-line">
+                                        <% if (gen.image) { %> <img class="avatar" src="<%= 'https://admin.prettysmart.co' + gen.image + '?' + Date.now() %>" /> <% } %>
+                                        <div>
+                                            <p class="fs18 mb-0">
+                                            <%-gen.name %>
+                                            </p>
+                                            <p class="fs13 mb-0" style="font-size: 1rem;font-weight: 400;line-height: 1.5;color: #495057;">
+                                            <%-gen.sub_title %>  • <%-gen._id %>
+                                            </p>
+                                        </div>
+                                        <div class="df mla buttons-wrapper">
+                                            <div onclick="genSelected(<%= JSON.stringify(gen) %>, <%= JSON.stringify(currentUser) %>)" class="df acc pointer button edit">
+                                                <i class="checkmark-<%= gen._id %> fa-regular fa-circle<%= gen.hasAccess ? '-check' : ''%>"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <%})%>
+                            </div>
+                            <p class="label-text mb-20 fs16">PAGES</p>
+                            <div class="user-list">
+                                <% pages.forEach(page => { %>
+                                    <div class="df aic user-line">
+                                        <i style="margin-right: 20px" class="fa-light fa-<%= page.icon %>"></i>                                        
+                                        <div>
+                                            <p class="fs18 mb-0">
+                                            <%-page.name %>
+                                            </p>
+                                        </div>
+                                        <div class="df mla buttons-wrapper">
+                                            <div onclick="pageSelected(<%= JSON.stringify(page) %>, <%= JSON.stringify(currentUser) %>)" class="df acc pointer button edit">
+                                                <i class="checkmark-<%= page.name %> fa-regular fa-circle<%= page.hasAccess ? '-check' : ''%>"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <%})%>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    $(function () {
+        $('.ai_field').each(function(i, el) {
+            $(el).autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: `/settings/users?query=${request.term}`,
+                        success: function (data) {
+                            if (data && data.success && data.users && data.users.length) {
+                                response(data.users);
+                            } else {
+                                response([]);
+                            }
+                        },
+                    });
+                },
+                minLength: 2,
+                select: function (event, ui) {
+                    $(el).val(ui.item.label)
+                    searchUser(ui)
+                },
+            });
+        });
+    });
+
+    function searchUser(ui) {
+        $('.user-main-wrapper').load(`/settings/access?id=${ui.item.value}` +  ' .user-secondary-wrapper', function(res) {
+
+        });
+    }
+
+    function genSelected(gen, user) {
+        $.post(`/settings/access/generator/` + user.account._id, {generator: gen}).then(function(res) {
+            if (res.success) {
+                $(".checkmark-" + gen._id).toggleClass("fa-circle-check")
+                $(".checkmark-" + gen._id).toggleClass("fa-circle")
+            }
+        }).catch(function(e) {
+            console.log(e)
+        })
+    }
+
+    function pageSelected(page, user) {
+        $.post(`/settings/access/page/` + user.account._id, {page: page}).then(function(res) {
+            if (res.success) {
+                $(".checkmark-" + page.name).toggleClass("fa-circle-check")
+                $(".checkmark-" + page.name).toggleClass("fa-circle")
+            }
+        }).catch(function(e) {
+            console.log(e)
+        })
+    }
+</script>
+
+</body>
+</html>

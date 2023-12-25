@@ -1,0 +1,33 @@
+<%- include('partials/header', {async: true}); %>
+
+    <div class="projects-page">
+
+         <div class="container-fluid">
+            <div class="banner">
+               <h1 class="text-secondary text-center">My recent projects</h1>
+                
+            </div>
+         </div>
+
+        <div class="container-fluid px-lg-5">
+           
+            <div class="row">
+                <% projects.forEach(project => { %>
+                   <div class="col-6 col-lg-2 mb-4">
+                    <%- include('partials/project', {async: true, project:project}); %>
+                   </div>
+                <% }) %>
+             </div>
+        </div>
+    </div>
+
+    <%- include('partials/export-template', {async: true}); %>
+<%- include('partials/footer', {async: true}); %>
+
+<script>
+
+    var TOKEN = '<%=user.token.access_token%>';
+ 
+ </script>
+
+<script src="/static/js/templates.js?<%=Date.now()%>"></script>

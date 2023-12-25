@@ -1,0 +1,126 @@
+<%- include('partials/header', {async: true}); %>
+<link rel="stylesheet" href="/static/css/settings.css?<%=Date.now()%>" />
+<!-- <link rel="stylesheet" href="/static/css/settings.css?1" /> -->
+<div class="df page-wrapper df ffp">
+  <%- include('partials/nav', {async: true}); %>
+
+    <div class="page-content">
+        <div class="settings-page">
+            <div class="page-content-wrapper">
+                <h2 class="page-title" style="z-index:150;">Settings<span class="text-primary">.</span></h2>
+                <div class="df inner-content-wrapper">
+                    <%- include('partials/settings-nav', {async: true}); %>
+                    <div class="df ffc content-wrapper">
+                        
+                        <p class="label-text mb-20 fs16 text-uppercase">Account email</p>
+                        <input value="<%- user.email %>" disabled type="text" name="username" class="form-control" required="" spellcheck="false" data-ms-editor="true">
+
+                        <p class="label-text mb-20 fs16 text-uppercase reset-p">Password</p>
+                        <div class="df aic password-btns-wrapper">
+                            <!-- <button class="my-button my-grey-button large"><i class="fa-regular fa-rotate"></i>Forgot password</button> -->
+                            <button class="my-button my-grey-button large"  onclick="window.location.href = '/settings/security/?reset=true' "><i class="fa-regular fa-key-skeleton-left-right"></i>Reset password</button>
+                        </div>
+
+                        <div class="mta">
+                           
+                            <button class="my-button my-light-button large text-primary logout"><i class="fa-regular fa-right-from-bracket"></i>Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="<%-showReset ? '':'d-none' %> new-popup-wrapper reset-password-popup">
+            <div class="overlay"></div>
+            <div class="new-popup"> 
+              
+                <form action="/settings/security/reset/<%=token%>" class="reset-form">
+                    <div class="text-danger text-center" data-field="reset"></div>  
+                    <div class="df aic new-popup-header">
+                        <p class="fs30 title">Reset Password</p>
+                        <div class="df acc mla close-button pointer" onclick="location.href='/settings/security'">
+                            <i class="fa-regular fa-xmark"></i>
+                        </div>
+                    </div>
+                    <div class="new-popup-content">
+                        <div class="input-wrapper">
+                            <label class="label ffp brand-label">CURRENT PASSWORD</label>
+                            <input type="text" name="current_password" value="" class="form-control" required="" spellcheck="false" data-ms-editor="true">
+                            <div class="text-danger" data-field="current_password"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <label class="label ffp brand-label">NEW PASSWORD</label>
+                            <input type="text" name="password" value="" class="form-control" required="" spellcheck="false" data-ms-editor="true">
+                            <div class="text-danger" data-field="password"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <label class="label ffp brand-label">REPEAT NEW PASSWORD</label>
+                            <input type="text" name="confirm_password" value="" class="form-control" required="" spellcheck="false" data-ms-editor="true">
+                            <div class="text-danger" data-field="confirm_password"></div>
+                        </div>
+                    </div>
+                    <div class="text-right new-popup-footer">
+                        <button class="btn btn-secondery badge-pill px-5 mt-4" onclick="location.href='/settings/security'">Cancel</button>
+                        <!-- <button class="btn btn-primary badge-pill px-5 mt-4" type="submit">Reset Password</button> -->
+                        <input type="submit" value="Reset Password" class="btn btn-primary badge-pill px-5 mt-4">
+                    </div>
+
+                    <div class="form-loader">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                            viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+                            <rect fill="none" stroke="#F7176D" stroke-width="4" x="25" y="25" width="50" height="50">
+                                <animateTransform attributeName="transform" dur="0.5s" from="0 50 50" to="180 50 50" type="rotate"
+                                    id="strokeBox" attributeType="XML" begin="rectBox.end" />
+                            </rect>
+                            <rect x="27" y="27" fill="#F7176D" width="46" height="50">
+                                <animate attributeName="height" dur="1.3s" attributeType="XML" from="50" to="0" id="rectBox"
+                                    fill="freeze" begin="0s;strokeBox.end" />
+                            </rect>
+                        </svg>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).on('submit', ".reset-form", function() {
+        var $form = $(this),
+            data = $form.serialize();
+
+        $form.find('.form-loader').addClass('d-flex');
+        $('[data-field="reset"]').text("");
+        $('[data-field="current_password"]').text("");
+        $('[data-field="password"]').text("");
+        $('[data-field="confirm_password"]').text("");
+
+        $.post($form.attr('action'), data, function(res) {
+            if (!res.success) {
+                failed(res, $form)
+            } else {
+                window.location.href = res.href;
+            }
+        }).fail(function(res){
+            failed(res, $form)
+        })
+
+        return false;
+    });
+
+    function failed(res, $form) {
+        if (res.errors) {
+            res.errors.forEach(function(error){
+                $('[data-field="'+ error.param +'"]').text(error.msg);
+            })
+        } else if (res.error){
+            $('[data-field="reset"]').text(res.error.message);
+        } else if (res.message) {                
+            $('[data-field="reset"]').text(res.message);
+        }
+        $form.find('.form-loader').removeClass('d-flex');
+    }
+</script>
+
+</body>
+</html>

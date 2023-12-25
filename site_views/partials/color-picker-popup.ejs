@@ -1,0 +1,95 @@
+<div id="colorPicker" class="new-popup-wrapper d-none gt misc">
+  <link rel="stylesheet" href="/static/css/color-picker.css?<%=Date.now()%>" />
+  <div class="overlay"></div>
+  <div class="new-popup">
+    <div class="colors-primary-wrapper">
+      <div>
+        <div class="df aic new-popup-header" style="border-bottom: none">
+          <p class="fs30 title">Colors </p>
+          <div
+            class="df acc mla close-button pointer close"
+            style="--bg-color: #84b9e01a %>; --bg-color-hover: #84b9e033 %>"
+            onclick="closeColorPicker()"
+          >
+            <i
+              class="fa-regular fa-xmark"
+              style="color: <%= user.account.brand.colors.primary %>"
+            ></i>
+          </div>
+        </div>
+        <div class="df colors-wrapper">
+          <div class="color-wrapper">
+            <div class="label ffp brand-label">PRIMARY COLOR</div>
+            <% if(typeof showLock != "undefined" && showLock === true) { %> 
+              <div class="color-lock lock-primary<%= user.account.brand.colors.primaryLocked ? ' selected' : '' %>"  onclick="updateLocked('primary')"><i class="fa-regular fa-lock<%= !user.account.brand.colors.primaryLocked ? '-open' : '' %>"></i></div>
+            <% } %>
+            <input
+              style="
+                background-color: <%= user.account.brand.colors.primary ||
+                  '#D5BA8C' %>;
+              "
+              type="color"
+              id="primary"
+              class="color"
+              value="<%= user.account.brand.colors.primary || '#1A428A' %>"
+              name="primary"
+              data-primary-color="<%= user.account.brand_primary || '#1A428A' %>"
+            />
+          </div>
+
+          <div class="color-wrapper">
+            <div class="label ffp brand-label">SECONDARY COLOR</div>
+            <% if(typeof showLock != "undefined" && showLock === true) { %> 
+              <div class="color-lock lock-secondary<%= user.account.brand.colors.secondaryLocked ? ' selected' : '' %>" onclick="updateLocked('secondary')"><i class="fa-regular fa-lock<%= !user.account.brand.colors.secondaryLocked ? '-open' : '' %>"></i></div>
+            <% } %>
+            <input
+              style="
+                background-color: <%= user.account.brand.colors.secondary ||
+                  '#D5BA8C' %>;
+              "
+              class="color"
+              type="color"
+              name="secondary"
+              id="secondary"
+              value="<%= user.account.brand.colors.secondary || '#D5BA8C' %>"
+              data-secondary-color="<%= user.account.brand_secondary || '#D5BA8C' %>"
+            />
+          </div>
+        </div>
+      </div>
+      <button class="save-brand fs14" data-save-brand>
+        <i class="fa-regular fa-check"></i>Save Changes
+      </button>
+    </div>
+  </div>
+</div>
+<script>
+  $(document).on("input", "#primary", function (e) {
+    $(e.target).css("background-color", e.target.value);
+  });
+
+  $(document).on("input", "#secondary", function (e) {
+    $(e.target).css("background-color", e.target.value);
+  });
+
+  function updateLocked(color){
+    $.post(`/brand/lock-color/${color}/${!$(`.lock-${color}`).hasClass("selected")}`).then(function(res) {
+      if (res && res.success) {
+        if (res.locked) {
+          $(`.lock-${color} i`).removeClass('fa-lock-open');
+          $(`.lock-${color} i`).addClass('fa-lock');
+        } else {
+          $(`.lock-${color} i`).removeClass('fa-lock');
+          $(`.lock-${color} i`).addClass('fa-lock-open');
+        }
+
+        $(`.lock-${color}`).toggleClass("selected")
+      } else {
+        alert(`Failed to lock color!${res.error ? " " + res.error : ""}`)
+      }
+    }).catch(function(e) {
+      console.log(e)
+      alert(`Failed to lock color!${e ? " " + e : ""}`)
+    })
+  }
+</script>

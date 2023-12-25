@@ -1,0 +1,131 @@
+<style>
+  .setup-help-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    /* padding: 25px; */
+    /* padding-top: 85px; */
+    font-style: normal;
+  }
+  .close-button {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+  }
+  .setup-help-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 25px;
+    text-align: center;
+    font-family: Poppins;
+    font-weight: 300;
+    width: 500px;
+    border-radius: 26px;
+    padding-top: 85px;
+    padding-bottom: 65px;
+  }
+  .setup-help-top-text {
+    font-size: 48px;
+    line-height: 50px;
+  }
+  .setup-help-mid-text {
+    line-height: 28px;
+    font-size: 20px;
+    margin-top: 20px;
+  }
+  .setup-help-bottom-text {
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 20px;
+    margin-top: 20px;
+  }
+  .primary-btn {
+    border: none;
+    border-radius: 10px;
+    color: #ffffff;
+    line-height: 1;
+    padding: 6px 14px;
+    height: 42px;
+    transition: all 0.2s ease;
+    margin-top: 20px;
+  }
+  @media (max-width: 767.98px) {
+    .setup-help-content {
+      flex-direction: column;
+    }
+  }
+</style>
+<div id="setup-help" class="new-popup-wrapper gt">
+  <div class="overlay"></div>
+  <div
+    class="new-popup"
+    style="max-width: unset; max-height: unset; aspect-ratio: unset"
+  >
+    <div class="setup-help-container">
+      <div
+        class="df acc mla close-button pointer"
+        style="background-color: white"
+        onclick="closeHelpPopUp()"
+      >
+        <i class="fa-regular fa-xmark" style="color: #db3965"></i>
+      </div>
+      <div class="setup-help-content">
+        <div class="setup-help-item">
+          <p class="setup-help-top-text" style="color: #db3965">
+            Set up your<br />brand<br />yourself.
+          </p>
+          <p class="setup-help-mid-text">
+            If you have your logo as an svg,<br />open pdf or ai file you can
+            set<br />it up yourself.
+          </p>
+          <p class="setup-help-bottom-text" style="color: #db3965">
+            It may take a minute but you can get<br />started right away.
+          </p>
+          <button
+            onclick="closeHelpPopUp();"
+            class="primary-btn fs16"
+            style="background-color: #db3965"
+          >
+            Let me try!
+          </button>
+        </div>
+        <div
+          class="setup-help-item"
+          style="
+            background-color: #db3965;
+            color: white;
+            border-top-left-radius: 0px;
+            border-bottom-left-radius: 0px;
+          "
+        >
+          <p class="setup-help-top-text">
+            Let us set up<br />your brand<br />for you.
+          </p>
+          <p class="setup-help-mid-text">
+            <%- plan_name === "Free" ? `Go premium and just upload<br />any
+            document with your<br />logo. We'll do the rest.` : `Just upload
+            any<br />document with your<br />logo.` %>
+          </p>
+          <p class="setup-help-bottom-text">
+            You might have to wait up to 48<br />hours but, hey, it's worth the
+            wait.
+          </p>
+          <button
+            onclick="<%= plan_name === 'Free' ? `location.href='/subscribe?upgrading=true'` : 'getItDone();' %>"
+            class="primary-btn fs16"
+            style="background-color: white; color: #db3965"
+          >
+            <%= plan_name === "Free" ? `Upgrade to premium!` : `Just get it
+            done!` %>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

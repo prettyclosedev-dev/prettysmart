@@ -1,0 +1,105 @@
+.sub-nav {
+  position: relative !important;
+  z-index: 100;
+  width: 23rem;
+  height: 100%;
+  border-right: 0.07rem solid #e0e0e0;
+  transition: all 0.5s ease;
+  top: 0;
+  background-color: white;
+  overflow-y: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.sub-nav::-webkit-scrollbar {
+  display: none;
+}
+.sub-nav .icon-text {
+  white-space: nowrap;
+  transition: opacity 0.6s ease;
+  opacity: 1;
+}
+.sub-nav .links-wrapper {
+  position: relative;
+  width: 100%;
+  flex-flow: column;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.5);
+  padding: 2rem 2.5rem 0px 1.9rem;
+}
+.sub-nav .links-wrapper .link-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  height: 2.7rem;
+  width: 100%;
+  padding: 1.5rem;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  color: rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+.sub-nav .links-wrapper .link-wrapper:hover {
+  color: #e0e0e0;
+  transition: 0.5s ease;
+}
+.sub-nav .links-wrapper .link-wrapper:hover::before {
+  opacity: 1;
+  visibility: unset;
+}
+.sub-nav .links-wrapper .link-wrapper.selected {
+  background-color: #f5f5f5;
+  border-radius: 1rem;
+  font-weight: 600;
+  color: #000000;
+}
+.sub-nav .links-wrapper .link-wrapper.selected i {
+  font-weight: 900;
+}
+.sub-nav .links-wrapper .link-wrapper .icon-wrapper {
+  height: 1.3rem;
+  width: 1.3rem;
+  opacity: 1;
+  position: relative !important;
+}
+.sub-nav .links-wrapper .link-wrapper .icon-wrapper i {
+  font-size: 1.3rem;
+}
+
+@media screen and (max-width: 1300px) {
+  .sub-nav {
+    width: initial;
+    flex-shrink: 0;
+  }
+  .sub-nav .icon-text {
+    display: none;
+  }
+  .sub-nav .links-wrapper {
+    padding: 0;
+  }
+  .sub-nav .links-wrapper .link-wrapper {
+    height: initial;
+    width: initial;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 22px;
+  }
+  .sub-nav .links-wrapper .link-wrapper.selected {
+    border-radius: initial;
+    background-color: #db3965;
+    opacity: 1;
+  }
+  .sub-nav .links-wrapper .link-wrapper.selected .icon-wrapper i {
+    color: white;
+  }
+  .sub-nav .links-wrapper .link-wrapper .icon-wrapper i {
+    font-size: 18px;
+  }
+}
+@media screen and (max-width: 768px) {
+  .sub-nav {
+    height: initial;
+  }
+}/*# sourceMappingURL=sub-nav.css.map */

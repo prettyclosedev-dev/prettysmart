@@ -1,0 +1,60 @@
+<div id="fontPicker" class="new-popup-wrapper d-none gt">
+<link rel="stylesheet" href="/static/css/font-picker.css?<%=Date.now()%>" />
+  <div class="overlay"></div>
+  <div class="new-popup">
+    <div class="fonts-primary-wrapper">
+      <div class="df aic new-popup-header" style="border-bottom: none">
+        <p class="fs30 title">Fonts</p>
+        <div
+          class="df acc mla close-button pointer close"
+          style="--bg-color: #84b9e01a %>; --bg-color-hover: #84b9e033 %>"
+          onclick="closeFontPicker()"
+        >
+          <i
+            class="fa-regular fa-xmark"
+            style="color: <%= user.account.brand.colors.primary %>"
+          ></i>
+        </div>
+      </div>
+      <div class="onboarding-font-row font-line" data-font-form="Regular">
+        <p class="brand-label title">
+          REGULAR FONT <%if(brand && brand.fonts && brand.fonts.Regular &&
+          brand.fonts.Regular.name){%> •
+          <span class="font-name"><%-brand.fonts.Regular.name%></span><%}%>
+        </p>
+        <%if(brand && brand.fonts && brand.fonts.Regular &&
+        brand.fonts.Regular.name){%>
+        <div class="font-preview userRegularFont">This is your font</div>
+        <%}%>
+        <div
+          class="<% if(brand && brand.fonts && brand.fonts.Regular && brand.fonts.Regular.name){ %>hovering<% } %> df font-upload-sec"
+        >
+          <label for="reg-input" class="df aic left-sec"
+            ><div class="icon"></div>
+            <div class="text">
+              <p class="fs10 label">Drop here to upload font</p>
+              <p class="fs8"><u>Or click to browse</u></p>
+            </div></label
+          >
+          <input
+            id="reg-input"
+            type="file"
+            data-file-type="font"
+            accept=".ttf"
+            name="Regular"
+            hidden
+          />
+          <div class="df acc right-sec">
+            <input
+              name="Regular"
+              class="google_font"
+              value="<%= brand && brand.fonts && brand.fonts.Regular ? brand.fonts.Regular.value : '' %>"
+              placeholder="Search Google Fonts"
+              class="form-control badge-pill pt-2 px-3"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,37 @@
+<div id="plansPopup" class="new-popup-wrapper d-none gt misc">
+  <link rel="stylesheet" href="/static/css/color-picker.css?<%=Date.now()%>" />
+  <div class="overlay"></div>
+  <div class="new-popup" style="min-width: 80%;max-width: 90%;max-height: 80%;">
+    <div class="plans-primary-wrapper">
+      <div>
+        <div class="df aic new-popup-header" style="border-bottom: none">
+          <p class="fs30 title">Plans</p>
+          <div
+            class="df acc mla close-button pointer close"
+            style="--bg-color: #84b9e01a %>; --bg-color-hover: #84b9e033 %>"
+            onclick="closePlansPopup()"
+          >
+            <i
+              class="fa-regular fa-xmark"
+              style="color: <%= user.account.brand.colors.primary %>"
+            ></i>
+          </div>
+        </div>
+        <script>
+            $(document).on('change', '[type="radio"]', function(e) {
+                  var new_interval = $(this).attr("id").includes("month") ? 'month' : 'year'
+                  $.post(`/landing/interval/${new_interval}`, function(data) {
+                      $('.price-items').html($(data).find('.price-items').html());
+                  });
+              });
+          </script>
+        <% if (typeof products != "undefined" && typeof interval != "undefined") { %>
+            <%- include('./plans-items', {async: true, onGray: false, products: products.data, interval}); %>
+        <% } %>
+      </div>
+    <div style="display: flex;justify-content: center;margin-top: 40px">
+        <%- include('./segment-control', {async: true, options: [{value: "Monthly", id: "month", selected: interval === "month"}, {value: "Yearly 20% off", id: "year", selected: interval === "year"}], inverted: false, segmentID: "land-seg"}); %>
+    </div>
+    </div>
+  </div>
+</div>

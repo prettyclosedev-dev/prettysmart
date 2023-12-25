@@ -1,0 +1,16 @@
+<div
+  data-template="<%=template.template_id%>"
+  data-export
+  class="template d-block rounded"
+  original_title="<%= template.template_title %>"
+  title="<%=template.template_title.replace('_free','');%>"
+>
+  <img
+    src="<%=template.thumbnail_url%>"
+    alt=""
+    class="rounded LoNotSensitive"
+  />
+  <% if (typeof showNewLoader != "undefined" && showNewLoader === true) { %> <%-
+  include('./template-loader-new', {async: true}); %> <% } else { %> <%-
+  include('./template-loader', {async:true}); %> <% } %>
+</div>

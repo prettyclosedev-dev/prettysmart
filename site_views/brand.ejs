@@ -1,0 +1,1010 @@
+<%- include('partials/header', {async: true}); %>
+    <link rel="stylesheet" href="/static/css/new-brand.css?<%=Date.now()%>">
+    <style>
+        @font-face {
+            font-family: "<%= brand.fonts.Regular.name %>";
+            <% if (!brand.fonts.Regular.google) { %> src: url("/files/<%= user.account.id %>/fonts/<%= brand.fonts.Regular.path %>") format('truetype'); <% } %>
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: "<%= brand.fonts.Bold.name %>";
+            <% if (!brand.fonts.Regular.google) { %> src: url("/files/<%= user.account.id %>/fonts/<%= brand.fonts.Bold.path %>") format('truetype'); <% } %>
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: "<%= brand.fonts.Italic.name %>";
+            <% if (!brand.fonts.Regular.google) { %> src: url("/files/<%= user.account.id %>/fonts/<%= brand.fonts.Italic.path %>") format('truetype'); <% } %>
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        @font-face {
+            font-family: "<%= brand.fonts.BoldItalic.name %>";
+            <% if (!brand.fonts.Regular.google) { %> src: url("/files/<%= user.account.id %>/fonts/<%= brand.fonts.BoldItalic.path %>") format('truetype'); <% } %>
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        .userRegularFont {
+            font-family: "<%= brand.fonts.Regular.name %>";
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        .userBoldFont {
+            font-family: "<%= brand.fonts.Bold.name %>";
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        .userItalicFont {
+            font-family: "<%= brand.fonts.Italic.name %>";
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        .userBoldItalicFont {
+            font-family: "<%= brand.fonts.BoldItalic.name %>";
+            font-weight: bold;
+            font-style: italic;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            var brand = <%- JSON.stringify(brand) %>;
+            var fonts = brand && brand.fonts;
+            if (fonts && Object.keys(fonts).length) {
+                Object.keys(fonts).forEach(function(key) {
+                    const {name, path, google} = fonts[key];
+                    if (google) {
+                        $('head').append(`<link href='https://fonts.googleapis.com/css?family=${name.replace(/([A-Z][a-z0-9]+)/g, '+$1 ').replace(/\s{2}/g," ").trim().replace(/ /g, "")}' rel='stylesheet' type='text/css'>`)
+                        $(`.user${key}Font`).css({
+                            'font-family': name.replace(/([a-z])([A-Z])/g, '$1 $2'), 
+                            'font-weight': key === 'Italic'
+                                    ? 'normal'
+                                    : key === 'BoldItalic'
+                                    ? 'bold'
+                                    : key.toLowerCase(), 
+                            'font-style': key === 'Italic' || key === 'BoldItalic'
+                                    ? 'italic'
+                                    : 'normal'
+                        });
+                    } /*else {
+                        $("head").append(`<style type='text/css'>
+                            @font-face {
+                                font-family: 'user${key}Font';
+                                src: url('/files/${user.account.id}/fonts/${path}') format('truetype');
+                                font-weight: ${
+                                name === "Italic"
+                                    ? "normal"
+                                    : name === "BoldItalic"
+                                    ? "bold"
+                                    : name.toLowerCase()
+                                };
+                                font-style: ${
+                                name === "Italic" || name === "BoldItalic"
+                                    ? "italic"
+                                    : "normal"
+                                };
+                            }
+                        </style>`);
+                        $(`.user${key}Font`).css('font-family', `user${key}Font`);
+                    }*/
+                });
+            }
+        });
+    </script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <link rel="stylesheet" href="/static/css/jquery.fontpicker.css">
+    <div class="df page-wrapper df ffp">
+        <%- include('partials/nav', {async: true}); %>
+
+      <div class="page-content">
+        <div class="new-brand-page">
+            <div class="page-content-wrapper">
+                <div class="page-title-container">
+                    <h2 class="page-title">My brand<span class="text-primary">.</span></h2>
+                    <button class="save-brand fs14" data-save-brand><i class="fa-regular fa-check" ></i>Save Changes</button>
+                </div>
+                <div class="inner-content-wrapper help d-none" data-content="ask-help-sec">
+                    <div class="df tab-content">
+                        <div class="df inner-content one" style="max-width: 100%;" data-help-tab="info">
+                            <button onclick="closeHelpSec()" style="margin: 28px; border-radius: 15px;" class="btn btn-primary px-4"><i class="fas fa-arrow-left"></i></button>
+                            <div class="df acc left-sec">
+                                <div class="img-wrpr one"></div>
+                            </div>
+                            <div class="df ffc jcc right-sec">
+                                <h4 class="fs30" style="max-width: 224px;">Good thing there are still humans around.</h4>
+                                <p class="" style="max-width: 384px;">Though all your posts will be created by our bot, your jpeg or png will be converted to svg by a real live human<%= plan_name && plan_name === "Free" ? "for a one time fee of $5.99." : "." %></p>
+                                <button onclick="setAskForHelpTab('upload')" style="margin-top: 76px;" class="btn btn-primary px-4"><i class="fas fa-arrow-right"></i>Next</button>
+                            </div>
+                        </div>
+
+                        <div class="df inner-content two d-none" style="max-width: 100%;"  data-help-tab="upload">
+                            <button onclick="closeHelpSec()" style="margin: 28px; border-radius: 15px;" class="btn btn-primary px-4"><i class="fas fa-arrow-left"></i></button>
+                            <div class="df acc left-sec"><div class="img-wrpr two"></div></div>
+                            <div class="df ffc jcc right-sec">
+                                <h4 class="fs30 ">Upload your logo.</h4>
+                                <p class="" style="max-width: 268px;">You can upload business cards, letterheads etc.</p>
+                               <label for="upload-assets" class="df acc upload-wrapper">
+                                    <i class="fa-light fa-upload"></i>
+                                    <div>
+                                        <p class="fs14">Drop here to upload</p>
+                                        <p class="fs10 mb-0 text-underline">Or click to browse</p>
+                                    </div>
+                                </label>
+                                <input onchange="getFiles(event)" hidden type="file" id="upload-assets" multiple/>
+                                <div class="file-list" id="selected-files-list"></div>
+                                <!-- onclick="setAskForHelpTab('complete')" -->
+                                <button onclick="uploadAssets(<%- JSON.stringify(plan_name && plan_name !== 'Free') %>)" style="margin-top: 36px;" class="btn btn-primary px-4 upload-assets-btn"><i class="fas fa-arrow-right"></i><%= plan_name && plan_name === "Free" ? "Continue to payment" : "Upload your logo" %></button>
+
+                                <!-- paymethod -->
+                                <div class="new-popup-wrapper brand-payment d-none" id="cards-popup">
+                                    <div class="overlay"></div>
+                                    <div class="new-popup">
+                                        <div class="df aic new-popup-header">
+                                            <p class="fs30 title">Payment</p>
+
+                                            <div class="df acc mla close-button pointer" onclick='$("#cards-popup").addClass("d-none");'><i class="fa-regular fa-xmark"></i></div>
+                                        </div>
+
+                                        <div class="new-popup-content">
+                                            <% if (paymentMethods && paymentMethods.length) { %>
+                                                <% paymentMethods.map(pm => {%>  
+                                                    <div class="df aic c-card">
+                                                        <input type="radio" name="selected-card" value="<%-pm.id%>" id="card-<%-pm.id%>"/>
+                                                        <label class="df aic mb-0" style="padding-left: 10px;" for="card-<%-pm.id%>">
+                                                            <i class="fa-brands fa-cc-<%-pm.card.brand%>"></i>
+                                                            <span class="df aic mb-0"><span style="margin: 0px 6px;">&bullet;&bullet;&bullet;&bullet;&bullet;</span><%-pm.card.last4 %></span>
+                                                        </label>
+                                                    </div>
+                                                <%})%>
+
+                                                <div class="text-center new-popup-footer">
+                                                    <button class="btn btn-primary badge-pill px-5 mt-4" onclick="processBrandAssetPayment()">Process Payment</button>
+                                                </div>
+                                            <% } else { %>
+                                                    <div class="card-element" id="card-element">
+                                                        <!-- Elements will create input elements here -->
+                                                    </div>
+                                                    
+                                                    <!-- We'll put the error messages in this element -->
+                                                    <div id="card-errors" role="alert"></div>
+
+                                                    <div class="text-center new-popup-footer">
+                                                        <button class="btn btn-primary badge-pill px-5 mt-4" onclick="submitCard()">Submit</button>
+                                                    </div>
+
+
+                                                    <script>
+                                                        var stripe = Stripe('<%=stripe_pub_key%>');
+                                                        var elements = stripe.elements();
+                                                        var card = elements.create("card");
+                                                        card.mount("#card-element");
+
+                                                        function submitCard() {
+                                                            stripe
+                                                                .createPaymentMethod({
+                                                                        type: 'card',
+                                                                        card: card,
+                                                                        // billing_details: {
+                                                                        //     name: 'Jenny Rosen',
+                                                                        // },
+                                                                    })
+                                                                    .then(function(result) {
+                                                                        $.post(`/brand/add-card`, { token: result.paymentMethod.id })
+                                                                        if (result.paymentMethod) {
+                                                                            console.log(result.paymentMethod)
+                                                                            // window.location.href = '/settings/plan';
+                                                                            processBrandAssetPayment(result.paymentMethod.id);
+                                                                            // setTimeout(() => {
+                                                                            //     window.location.reload();
+                                                                            // }, 500);
+                                                                        }
+
+                                                                        if (result.error) {
+                                                                            alert(JSON.stringify(result.error))
+                                                                        }
+                                                                    }).catch(function(error) {
+                                                                         alert(JSON.stringify(error))
+                                                                    });
+                                                        }
+                                                    </script>
+                                            <% } %>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="df inner-content three d-none" style="max-width: 100%;"  data-help-tab="complete">
+                            <div class="df acc left-sec"><div class="img-wrpr three"></div></div>
+                            <div class="df ffc jcc right-sec">
+                                <h4 class="fs30 "><%= plan_name && plan_name === "Free" ? "Payment" : "Process" %> complete!</h4>
+                                <p class="" style="max-width: 328px;">You will receive your logo, icon, and wordmark by email within 48 hours. Upon receiving your logo, go to Your brand page and  upload it. </p>
+                                <p style="font-weight: 600;">Watch your posts transform.</p>
+                             
+
+                                <button 
+                                    onclick="closeHelpSec()" 
+                                    style="margin-top: 76px;" class="btn btn-primary back px-4"><i class="fas fa-arrow-left"></i>Back to my brand</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="df inner-content-wrapper reg" data-content="self-help">
+
+                    <div class="left-sec">
+                        <div class="df aic tabs-wrapper">
+                            <div id="logo-tab" class="df acc tab ffp selected" data-tab="logo">Logo</div>
+                            <div id="colors-tab" class="df acc tab ffp" data-tab="colors">Colors</div>
+                            <div id="fonts-tab" class="df acc tab ffp" data-tab="fonts">Fonts</div>
+                            <div id="info-tab" class="df acc tab ffp" data-tab="info">Info</div>
+                        </div>
+
+                        <%
+                            function addViewBox(svg) {
+                                if (!svg) {
+                                    return;
+                                }
+
+                                if (!svg.includes("viewBox")) {
+                                    var width, height;
+
+                                    var wArr = svg.match(/width="(.*?)"/i)
+                                    if (wArr && wArr.length) {
+                                        width = wArr[1];
+                                    }
+                                    
+                                    var hArr = svg.match(/height="(.*?)"/i);
+                                    if (hArr && hArr.length) {
+                                        height = hArr[1]
+                                    }
+
+                                    if (width && height) {
+                                        svg = svg.replace("height=", `height="${height}" viewBox="0 0 ${width} ${height}"`);
+                                    }
+                                }
+
+                                return svg;
+                            }
+                        %>
+                        <div class="tabs-content-wrapper">
+                            <div class="tab-content logo" data-tab-content="logo">  
+                                <div class="df aic ffp fs12 need-help"><p>Don't have your logo files as an .ai, open .pdf or .svg?</p><button class="mla" onclick="openMiniHelp();">Ask for help </button></div>
+                                <div class="df line">
+                                    <div class="sec" id="logo">
+                                        <div class="onboarding-label mt-1 mb-20  fs12">LOGO</div>
+                                        <label class="onboarding-logo-inner">
+                                            <p></p>
+                                            <span class="onboarding-logo-preview" id="logo-preview">
+                                                <% if(brand && brand.logos && brand.logos.logo){ %>
+                                                    <%- brand.logos.logo %>
+                                                    <div class="df aic logo-select-wrapper floating">
+                                                        <div class="df aic">
+                                                            <i class="fa-light fa-upload"></i>
+                                                            <div class="text-wrapper">
+                                                                <p class="text fs12 mb-0">Drop here to upload Logo</p>
+                                                                <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'logo')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                    </div>
+                                                <% } else { %>
+                                                    <div class="df aic logo-select-wrapper">
+                                                        <div class="df aic">
+                                                            <i class="fa-light fa-upload"></i>
+                                                            <div class="text-wrapper">
+                                                                <p class="text fs12 mb-0">Drop here to upload Logo</p>
+                                                                <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'logo')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                    </div>
+                                                <% }  %>
+                                            </span>
+                                            <input type="file" name="logo" hidden data-file-type="logo" accept="image/svg+xml,application/pdf,.ai">
+                                        </label>
+                                    </div>
+                                </div>
+
+                                    <div class="df line">
+                                    <div class="sec icon">
+                                        <div class="onboarding-label mt-1 fs12">ICON</div>
+                                        <label class="onboarding-logo-inner">
+                                            <span class="onboarding-logo-preview" id="icon-preview">
+                                                <% if(brand && brand.logos && brand.logos.icon){ %>
+                                                    <%- addViewBox(brand.logos.icon) %>
+                                                    <div class="df aic logo-select-wrapper floating">
+                                                        <div class="df aic">
+                                                            <i class="fa-light fa-upload"></i>
+                                                            <div class="text-wrapper">
+                                                                <p class="text fs12 mb-0">Drop here to upload Icon</p>
+                                                                <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'icon')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                    </div>
+                                                <% } else { %>
+                                                    <div class="df aic logo-select-wrapper">
+                                                        <div class="df aic">
+                                                            <i class="fa-light fa-upload"></i>
+                                                            <div class="text-wrapper">
+                                                                <p class="text fs12 mb-0">Drop here to upload Icon</p>
+                                                                <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'icon')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                    </div>
+                                                <% }  %>
+                                            </span>
+                                            <input type="file" name="icon" hidden data-file-type="logo" accept="image/svg+xml,application/pdf,.ai">
+                                        </label>
+                                    </div>
+                                    
+                                
+                                </div>
+                                <div class="df line">
+                                    <div class="sec wordmark">
+                                        <div class="onboarding-label mt-1  fs12">WORDMARK</div>
+                                            <label class="onboarding-logo-inner">
+                                                <p>
+                                            </p>
+                                                <span class="onboarding-logo-preview" id="wordmark-preview">
+                                                    <% if(brand && brand.logos && brand.logos.watermark){ %>
+                                                        <%- addViewBox(brand.logos.watermark) %>
+                                                        <div class="df aic logo-select-wrapper floating">
+                                                            <div class="df aic">
+                                                                <i class="fa-light fa-upload"></i>
+                                                                <div class="text-wrapper">
+                                                                    <p class="text fs12 mb-0">Drop here to upload Wordmark</p>
+                                                                    <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'wordmark')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                        </div>
+                                                    <% } else { %>
+                                                        <div class="df aic logo-select-wrapper">
+                                                            <div class="df aic">
+                                                                <i class="fa-light fa-upload"></i>
+                                                                <div class="text-wrapper">
+                                                                    <p class="text fs12 mb-0">Drop here to upload Wordmark</p>
+                                                                    <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'wordmark')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                        </div>
+                                                    <% }  %>
+                                                </span>
+                                                <input type="file" name="watermark" hidden data-file-type="logo" accept="image/svg+xml,application/pdf,.ai">
+                                            </label>
+                                        
+                                    
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-content fonts d-none" data-tab-content="fonts">
+                            
+                                <div class="onboarding-font-row font-line" data-font-form="Regular">
+                                    <p class="brand-label title">REGULAR FONT <%if(brand && brand.fonts && brand.fonts.Regular && brand.fonts.Regular.name){%> • <span class="font-name"><%-brand.fonts.Regular.name%></span><%}%></p>
+                                    <%if(brand && brand.fonts && brand.fonts.Regular && brand.fonts.Regular.name){%> 
+                                        <div class="font-preview userRegularFont">This is your font</div>
+                                    <%}%> 
+                                        <div class="<% if(brand && brand.fonts && brand.fonts.Regular && brand.fonts.Regular.name){ %>hovering<% } %> df font-upload-sec">
+                                            <label for="reg-input" class="df aic left-sec"><div class="icon"></div><div class="text"><p class="fs10 label">Drop here to upload font</p><p class="fs8"><u>Or click to browse</u></p></div></label>
+                                            <input id="reg-input" type="file" data-file-type="font" accept=".ttf" name="Regular" hidden>
+                                            <div class="df acc right-sec"> 
+                                                <input name="Regular" class="google_font" value="<%= brand && brand.fonts && brand.fonts.Regular ? brand.fonts.Regular.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
+                                            </div>
+                                        </div>
+                                </div> 
+                                <div class="onboarding-font-row font-line" data-font-form="Italic">
+                                    <p class="brand-label  title">ITALIC FONT <%if(brand && brand.fonts && brand.fonts.Italic && brand.fonts.Italic.name){%> • <span class="font-name"><%-brand.fonts.Italic.name%></span><%}%></p>
+                                    <%if(brand && brand.fonts && brand.fonts.Italic && brand.fonts.Italic.name){%> 
+                                        <div class="font-preview userItalicFont">This is your font</div>
+                                        <%}%> 
+                                        <div class="<% if(brand && brand.fonts && brand.fonts.Italic && brand.fonts.Italic.name){ %>hovering<% } %> df font-upload-sec">
+                                            <label for="ital-input" class="df aic left-sec"><div class="icon"></div><div class="text"><p class="fs10 label">Drop here to upload font</p><p class="fs8"><u>Or click to browse</u></p></div></label>
+                                            <input id="ital-input" type="file" data-file-type="font" accept=".ttf" name="Italic" hidden>
+                                            <div class="df acc right-sec"> 
+                                                <input name="Italic" class="google_font" value="<%= brand && brand.fonts && brand.fonts.Italic ? brand.fonts.Italic.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
+                                            </div>
+                                        </div>
+                                </div>
+                                <div class="onboarding-font-row font-line" data-font-form="Bold">
+                                    <p class="brand-label  title">BOLD FONT <%if(brand && brand.fonts && brand.fonts.Bold && brand.fonts.Bold.name){%> • <span class="font-name"><%-brand.fonts.Bold.name%></span><%}%></p>
+                                    <%if(brand && brand.fonts && brand.fonts.Bold && brand.fonts.Bold.name){%> 
+                                        <div class="font-preview userBoldFont">This is your font</div>
+                                        <%}%> 
+                                        <div class="<% if(brand && brand.fonts && brand.fonts.Bold && brand.fonts.Bold.name){ %>hovering<% } %> df font-upload-sec">
+                                            <label for="bold-input" class="df aic left-sec"><div class="icon"></div><div class="text"><p class="fs10 label">Drop here to upload font</p><p class="fs8"><u>Or click to browse</u></p></div></label>
+                                            <input id="bold-input" type="file" data-file-type="font" accept=".ttf" name="Bold" hidden>
+                                            <div class="df acc right-sec"> 
+                                                <input name="Bold" class="google_font" value="<%= brand && brand.fonts && brand.fonts.Bold ? brand.fonts.Bold.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
+                                            </div>
+                                        </div>
+                                </div>
+                                <div class="onboarding-font-row font-line" data-font-form="BoldItalic">
+                                    <p class="brand-label  title">BOLD ITALIC FONT <%if(brand && brand.fonts && brand.fonts.BoldItalic && brand.fonts.BoldItalic.name){%> • <span class="font-name"><%-brand.fonts.BoldItalic.name%></span><%}%></p>
+                                    <%if(brand && brand.fonts && brand.fonts.BoldItalic && brand.fonts.BoldItalic.name){%> 
+                                        <div class="font-preview userBoldItalicFont">This is your font</div>
+                                        <%}%> 
+                                        <div class="<% if(brand && brand.fonts && brand.fonts.BoldItalic && brand.fonts.BoldItalic.name){ %>hovering<% } %> df font-upload-sec">
+                                            <label for="boldital-input" class="df aic left-sec"><div class="icon"></div><div class="text"><p class="fs10 label">Drop here to upload font</p><p class="fs8"><u>Or click to browse</u></p></div></label>
+                                            <input id="boldital-input" type="file" data-file-type="font" accept=".ttf" name="BoldItalic" hidden>
+                                            <div class="df acc right-sec"> 
+                                                <input name="BoldItalic" class="google_font" value="<%= brand && brand.fonts && brand.fonts.BoldItalic ? brand.fonts.BoldItalic.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
+                                            </div>
+                                        </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-content colors d-none" data-tab-content="colors">
+                                <div>
+                                <div class="df colors-wrapper">
+                                    <div class="color-wrapper">
+                                        <div class="label ffp brand-label ">PRIMARY COLOR</div>
+                                        <input 
+                                            style="background-color: <%= user.account.brand.colors.primary || '#D5BA8C' %>"
+                                            type="color" 
+                                            id="primary"
+                                            class="color " 
+                                            value="<%= user.account.brand.colors.primary || '#1A428A' %>"   
+                                            name="primary"  
+                                            data-primary-color="<%= user.account.brand_primary || '#1A428A' %>"
+                                        />
+                                    </div>
+                                
+                                    <div class="color-wrapper">
+                                        <div class="label ffp brand-label ">SECONDARY COLOR</div>
+                                        <input
+                                            style="background-color: <%= user.account.brand.colors.secondary || '#D5BA8C' %>"
+                                            class="color" 
+                                            type="color"
+                                            name="secondary"
+                                            id="secondary"
+                                            value="<%= user.account.brand.colors.secondary || '#D5BA8C' %>"
+                                            data-secondary-color="<%= user.account.brand_secondary || '#D5BA8C' %>"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <% if(brand && brand.logos && brand.logos.logo){ %>
+                            <div class="df line" style="margin-top: 235px;">
+                                <div class="sec" id="logo">
+                                    <div class="onboarding-label mt-1 mb-20  fs12">Choose from Logo</div>
+                                    <label class="onboarding-logo-inner">
+                                        <p></p>
+                                        <span class="onboarding-logo-preview">
+                                            <%- brand.logos.logo %>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            <% } %>
+                            </div>
+
+                            <div class="tab-content info d-none" data-tab-content="info">
+                                <form data-hs-cf-bound="true">
+                                    <div class="input-wrapper">
+                                        <label class="label ffp brand-label">BRAND NAME</label>
+                                        <input type="text" name="name" value="<%= user.account.name %>" class="form-control" required>
+                                    </div>
+                                        <div class="input-wrapper">
+                                            <label class="label ffp brand-label">BRAND EMAIL</label>
+                                            <input type="text" name="brand_email" value="<%= user.account.brand_email %>" class="form-control" required>
+                                        </div>
+                                        <div class="input-wrapper">
+                                            <label class="label ffp brand-label">BRAND PHONE</label>
+                                            <input type="text" name="brand_phone" value="<%= user.account.brand_phone %>" class="form-control" required>
+                                        </div>
+                                        <div class="input-wrapper">
+                                            <label class="label ffp brand-label">INDUSTRY</label>
+                                            <input type="text" name="industry" value="<%= user.account.industry %>" class="form-control" required>
+                                        </div>
+                                        <div class="input-wrapper">
+                                            <label class="label ffp brand-label">DESCRIPTION</label>
+                                            <input type="text" name="industry_description" value="<%= user.account.industry_description %>" class="form-control" required>
+                                        </div>
+                                        <div class="input-wrapper">
+                                            <label class="label ffp brand-label">TAGLINE</label>
+                                            <input type="text" name="tagline" value="<%= user.account.tagline %>" class="form-control" required>
+                                        </div>
+                                        <div class="input-wrapper">
+                                            <label class="label ffp brand-label">FOOTER</label>
+                                            <textarea type="text" name="brand_footer" value="<%= user.account.brand_footer %>" class="form-control" placeholder="Enter your legals, terms & conditions etc"></textarea>
+                                        </div>
+                                </form>
+                            
+                                </div>
+                            </div>
+                        </div>
+
+                    <div class="right-sec">
+                        <div class="onboarding-templates-preview">
+                            <div class="df acc tab ffp" style="margin-bottom: 32.5px; margin-top: 10px;">Brand Preview</div>
+                            <%- include('partials/template', {async: true, template:templates[0], showNewLoader: true}); %>
+                        </div>
+                    </div>
+                </div>
+               
+                <!-- <%- include('brand-help', {async: true}); %>                   -->
+                <%- include('partials/mini-help-setup', {async: true, plan_name}); %>
+            </div>
+            
+        </div>
+    </div>
+  
+    </div>
+    </div>
+    <div id="svg-editor-popup-wrpr" class="d-none">
+        <div class="df ffc" id="svg-editor-popup">
+          <p id="editor-desc" class="fs14">
+            Select or drag over the elements you want to use as your
+          </p>
+          <div id="svg-editor-app" v-cloak>
+            <!-- <div class="edit" @click="fileUploaded()">Edit</div> -->
+            <!-- <div>
+                  <input type="file" id="file-input" accept="image/svg+xml" @change="fileUploaded($event)" />
+              </div> -->
+            <!-- v-if="original_svg" -->
+            <div
+              id="original-container"
+              ref="container"
+              class="original-container"
+              v-html="original_svg"
+              v-if="original_svg"
+            ></div>
+      
+            <div
+              id="modified-container"
+              ref="container"
+              class="modified-container"
+              v-html="modified_svg"
+              v-if="modified_svg"
+            ></div>
+           
+           
+          <!-- </div> -->
+
+          <!-- <div class="ftr text-center"> -->
+            <div class="editor-buttons">
+                <button type="button" class="cancel-editor fs14" onclick="$('#svg-editor-popup-wrpr').addClass('d-none')">Cancel</button> 
+                <button id="editor-generate" type="button" class="save-editor fs14" @click="generate_svg()">Generate my</button>
+            </div>
+        </div>
+      
+        </div>
+      
+        <div class="editor-backdrop"></div>
+      </div>
+
+      
+      
+  
+    </div>
+
+    
+    <div class="dummy-select-or-edit" style="transform: scale(0)">
+        <div class="df aic logo-select-wrapper floating">
+          <div class="df aic">
+            <i class="fa-light fa-upload"></i>
+            <div class="text-wrapper">
+              <p class="text fs12 mb-0">Drop here to upload <span>Wordmark</span></p>
+              <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+            </div>
+          </div>
+          <div
+            class="df acc upload-wrapper"
+            onclick="openSVGEditor(event, 'Wordmark');"
+          >
+            <i class="fa-light fa-crop-alt"></i>
+            <p class="mb-0 fs12">Or select from logo</p>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        var TOKEN = '<%=locals.user ? locals.user.token.access_token : ''%>';
+        var draft_brand = <%- JSON.stringify(brand) %>;
+     </script>
+
+    <script src="/static/js/jquery.js"></script>
+    <script src="/static/js/loader.js"></script>
+    <script type="text/javascript" src="https://cdn.designhuddle.com/editor/v1/lib.js"></script>
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-drag-select@0.4.2"></script>
+    <script>
+
+        // $(document).on('click', '.open-svg-editor', function(e){
+        //    $(e.target).css('background-color', e.target.value);
+        // })
+
+        function setAskForHelpTab(tab) {
+            $("[data-help-tab]").addClass("d-none")
+            $(`[data-help-tab=${tab}]`).removeClass("d-none")
+        }
+
+        function openSVGEditor(e, type) {
+            console.log("CLICKED OPEN EDITOR")
+            e.preventDefault()
+
+            $('#svg-editor-popup-wrpr').removeClass("d-none").attr("data-type", type)
+            
+            $("#editor-desc").find('span').remove();
+            $("#editor-desc").append(`<span>${type}</span>`);
+            $("#editor-generate").find('span').remove();
+            $("#editor-generate").append(`<span> ${type}</span>`);
+            
+            window.app.init();
+        }
+
+        $(document).on('input', '#primary', function(e){
+           $(e.target).css('background-color', e.target.value);
+        })
+
+        $(document).on('input', '#secondary', function(e){
+           $(e.target).css('background-color', e.target.value);
+        })
+
+        $(document).on('click', '[data-tab]', function(e){
+            $target = $(event.target);   
+            $target.addClass('selected').siblings().removeClass("selected");
+            var tab = $(this).data('tab');
+            $('[data-tab-content="'+tab+'"]').removeClass('d-none').siblings().addClass('d-none')
+        })
+    </script>
+
+   
+<script>
+    function strictIntersectionSelector(context) {
+        const dragAreaInSvgCoordinate = context.dragAreaInSvgCoordinate
+        return context.getIntersections().filter(function (element) {
+            if (context.pointerEvent.target === element) {
+                return true
+            }
+            if (!(element instanceof SVGPathElement)) {
+                // strictly check only <path>s.
+                return true
+            }
+            for (let i = 0, len = element.getTotalLength(); i <= len; i += 4 /* arbitrary */) {
+                const point = element.getPointAtLength(i)
+                const x = point.x
+                const y = point.y
+                if (
+                    dragAreaInSvgCoordinate.x <= x && x <= dragAreaInSvgCoordinate.x + dragAreaInSvgCoordinate.width &&
+                    dragAreaInSvgCoordinate.y <= y && y <= dragAreaInSvgCoordinate.y + dragAreaInSvgCoordinate.height
+                ) {
+                    return true
+                }
+            }
+            return false
+        })
+    }
+</script>
+
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                svgTree: {},
+                original_file: '',
+                original_svg: '',
+                modified_svg: '',
+                selectedElements: [],
+                floatingElements: [],
+                is_in_click:true,
+            }
+        },
+        methods: {
+
+            init(){
+                const logo = $("#logo-preview svg")[0];
+                this.original_svg = logo?.outerHTML;
+            //call API
+            //Setup game
+            },
+
+            // ***************
+            fileUploaded: function (e) {
+                var file2 =  $("#svg-editor-popup-wrpr svg")[0];
+                var file = e.target.files[0];
+                const reader = new FileReader();
+
+                reader.addEventListener("load", () => {
+                    // this will then display a text file
+                    var text = reader.result;
+                    this.original_svg = text;
+                    var el = file2;
+                }, false);
+
+                if (file) {
+                    reader.readAsText(file);
+                }
+            },
+            // ******************
+            // fileUploaded: function (e) {
+            //     var file = $("#svg-editor-popup svg")[0];
+            //     // const reader = new FileReader();
+
+            //     reader.addEventListener("load", () => {
+            //         // this will then display a text file
+            //         var text = reader.result;
+            //         this.original_svg = text;
+            //         var el = document.getElementsByTagName("svg");
+            //     }, false);
+
+            //     if (file) {
+            //         reader.readAsText(file);
+            //     }
+            // },
+            generate_svg: function () {
+               
+                var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                svg.setAttribute("version", "1.1");
+                svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+                svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+                var heights = [];
+                var widths = [];
+                var xs = [];
+                var ys = [];
+
+                if (!this.selectedElements || !this.selectedElements.length) {
+                    alert("Please select elements.")
+                    return;
+                }
+
+                this.selectedElements.forEach(path => {
+                    heights.push(path.getBBox().height);
+                    widths.push(path.getBBox().width);
+                    xs.push(path.getBBox().x);
+                    ys.push(path.getBBox().y);
+                    svg.appendChild(path.cloneNode(true));
+                });
+                var x = Math.min(...xs);
+                var y = Math.min(...ys);
+                var width = Math.max(...widths.map((w, i) => w = w + xs[i] - x));
+                var height = Math.max(...heights.map((h, i) => h = h + ys[i] - y));
+
+                const arr = [x, y, width, height];
+                const match = arr.find(element => {
+                    if (typeof element === "string" && element.indexOf('Infinity') > -1) {
+                        return true;
+                    }
+                });
+
+                if (match !== undefined) {
+                    alert("Could not generate svg, no paths found.")
+                    return;
+                }
+
+                svg.setAttribute("viewBox", `${x} ${y} ${width} ${height}`);
+
+                var alldefs = document.getElementById("original-container").getElementsByTagName("defs");
+                if (alldefs.length > 0) {
+                    var defs = alldefs[0];
+                    svg.insertBefore(defs.cloneNode(true), svg.firstChild);
+                }
+
+                var svg_string = new XMLSerializer().serializeToString(svg);
+                const type = $("#svg-editor-popup-wrpr").attr("data-type");
+
+                // $(".dummy-select-or-edit .logo-select-wrapper").find("p span").text(type);
+                // console.log($(".dummy-select-or-edit .logo-select-wrapper").find(".upload-wrapper").attr("onclick"))
+                // $(".dummy-select-or-edit .logo-select-wrapper").find(".upload-wrapper").attr("onclick", openSVGEditor(event, type));
+                // $selectOrEdit = $(".dummy-select-or-edit .logo-select-wrapper").prop("outerHTML");
+                // var text = ".onboarding-logo-preview#" + type + "-preview"
+                // console.log(text, $(".onboarding-logo-preview#" + type + "-preview"))
+                // $selectOrEdit = $(".onboarding-logo-preview#" + type + "-preview").prop("outerHTML");
+
+                if (!svg_string.includes("Infinity")) { // empty
+                    var innerHtml = $("#"+type+"-preview")[0].innerHTML;
+                    var regex = new RegExp(`<svg.*?</svg>`, "g");
+                    innerHtml = innerHtml.replace(regex, ``);
+
+                    $("#"+type+"-preview")[0].innerHTML = svg_string + innerHtml;
+                    $("#"+type+"-preview").siblings("input").addClass("touched svg-string");
+                    $("#"+type+"-preview").find(".logo-select-wrapper").addClass("floating");
+
+                    $("#svg-editor-popup-wrpr").addClass("d-none");
+
+                    // $("#"+type+"-preview").siblings('[type="file"]').addClass("touched");
+                    uploadLogo($("#"+type+"-preview").closest(".onboarding-logo-inner"), true);
+                    addTabState("logo", "draft");
+                }
+
+                // updateLogos();
+               
+                // var svg_blob = new Blob([svg_string], {
+                //     type: "image/svg+xml;charset=utf-8"
+                // });
+                // var svg_url = URL.createObjectURL(svg_blob);
+                // var downloadLink = document.createElement("a");
+                // downloadLink.href = svg_url;
+                // downloadLink.download = "svg.svg";
+                // console.log(downloadLink)
+                // document.body.appendChild(downloadLink);
+                // downloadLink.click();
+                // document.body.removeChild(downloadLink);
+                // this.selectedElements = [];
+                // console.log(this.selectedElements);
+            }
+        },
+
+        updated() {
+            var self = this;
+           
+            try {
+                this.original_svg = this.$refs.container.innerHTML;
+
+                window.svgDragSelectOptions = {
+                    svg: $("#svg-editor-popup-wrpr svg")[0],
+                    onSelectionStart: function (selectionStart) {
+                        const selectedElements = selectionStart.svg.querySelectorAll('[data-selected]')
+                        for (let i = 0; i < selectedElements.length; i++) {
+                            selectedElements[i].removeAttribute('data-selected')
+                        }
+                        self.floatingElements = [];
+                    },
+                    onSelectionEnd: function (selectionEnd) {
+                        if (selectionEnd.dragAreaInClientCoordinate.height<5 && selectionEnd.dragAreaInClientCoordinate.width<5) {
+                            var current_element = selectionEnd.selectedElements[0]; // TODO: - handle current_element null
+                            var current=self.selectedElements.indexOf(current_element) !== -1;
+                            if (current) {
+                                current_element.removeAttribute('data-selected');
+                                var position = self.selectedElements.indexOf(current_element);
+                                self.selectedElements[position] = self.selectedElements[ self.selectedElements.length - 1 ];
+                                self.selectedElements.pop();
+                            } else {
+                                current_element.setAttribute('data-selected', 'true');
+                                self.selectedElements.push(current_element);
+                            }
+                            self.selectedElements.forEach(path => {
+                                path.setAttribute('data-selected', 'true');
+                            });
+                        } else {
+                            self.selectedElements = [];
+                            selectionEnd.selectedElements.forEach(element => {
+                                element.setAttribute('data-selected', 'true');
+                                self.selectedElements.push(element);
+                            });
+                        }
+                    },
+                    onSelectionChange: function (selectionChange) {
+                        selectionChange.newlyDeselectedElements.forEach(function (element) {
+                            element.removeAttribute('data-selected')
+                        })
+                        selectionChange.newlySelectedElements.forEach(function (element) {
+                            element.setAttribute('data-selected', '')
+                        })
+                        selectionChange.newlySelectedElements.forEach(element => {
+                        
+                        });
+                    },
+                    selector: "intersection",
+                }
+
+                svgDragSelect(svgDragSelectOptions)
+               
+
+            }
+            catch (e) {
+                console.log(e);
+            }
+        },
+
+        mounted(){
+            this.init()
+        }
+
+    }).mount('#svg-editor-app');
+
+    window.app = app;
+
+    function getFiles(e) {
+
+        let $container = $("#selected-files-list")
+        
+        $container.empty()
+
+        Array.from(e.target.files).map(file=> {
+            $container.append(`<p>${file.name}</p>`)
+        })
+
+    }
+
+    function openMiniHelp() {
+        $('.mini-setup-help').removeClass('d-none'); 
+    }
+
+    function closeMiniHelpPopUp() {
+      $(".mini-setup-help").addClass("d-none");
+    }
+
+    function getItDone() {
+      closeHelpPopUp();
+      closeMiniHelpPopUp();
+      openHelpSection();
+    }
+
+    function closeHelpPopUp() {
+      $("#setup-help").addClass("d-none");
+    }
+
+    function openHelpSection() {
+        $('[data-content=ask-help-sec]').removeClass('d-none'); 
+        $('[data-content=self-help]').addClass('d-none'); 
+        $('.save-brand').addClass('d-none')
+    }
+
+    function closeHelpSec() {
+        $('[data-content=ask-help-sec]').addClass('d-none'); 
+        $('[data-content=self-help]').removeClass('d-none');
+        $('[data-help-tab]').addClass('d-none');
+        $(`[data-help-tab=info]`).removeClass('d-none');
+        $(`.save-brand`).removeClass('d-none')
+    }
+</script>
+
+<script>
+    // Instance the tour
+    var tour = new Tour({
+        steps: [
+            {
+                element: ".page-title",
+                title: "On this page you can edit your brand.",
+                content: "What you see is a dummy brand we created for you, feel free to edit to your liking."
+            },
+            {
+                element: ".right-sec",
+                title: "Brand Preview",
+                content: "See a preview of how your brand's design will look like. Save changes to update preview."
+            },
+            {
+                element: "#logo",
+                title: "Here you edit your brand logo.",
+                content: "Upload a svg, open pdf, or ai file of your logo here."
+            },
+            {
+                element: ".sec.icon",
+                title: "Here you edit your brand icon.",
+                content: "Either upload your icon here or select it out of the logo you uploaded."
+            },
+            {
+                element: ".sec.wordmark",
+                title: "Here you edit your brand wordmark.",
+                content: "Either upload your wordmark here or select it out of the logo you uploaded. A wordmark is the actual name of your company without the icon."
+            },
+            {
+                element: "#colors-tab",
+                title: "Here you edit your brand colors.",
+                content: "Choose the primary and secondary color of your brand. You can click on the color picker tool and choose the colors from your logo below."
+            },
+            {
+                element: "#fonts-tab",
+                title: "Here you edit your brand fonts.",
+                content: "Upload your fonts here. You can choose a google font or leave the default font."
+            }
+        ],
+    });
+
+    // Initialize the tour
+    tour.init();
+
+    // Start the tour
+    tour.start();
+</script>
+
+
+<script src="/static/js/jquery.fontpicker.js?<%=Date.now()%>"></script>
+<script src="/static/js/templates.js?<%=Date.now()%>"></script>
+<script src="/static/js/brand.js?<%=Date.now()%>"></script>
+</body>
+</html>
+
+

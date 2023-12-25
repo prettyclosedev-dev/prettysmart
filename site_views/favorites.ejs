@@ -1,0 +1,65 @@
+<%- include('partials/header', {async: true}); %>
+<link rel="stylesheet" href="/static/css/favorites.css?<%=Date.now()%>">
+<div class="df page-wrapper df ffp">
+  <%- include('partials/nav', {async: true}); %>
+
+    <div class="page-content">
+
+        <div class="favorites-page">
+            <div class="page-content-wrapper">
+                <h2 class="page-title">Favorites<span class="text-primary">.</span></h2>
+                <div class="df inner-content-wrapper">
+                    <% if (!user.account.plan_id) { %>
+                    <div class="upgrade-wrapper">
+                        <p>
+                        This feature is only available for premium plans
+                        </p>
+                        <a href="/plans" class="upgrade-btn">Upgrade plan</a>
+                    </div>
+                    <% } else if (typeof favorites != "undefined" && favorites.length) { %>
+                        <div class="section-wrapper">
+                            <div class="df aic  section-header">
+                                <p class="section-title">Your Favorites</p>   
+                            </div>
+                            <div class="square section-list">
+                                <% favorites.forEach(project => { %>
+                                <div class="item template">
+                                    <%- include('partials/project', {async: true, project:project}); %>
+                                </div>
+                                <% }) %>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <div class="upgrade-wrapper">
+                            <p>
+                            Your favorite templates will appear here.
+                            </p>
+                            <a onclick="navClicked()" href="/templates" class="upgrade-btn">Templates</a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include('partials/export-template', {async: true}); %>
+</div>
+
+<script>
+    var TOKEN = '<%=user.token.access_token%>';
+
+    function navClicked() {
+        topbar.config({
+            barThickness : 7,
+            barColors    : {
+              '0'        : '#db3965',
+              '1.0'      : '#db3965'
+            },
+          })
+          
+          topbar.show()
+        }
+</script>
+<script src="/static/js/templates.js?<%=Date.now()%>"></script>
+
+</body>
+</html>

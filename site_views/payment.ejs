@@ -1,0 +1,22 @@
+<%- include('partials/header', {async: true,fixed_header:true}); %>
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+  var stripe = Stripe('<%=stripe_pub_key%>');
+
+  stripe.redirectToCheckout({
+      sessionId: '<%=sessionId%>'
+  }).then(function(res){
+      console.log(res)
+      fbq('track', 'InitiateCheckout', {plan: "<%= plan_name %>"})
+  });
+</script>
+
+<div class="payment-page d-flex align-items-center justify-content-center">
+  <div>
+    <div class="login-title">
+      <h1 class="text-center"></h1>
+    </div>
+  </div>
+</div>
+<%- include('partials/footer', {async: true}); %>

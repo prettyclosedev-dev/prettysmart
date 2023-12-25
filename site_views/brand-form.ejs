@@ -1,0 +1,419 @@
+<%- include('partials/header', {async: true,fixed_header:true}); %>
+    <link rel="stylesheet" href="/static/css/jquery.fontpicker.css?1">
+    <style>
+        body{
+            background-color: #F7F9FB;
+        }
+        .brand-container{
+            height: 100%;
+        }
+        .brand-section{
+            width: 650px;
+            max-width: 100%;
+            display: none;
+            margin: auto;
+        }
+        .hs-richtext{
+            text-align: center;
+        }
+        .hs-fieldtype-file{
+            height: 160px;
+            width: 160px;
+            background-color: #fff;
+            border: 1px solid #707070;
+            background-image: url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='183.374' height='182.487' viewBox='0 0 183.374 182.487'%3E%3Cg transform='translate(-350.394 -351.119)'%3E%3Cpath d='M524,515.4a9.267,9.267,0,0,0-9.268,9.268V555.1a23.12,23.12,0,0,1-23.092,23.092h-99.12A23.117,23.117,0,0,1,369.43,555.1V524.672a9.268,9.268,0,0,0-18.536,0V555.1a41.674,41.674,0,0,0,41.625,41.628h99.12A41.676,41.676,0,0,0,533.268,555.1V524.672A9.267,9.267,0,0,0,524,515.4Z' transform='translate(0 -63.621)' fill='%23fff' stroke='%23000' stroke-width='1'/%3E%3Cpath d='M430.563,406.939a9.244,9.244,0,0,0,6.369-2.537l23.225-21.981V482.85a9.268,9.268,0,0,0,18.536,0V382.419L501.921,404.4a9.269,9.269,0,1,0,12.744-13.462L475.8,354.156c-.053-.05-.11-.092-.164-.14-.079-.072-.156-.145-.237-.213s-.141-.114-.213-.171c-.09-.072-.182-.139-.273-.207s-.157-.119-.237-.175-.154-.1-.231-.15q-.151-.1-.306-.188c-.075-.044-.149-.092-.224-.134s-.174-.09-.261-.135c-.109-.056-.218-.108-.329-.159-.069-.032-.136-.069-.207-.1-.1-.043-.2-.079-.3-.119s-.221-.083-.331-.121l-.013,0c-.062-.021-.123-.048-.185-.068-.111-.036-.224-.066-.336-.1s-.213-.056-.321-.083l-.031-.008c-.059-.014-.117-.032-.177-.045-.117-.026-.236-.047-.355-.068s-.212-.033-.318-.048c-.075-.011-.15-.026-.225-.034-.117-.014-.235-.024-.353-.033-.1-.008-.2-.012-.3-.017s-.178-.01-.267-.012c-.059,0-.116-.009-.174-.009s-.116.007-.174.009c-.089,0-.177.008-.265.012s-.2.009-.3.017c-.121.009-.24.019-.36.033-.073.009-.146.023-.219.034h0c-.1.015-.209.029-.312.048-.123.021-.246.043-.367.07-.046.01-.092.024-.138.035l-.075.02c-.1.025-.2.05-.3.078-.118.033-.236.065-.352.1-.043.015-.086.033-.13.048l-.075.028c-.1.036-.206.073-.309.113s-.213.081-.318.127c-.067.029-.131.064-.2.095-.108.05-.215.1-.321.155s-.187.092-.278.143c-.072.04-.142.087-.214.129-.1.06-.2.12-.3.185-.081.053-.165.1-.244.158s-.152.113-.228.169c-.092.067-.183.135-.273.206-.073.058-.148.116-.22.177s-.154.138-.231.207c-.054.049-.113.092-.167.142l-38.864,36.783a9.268,9.268,0,0,0,6.375,16Z' transform='translate(-27.346 0)' fill='%23fff' stroke='%23000' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+            border-radius: 50%;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 70px;
+            transition: 500ms;
+            position: relative;
+            cursor: pointer;
+            margin: 50px auto;
+        }
+        
+        .hs-fieldtype-file:hover{
+            background-color: rgba(247, 23, 106, 0.12);
+        }
+        .hs-fieldtype-file  input{
+            display: block;
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 100% !important;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .hs-fieldtype-file .has-files{
+            transform: translateX(-100%);
+        }
+        .hs-fieldtype-text{
+            margin-top: 120px;
+        }
+        .hbspt-form fieldset{
+            margin: auto;
+            max-width: none;
+        }
+        .actions{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 120px;
+        }
+        .actions .section-back{
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .actions .section-back:before{
+            position: relative;
+            margin-right: 10px;
+            width: 22px;
+            height: 20px;
+            display: block;
+            content: url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='21.731' height='15.428' viewBox='0 0 21.731 15.428'%3E%3Cpath d='M6.934,4.9A.753.753,0,0,1,8,5.958L2.579,11.383h17.9a.745.745,0,0,1,.749.75.754.754,0,0,1-.749.76H2.579L8,18.308a.768.768,0,0,1,0,1.07.75.75,0,0,1-1.07,0l-6.71-6.71a.737.737,0,0,1,0-1.059Z' transform='translate(0.25 -4.424)' stroke='%23fff' stroke-width='0.5'/%3E%3C/svg%3E");
+        }
+        .submitted-message{
+            font-size: 2.5rem;
+            text-align: center;
+            opacity: 0;
+        }
+        .hs_primary_color,
+        .hs_secondary_color{
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            justify-content: center;
+        }
+        .color-picker{
+            display: inline-block;
+            margin: 0 0 20px 0;
+            width: 150px;
+            height: 150px;
+            background-image: url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='51.062' height='75.463' viewBox='0 0 51.062 75.463'%3E%3Cg transform='translate(-6340.665 -1010.187)'%3E%3Cg transform='translate(6358.305 1028.733)'%3E%3Cpath d='M6366.809,1077.159a1.193,1.193,0,0,1-1.116-.78l-4.194-11.429-9.542,4.879a1.188,1.188,0,0,1-1.729-1.057v-47.342a1.188,1.188,0,0,1,2.1-.762l31.044,37.092a1.188,1.188,0,0,1-.693,1.931l-11.062,2.051,4.2,11.25a1.185,1.185,0,0,1-.746,1.546l-7.891,2.562A1.153,1.153,0,0,1,6366.809,1077.159Zm-4.658-15.067a1.169,1.169,0,0,1,.434.083,1.182,1.182,0,0,1,.683.7l4.263,11.616,5.622-1.826-4.256-11.415a1.186,1.186,0,0,1,.9-1.583l10.454-1.939L6352.6,1024.7v42.129l9.007-4.606A1.184,1.184,0,0,1,6362.151,1062.092Z' transform='translate(-6350.228 -1020.241)' fill='%23fff'/%3E%3C/g%3E%3Cg transform='translate(6358.305 1010.187)'%3E%3Cpath d='M6351.416,1019.639a1.187,1.187,0,0,1-1.187-1.188v-7.076a1.188,1.188,0,1,1,2.376,0v7.076A1.188,1.188,0,0,1,6351.416,1019.639Z' transform='translate(-6350.228 -1010.187)' fill='%23fff'/%3E%3C/g%3E%3Cg transform='translate(6340.665 1023.003)'%3E%3Cpath d='M6348.583,1021.7a1.169,1.169,0,0,1-.367-.059l-6.729-2.186a1.188,1.188,0,1,1,.734-2.26l6.73,2.186a1.188,1.188,0,0,1-.368,2.319Z' transform='translate(-6340.665 -1017.135)' fill='%23fff'/%3E%3C/g%3E%3Cg transform='translate(6347.403 1038.011)'%3E%3Cpath d='M6345.5,1033.372a1.188,1.188,0,0,1-.959-1.885l4.159-5.726a1.188,1.188,0,1,1,1.922,1.4l-4.159,5.726A1.186,1.186,0,0,1,6345.5,1033.372Z' transform='translate(-6344.318 -1025.271)' fill='%23fff'/%3E%3C/g%3E%3Cg transform='translate(6358.305 1040.203)'%3E%3Cpath d='M6351.416,1035.913a1.189,1.189,0,0,1-1.187-1.19v-7.076a1.188,1.188,0,1,1,2.376,0v7.076A1.19,1.19,0,0,1,6351.416,1035.913Z' transform='translate(-6350.228 -1026.459)' fill='%23fff'/%3E%3C/g%3E%3Cg transform='translate(6369.212 1023.003)'%3E%3Cpath d='M6357.329,1021.7a1.189,1.189,0,0,1-.367-2.319l6.731-2.186a1.188,1.188,0,1,1,.733,2.26l-6.73,2.186A1.156,1.156,0,0,1,6357.329,1021.7Z' transform='translate(-6356.141 -1017.135)' fill='%23fff'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            border-radius: 50%;
+            background-position: center;
+            background-repeat: no-repeat;
+            cursor: pointer;
+        }
+        input[type="color"]{
+            width: 150px;
+            height: 150px;
+            overflow: hidden;
+            border-radius: 50%;
+            border: none;
+            outline:none;
+            opacity: 0;
+            cursor: pointer;
+            transition: opacity 300ms;
+        }
+        input[type="color"]:hover{
+            opacity: 0.3;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+            border: none;
+            outline:none;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 50%;
+            border: none;
+            outline:none;
+        }
+        .colors-section .submitted-message{
+            padding-bottom: 40px;
+        }
+        .colors-section .submitted-message p{
+            font-size: 20px;
+            max-width: 400px;
+            margin: auto;
+            line-height: 1.2;
+            
+        }
+        .colors-section .submitted-message p strong{
+            font-weight: 300;
+            color: #F7176D;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            display: block;
+        }
+        .hs-files{
+            max-height: 200px;
+            overflow: auto;
+            margin-bottom: -50px;
+            padding: 0 4px;
+        }
+        .hs-files::-webkit-scrollbar{
+            width: 4px;
+        }
+        .hs-files::-webkit-scrollbar-thumb {
+        background: #888;
+        }
+        .hs-file-preview{ 
+            margin: 0 0 10px 0;
+            line-height: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .hs-file-preview-name{
+            border: 1px solid #17F77E;
+            background-color: #fff;
+            padding: 0 15px;
+            color: #747474;
+            border-radius: 22px;
+            flex: auto;
+            height: 40px;
+            line-height: 40px;
+        }
+        .hs-file-preview-remove{
+            background-color: #fff;
+            border: 1px solid #000000;
+            width: 40px;
+            height: 40px;
+            margin-left: 20px;
+            border-radius: 50%;
+            text-align: center;
+            cursor: pointer;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 38%;
+            background-image: url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='12.694' height='12.698' viewBox='0 0 12.694 12.698'%3E%3Cpath d='M.181,1.06a.632.632,0,0,1,0-.881.632.632,0,0,1,.881,0L6.346,5.472,11.64.179a.62.62,0,0,1,.872.881L7.227,6.345l5.285,5.294a.62.62,0,1,1-.872.881L6.346,7.226,1.062,12.519a.632.632,0,0,1-.881,0,.632.632,0,0,1,0-.881L5.466,6.345Z' transform='translate(-0.002 0)' fill='%23000000'/%3E%3C/svg%3E");
+        }
+
+        .brand-loader{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 0.5);
+            display: none;
+        }
+        .brand-loader svg{
+            width: 100px;
+            height: 100px;
+        }
+
+        .hs_google_font{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+        .hs_google_font .hs-field-desc{
+            width: auto;
+            margin-right: 20px;
+            line-height: 1;
+        }
+        .hs_google_font input,
+        .font-select > span{
+            min-height: 40px;
+            border: 1px solid #aaa;
+            border-radius: 20px;
+            padding: 0 20px;
+            background-color: #fff;
+            line-height: 40px;
+        }
+        .font-select-active > span{
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        .hs_google_font label{
+            display: none;
+        }
+    </style>
+
+    <div class="container position-relative brand-container d-flex align-items-center justify-content-center">
+
+        <div class="position-relative w-100">
+        
+            <!--[if lte IE 8]>
+                <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/v2-legacy.js"></script>
+            <![endif]-->
+            <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/v2.js"></script>
+
+            
+
+            <div class="brand-section logos-section" style="display: block;">
+
+                <script>
+                    hbspt.forms.create({
+                        portalId: "44142094",
+                        formId: "086972c9-af7a-4a15-b1bb-ac854e6779cf",
+                        onFormSubmit : function(){
+                            //$('.logos-section').hide()
+                            //$('.fonts-section').fadeIn();
+                        },
+                        onFormSubmitted: function($form) {
+                            console.log('Logo Submited')
+                            $('.fonts-section form').submit();
+                        }   
+                    }).onReady(function(){
+                        setupForms({
+                            back : false
+                        })                              
+                    })
+                </script>
+
+            </div>
+
+            <div class="brand-section fonts-section">
+
+                <script>
+                    hbspt.forms.create({
+                        portalId: "44142094",
+                        formId: "e8e69888-4443-409b-8728-53019e1aa52c",
+                        onFormSubmit : function(){
+                            // $('.fonts-section').hide()
+                            // $('.colors-section').fadeIn();
+                        },
+                        onFormSubmitted: function($form) {
+                            $('.colors-section').hide();
+                            $('.colors-section form').submit();
+                        }  
+                    }).onReady(function(){
+                        $('[name="google_font"]').fontpicker({
+                            placeholder : 'Choose a font for your brand'
+                        })
+                        setupForms({
+                            back : true
+                        })                       
+                    })
+                </script>
+
+            </div>
+
+            <div class="brand-section colors-section">
+
+                <script>
+                    hbspt.forms.create({
+                        portalId: "44142094",
+                        formId: "72977af6-e5ec-432a-b760-f182d6308eb8",
+                        onFormSubmit: function($form) {
+                            $('.colors-section').hide();
+                        },
+                        onFormSubmitted: function($form) {
+                            $('.brand-loader').removeClass('d-flex');
+                            window.location.href = '/templates';
+                        } 
+                    }).onReady(function(){
+                        setupForms({
+                            back : true
+                        })                               
+                    })
+                </script>
+
+            </div>
+
+            <div class="brand-loader">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                    viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+                    <rect fill="none" stroke="#F7176D" stroke-width="4" x="25" y="25" width="50" height="50">
+                        <animateTransform attributeName="transform" dur="0.5s" from="0 50 50" to="180 50 50" type="rotate"
+                            id="strokeBox" attributeType="XML" begin="rectBox.end" />
+                    </rect>
+                    <rect x="27" y="27" fill="#F7176D" width="46" height="50">
+                        <animate attributeName="height" dur="1.3s" attributeType="XML" from="50" to="0" id="rectBox"
+                            fill="freeze" begin="0s;strokeBox.end" />
+                    </rect>
+                </svg>
+            </div>
+
+        </div>
+
+    
+    </div>
+
+<%- include('partials/footer', {async: true}); %>
+
+<script src="/static/js/jquery.fontpicker.js?<%=Date.now()%>"></script>
+
+<script>
+
+    function setupForms(options){
+        $('[name="email"]').val('<%=user.email%>')
+        
+        $('.hs-button:not(.btn)').addClass('btn btn-secondary px-5 badge-pill').attr('type', 'button')
+
+        if(options.back){
+            $('.actions:not(.added)').prepend('<div class="section-back">Back</div>').addClass('added')
+        }else{
+            $('.actions:not(.added)').prepend('<div></div>').addClass('added')
+        }
+
+        var $primary_color = $('[name="primary_color"]'),
+            $secondary_color = $('[name="secondary_color"]');
+        $primary_color.attr('type', 'color').parent().addClass('color-picker').css('background-color', $primary_color.val())
+        $secondary_color.attr('type', 'color').parent().addClass('color-picker').css('background-color', $secondary_color.val())
+    }
+    
+    $(document).on('change', '[type="file"]', function(e){
+        var $this = $(this),
+            copy = $('<input type="file" multiple/>'),
+            uniq_id = $this.index();
+
+        copy.attr('name', $this.attr('name'))
+        $this.after(copy);
+        $this.addClass('has-files');
+
+        if(!$this.closest('.brand-section').find('.hs-files').length){
+            $this.closest('.brand-section').find('.hs_google_font, .hs-logos').after('<div class="hs-files"></div>');
+        }
+        
+        for (var i = 0; i < e.target.files.length; i++){
+            if(e.target.files[i].name){
+                $this.closest('.brand-section').find('.hs-files').append('<div class="hs-file-preview" data-input="'+uniq_id +'"><div class="hs-file-preview-name">'+e.target.files[i].name+'</div><div class="hs-file-preview-remove"></div></div>')
+            }
+        }
+    }).on('click', '.hs-file-preview-remove', function(){
+        var uniq_id = $(this).parent().data('input');
+        
+        $(this).closest('.brand-section').find('[type="file"]').eq(uniq_id).val('');
+        $('[data-input="'+uniq_id +'"]').remove();
+
+    }).on('change keyup input', '[type="color"]', function(){
+        $(this).parent().css('background-color', $(this).val())
+    }).on('click', '.hs-button', function(){
+
+        var section = $(this).closest('.brand-section');
+
+        if(section.next('.brand-section').length){
+            section.hide();
+            section.next('.brand-section').fadeIn();
+        }else{
+            //Subbmit
+            $('.brand-loader').addClass('d-flex');
+            
+            var logo_files = $('.logos-section').find('[type="file"]').filter(function(){
+                return $(this).val()
+            });
+            if(logo_files.length){
+                $('.logos-section form').submit();
+            }else{
+                var fonts_files = $('.fonts-section').find('[type="file"]').filter(function(){
+                    return $(this).val()
+                });
+                if(fonts_files.length){
+                    $('.font-section form').submit();
+                }else{
+                    $('.colors-section form').submit();
+                }
+            }
+        }
+
+    }).on('click', '.section-back', function(){
+
+        var section = $(this).closest('.brand-section');
+
+        section.hide();
+        section.prev('.brand-section').fadeIn();
+
+    })
+</script>

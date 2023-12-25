@@ -1,0 +1,110 @@
+.support-page .inner-content-wrapper {
+  background-color: white;
+  border-radius: 26px;
+  height: 760px;
+}
+.support-page .inner-content-wrapper .content-wrapper {
+  width: 100%;
+  padding: 50px 40px;
+}
+.support-page .label-text {
+  letter-spacing: 0.5px;
+}
+.support-page .label-text.users {
+  margin-top: 60px;
+}
+.support-page input {
+  border: none;
+  border-radius: 14px;
+  height: 48px;
+  padding: 0px 22px;
+  background-color: #f5f5f5;
+}
+.support-page .user-list {
+  padding: 10px;
+  border-radius: 14px;
+  background-color: #fff;
+}
+.support-page .user-list .user-line {
+  background-color: #f5f5f5;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  padding: 18px 24px;
+}
+.support-page .user-list .user-line:last-child {
+  margin-bottom: 0px;
+}
+.support-page .user-list .user-line .buttons-wrapper .button {
+  height: 40px;
+  width: 40px;
+  background-color: #fff;
+  border-radius: 50%;
+  margin-left: 14px;
+  transition: 0.25s;
+}
+.support-page .user-list .user-line .buttons-wrapper .button.disabled {
+  cursor: no-drop;
+  filter: grayscale(100%);
+  opacity: 0.5;
+}
+.support-page .user-list .user-line .buttons-wrapper .button:not(.disabled):hover {
+  transform: scale(1.15);
+}
+.support-page .user-list .user-line .buttons-wrapper .button.edit i {
+  color: rgba(107, 82, 250, 0.5);
+}
+.support-page .user-list .user-line .buttons-wrapper .button.delete i {
+  color: rgba(242, 32, 32, 0.5);
+}
+.support-page .add-user-button {
+  margin-top: 16px;
+  margin-left: 10px;
+}
+.support-page .current-plan-wrapper {
+  background-color: #f5f5f5;
+  border-radius: 14px;
+  padding: 16px 32px;
+  margin-bottom: 40px;
+}
+.support-page .payment-types {
+  overflow: hidden;
+  background-color: #f5f5f5;
+  border-radius: 14px;
+  padding: 16px 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 33fr);
+  gap: 12px;
+}
+.support-page .payment-types .card-wrapper {
+  aspect-ratio: 1.65/1;
+  border-radius: 8px;
+  position: relative;
+}
+.support-page .payment-types .card-wrapper.amex {
+  background-color: #e3ebff;
+  color: #3042df;
+}
+.support-page .payment-types .card-wrapper.visa {
+  background-color: #ffefe3;
+  color: #e46d3a;
+}
+.support-page .payment-types .card-wrapper .cc-header,
+.support-page .payment-types .card-wrapper .cc-footer {
+  width: 100%;
+  padding: 10px 18px;
+}
+.support-page .payment-types .card-wrapper .cc-header {
+  padding-top: 14px;
+}
+.support-page .payment-types .card-wrapper .hover-only {
+  display: none;
+}
+.support-page .payment-types .card-wrapper:hover .hover-only {
+  display: block;
+}
+.support-page .payment-types .card-wrapper:hover .hover-only.df {
+  display: flex;
+}
+.support-page .payment-types .card-wrapper .brand-icon i {
+  font-size: 22px;
+}/*# sourceMappingURL=support.css.map */

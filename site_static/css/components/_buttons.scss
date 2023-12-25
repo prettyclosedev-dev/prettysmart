@@ -1,0 +1,35 @@
+.btn-a{
+    display: inline-block;
+    min-width: 170px;
+    text-align: center;
+    padding: 20px 10px 18px 10px;
+    border-radius: 4px;
+    box-shadow: 0 8px 20px 0 $c-box-shadow;
+    border: solid 1.5px #a301e8;
+    font-size: 21px;
+    line-height: 1;
+    background: $c-v;
+    color: $c-white;
+    font-family: $f-tm;
+    &:hover{
+        background: $c-white;
+    }
+    @media (max-width:$md-max) {
+        font-size: 20px;
+    }
+    @media (max-width:$sm-max) {
+        min-width: 150px;
+        font-size: 19px;
+      
+    }
+    @media (max-width:$xs-max) {
+        min-width: 120px;
+    }
+    &:hover{
+        background: $c-white;
+        text-decoration: none;
+    }
+}    
+.btn-long{
+    min-width: 220px;
+}

@@ -1,0 +1,318 @@
+.templates-page .hidden {
+  display: none;
+}
+.templates-page .item-wrapper {
+  background-color: white;
+  margin-bottom: 40px;
+  padding: 20px 18px;
+  border-radius: 26px;
+}
+.templates-page .item-wrapper .item-header {
+  margin-bottom: 30px;
+  font-weight: 600;
+  font-size: 20px;
+}
+.templates-page .item-wrapper .item-header p {
+  margin-bottom: 0px;
+}
+.templates-page .item-wrapper .item-header .mla {
+  margin-top: -20px;
+}
+.templates-page .item-wrapper .item-header .mla .orientation-selection-wrapper {
+  display: flex;
+  margin-top: 20px;
+}
+.templates-page .item-wrapper .swiper-button-next {
+  color: #db3965;
+}
+.templates-page .item-wrapper .swiper-button-prev {
+  color: #db3965;
+}
+.templates-page .item-wrapper .swiper-slide {
+  width: 300px;
+  border-radius: 20px;
+}
+.templates-page .item-wrapper .swiper-slide .template {
+  border-radius: 20px;
+  overflow: hidden;
+}
+.templates-page .item-wrapper .swiper-slide .template::before {
+  content: "";
+  background-color: rgba(0, 0, 0, 0);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  height: 100%;
+  width: 100%;
+  transition: background-color 0.15s;
+}
+.templates-page .item-wrapper .swiper-slide .template .tag {
+  position: absolute;
+  left: 13px;
+  top: 20px;
+  color: white;
+  border-radius: 5px;
+  padding: 6px 10px;
+  z-index: 1;
+  opacity: 1;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.templates-page .item-wrapper .swiper-slide .template .favorite-wrapper {
+  position: absolute;
+  top: 5px;
+  right: 20px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 12px 18px;
+  font-weight: 600;
+  font-size: 16px;
+  opacity: 0;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  cursor: pointer;
+  filter: grayscale(100%);
+  color: #878787;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.templates-page .item-wrapper .swiper-slide .template .favorite-wrapper .like-icon {
+  width: 18px;
+  height: 16px;
+  display: inline-block;
+  position: relative;
+  margin-right: 0.25em;
+  font-size: 1.5rem;
+  background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48IS0tISBGb250IEF3ZXNvbWUgUHJvIDYuMC4wIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlIChDb21tZXJjaWFsIExpY2Vuc2UpIENvcHlyaWdodCAyMDIyIEZvbnRpY29ucywgSW5jLiAtLT48cGF0aCBkPSJNMCAxOTAuOVYxODUuMUMwIDExNS4yIDUwLjUyIDU1LjU4IDExOS40IDQ0LjFDMTY0LjEgMzYuNTEgMjExLjQgNTEuMzcgMjQ0IDg0LjAyTDI1NiA5NkwyNjcuMSA4NC4wMkMzMDAuNiA1MS4zNyAzNDcgMzYuNTEgMzkyLjYgNDQuMUM0NjEuNSA1NS41OCA1MTIgMTE1LjIgNTEyIDE4NS4xVjE5MC45QzUxMiAyMzIuNCA0OTQuOCAyNzIuMSA0NjQuNCAzMDAuNEwyODMuNyA0NjkuMUMyNzYuMiA0NzYuMSAyNjYuMyA0ODAgMjU2IDQ4MEMyNDUuNyA0ODAgMjM1LjggNDc2LjEgMjI4LjMgNDY5LjFMNDcuNTkgMzAwLjRDMTcuMjMgMjcyLjEgLjAwMDMgMjMyLjQgLjAwMDMgMTkwLjlMMCAxOTAuOXoiIHN0eWxlPSJmaWxsOiByZ2IoMjE5LCA1NywgMTAxKTsiLz48L3N2Zz4=") no-repeat center;
+  background-size: 100%;
+  animation: heartUnlike 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+.templates-page .item-wrapper .swiper-slide .template .favorite-wrapper.liked {
+  color: #db3965;
+  border-color: currentColor;
+  filter: grayscale(0);
+}
+.templates-page .item-wrapper .swiper-slide .template .favorite-wrapper.liked:hover {
+  border-color: currentColor;
+}
+.templates-page .item-wrapper .swiper-slide .template .favorite-wrapper.liked .like-icon {
+  animation: heartPulse 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+.templates-page .item-wrapper .swiper-slide .template .favorite-wrapper.liked .like-icon [class^=heart-animation-] {
+  background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48IS0tISBGb250IEF3ZXNvbWUgUHJvIDYuMC4wIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlIChDb21tZXJjaWFsIExpY2Vuc2UpIENvcHlyaWdodCAyMDIyIEZvbnRpY29ucywgSW5jLiAtLT48cGF0aCBkPSJNMCAxOTAuOVYxODUuMUMwIDExNS4yIDUwLjUyIDU1LjU4IDExOS40IDQ0LjFDMTY0LjEgMzYuNTEgMjExLjQgNTEuMzcgMjQ0IDg0LjAyTDI1NiA5NkwyNjcuMSA4NC4wMkMzMDAuNiA1MS4zNyAzNDcgMzYuNTEgMzkyLjYgNDQuMUM0NjEuNSA1NS41OCA1MTIgMTE1LjIgNTEyIDE4NS4xVjE5MC45QzUxMiAyMzIuNCA0OTQuOCAyNzIuMSA0NjQuNCAzMDAuNEwyODMuNyA0NjkuMUMyNzYuMiA0NzYuMSAyNjYuMyA0ODAgMjU2IDQ4MEMyNDUuNyA0ODAgMjM1LjggNDc2LjEgMjI4LjMgNDY5LjFMNDcuNTkgMzAwLjRDMTcuMjMgMjcyLjEgLjAwMDMgMjMyLjQgLjAwMDMgMTkwLjlMMCAxOTAuOXoiIHN0eWxlPSJmaWxsOiByZ2IoMjE5LCA1NywgMTAxKTsiLz48L3N2Zz4=") no-repeat center;
+  background-size: 100%;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 14px;
+  opacity: 0;
+}
+.templates-page .item-wrapper .swiper-slide .template .favorite-wrapper.liked .like-icon [class^=heart-animation-]::before, .templates-page .item-wrapper .swiper-slide .template .favorite-wrapper.liked .like-icon [class^=heart-animation-]::after {
+  content: "";
+  background: inherit;
+  background-size: 100%;
+  width: inherit;
+  height: inherit;
+  display: inherit;
+  position: relative;
+  top: inherit;
+  left: inherit;
+  opacity: 0;
+}
+.templates-page .item-wrapper .swiper-slide .template .favorite-wrapper.liked .like-icon .heart-animation-1 {
+  animation: heartFloatMain-1 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+.templates-page .item-wrapper .swiper-slide .template .favorite-wrapper.liked .like-icon .heart-animation-1::before, .templates-page .item-wrapper .swiper-slide .template .favorite-wrapper.liked .like-icon .heart-animation-1::after {
+  width: 12px;
+  height: 10px;
+  visibility: hidden;
+}
+.templates-page .item-wrapper .swiper-slide .template .favorite-wrapper.liked .like-icon .heart-animation-1::before {
+  opacity: 0.6;
+  animation: heartFloatSub-1 1s 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+.templates-page .item-wrapper .swiper-slide .template .favorite-wrapper.liked .like-icon .heart-animation-1::after {
+  animation: heartFloatSub-2 1s 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  opacity: 0.75;
+}
+.templates-page .item-wrapper .swiper-slide .template .favorite-wrapper.liked .like-icon .heart-animation-2 {
+  animation: heartFloatMain-2 1s 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+.templates-page .item-wrapper .swiper-slide .template .favorite-wrapper.liked .like-icon .heart-animation-2::before, .templates-page .item-wrapper .swiper-slide .template .favorite-wrapper.liked .like-icon .heart-animation-2::after {
+  width: 10px;
+  height: 8px;
+  visibility: hidden;
+}
+.templates-page .item-wrapper .swiper-slide .template .favorite-wrapper.liked .like-icon .heart-animation-2::before {
+  animation: heartFloatSub-3 1s 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  opacity: 0.25;
+}
+.templates-page .item-wrapper .swiper-slide .template .favorite-wrapper.liked .like-icon .heart-animation-2::after {
+  animation: heartFloatSub-4 1s 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  opacity: 0.4;
+}
+.templates-page .item-wrapper .swiper-slide .template .download-wrapper {
+  width: calc(100% - 40px);
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: all 0.25s;
+}
+.templates-page .item-wrapper .swiper-slide .template .download-button {
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  line-height: 1;
+  padding: 6px 14px;
+  height: 42px;
+  width: 100%;
+  background-color: #db3965;
+  margin-left: 0px;
+}
+.templates-page .item-wrapper .swiper-slide .template .download-button > i {
+  margin-right: 10px;
+}
+.templates-page .item-wrapper .swiper-slide .template:hover::before {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.templates-page .item-wrapper .swiper-slide .template:hover .download-wrapper {
+  opacity: 1;
+  bottom: 20px;
+}
+.templates-page .item-wrapper .swiper-slide .template:hover .favorite-wrapper {
+  top: 20px;
+  opacity: 1;
+}
+
+.download-button {
+  margin-left: 20px;
+  text-align: left;
+  padding: 0px;
+}
+.download-button > button {
+  height: 100%;
+  color: #ffffff;
+}
+.download-button > button:hover {
+  color: white;
+}
+.download-button > button:nth-child(1) {
+  flex: 8;
+  text-align: left;
+  justify-content: flex-start;
+  padding-left: 18px;
+  border-radius: 10px 0px 0px 10px;
+}
+.download-button > button:nth-child(2) {
+  border-radius: 0px 10px 10px 0px;
+}
+.download-button > button:nth-child(2)::before {
+  content: "";
+  height: 80%;
+  width: 1px;
+  background-color: rgba(255, 255, 255, 0.2);
+  position: absolute;
+  left: -2px;
+}
+.download-button > button:nth-child(2)::after {
+  border-width: 0px;
+}
+.download-button .dropdown-menu button {
+  color: #000000;
+}
+.download-button .opener {
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  padding-left: 14px;
+  height: 100%;
+}
+.download-button .more-options {
+  position: absolute;
+}
+
+@keyframes heartPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+}
+@keyframes heartUnlike {
+  50% {
+    transform: scale(0.75);
+  }
+}
+@keyframes heartFloatMain-1 {
+  0% {
+    opacity: 0;
+    transform: translate(0) rotate(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(0, -25px) rotate(-20deg);
+  }
+}
+@keyframes heartFloatMain-2 {
+  0% {
+    opacity: 0;
+    transform: translate(0) rotate(0) scale(0);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translate(-10px, -38px) rotate(25deg) scale(1);
+  }
+}
+@keyframes heartFloatSub-1 {
+  0% {
+    visibility: hidden;
+    transform: translate(0) rotate(0);
+  }
+  50% {
+    visibility: visible;
+    transform: translate(13px, -13px) rotate(30deg);
+  }
+}
+@keyframes heartFloatSub-2 {
+  0% {
+    visibility: hidden;
+    transform: translate(0) rotate(0);
+  }
+  50% {
+    visibility: visible;
+    transform: translate(18px, -10px) rotate(55deg);
+  }
+}
+@keyframes heartFloatSub-3 {
+  0% {
+    visibility: hidden;
+    transform: translate(0) rotate(0);
+  }
+  50% {
+    visibility: visible;
+    transform: translate(-10px, -10px) rotate(-40deg);
+  }
+  100% {
+    transform: translate(-50px, 0);
+  }
+}
+@keyframes heartFloatSub-4 {
+  0% {
+    visibility: hidden;
+    transform: translate(0) rotate(0);
+  }
+  50% {
+    visibility: visible;
+    transform: translate(2px, -18px) rotate(-25deg);
+  }
+}
+@media screen and (max-width: 768px) {
+  .item-header {
+    display: block;
+  }
+}/*# sourceMappingURL=templates-page.css.map */

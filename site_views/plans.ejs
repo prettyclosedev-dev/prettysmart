@@ -1,0 +1,38 @@
+<%- include('partials/header', {async: true}); %>
+<link rel="stylesheet" href="/static/css/plans.css?<%=Date.now()%>">
+<div class="df page-wrapper df ffp">
+  <%- include('partials/nav', {async: true}); %>
+
+  <div class="page-content">
+
+    <div class="plans-page">
+      <div class="page-content-wrapper">
+        <h2 class="page-title">Plans<span class="text-primary">.</span></h2>
+        <div class="df inner-content-wrapper">
+          <div class="plans-wrapper">
+            <script>
+              $(document).on('click', "#plan-button", function(e) {
+
+              });
+            </script>
+            <script>
+              $(document).on('change', '[type="radio"]', function(e) {
+                var new_interval = $(this).attr("id").includes("month") ? 'month' : 'year'
+                $.post(`/plans/interval/${new_interval}`, function(data) {
+                  $('.price-items').html($(data).find('.price-items').html());
+                });
+              });
+              </script>
+            <div class="seg-wrapper" style="display: flex; align-self: center;">
+              <%- include('partials/segment-control', {async: true, options: [{value: "Monthly", id: "month", selected: interval === "month"}, {value: "Yearly 20% off", id: "year", selected: interval === "year"}], inverted: true, segmentID: "plans-seg"}); %>
+            </div>
+            <%- include('partials/plans-items', {async: true, onGray: true, products: products.data, interval, current: subscription && subscription.plan ? subscription.plan.id : null, status: subscription ? subscription.status : null}); %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+
+</html>

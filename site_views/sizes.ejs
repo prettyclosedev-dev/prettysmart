@@ -1,0 +1,70 @@
+<%- include('partials/header', {async: true, fixed_header:true}); %>
+<div class="sizes-page d-flex align-items-center justify-content-center">
+    <div class="w-100">
+        <div class="container">
+            <h1 class="fs55 text-center">
+                Now, what would you 
+                <br>
+                like to create?
+            </h1>
+        </div>
+
+        <div class="container">
+            <div class="col-lg-7 mx-auto">
+                <div class="sizes row justify-content-around">
+                    <% sizes.forEach(size_chunk => { %>
+                        <div class="size-type fs30">
+                        <% size_chunk.forEach(size => { %>
+                            
+                                <div>
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="size_<%= size.name %>" name="size" value="/form/<%= event %>/<%= size._id %>" class="custom-control-input">
+                                        <label class="custom-control-label" for="size_<%= size.name %>">
+                                            <span><%= size.name %></span>
+                                        </label>
+                                    </div>  
+                                </div>
+                            
+                        <% }) %>
+                    </div>
+                    <% }) %>
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="form-footer px-lg-4">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-7">
+                        <a href="/events" class="fs25 d-inline-flex align-items-center text-dark">
+                            &larr;
+                            sorry, go back.
+                        </a>
+                    </div>
+                    <div class="col-5 text-right d-flex align-items-center justify-content-end">
+                        <a data-next class="fs25 btn btn-primary badge-pill ml-lg-5 px-3 px-lg-4 text-white disabled">next &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>        
+<%- include('partials/footer', {async: true}); %>
+
+<script>
+    $(document).on('change', '[name="size"]', function(){
+        var selectedLink = $('[name="size"]:checked').val();
+        $('[data-next]').attr('href', selectedLink).removeClass('disabled')
+    })
+
+
+    window.onload = function(){
+        if($('[name="size"]:checked').length){
+            var selectedLink = $('[name="size"]:checked').val();
+            $('[data-next]').attr('href', selectedLink).removeClass('disabled')
+        }
+    }
+
+    
+</script>

@@ -1,0 +1,179 @@
+<div id="signupPopup" class="new-popup-wrapper d-none gt misc">
+  <link rel="stylesheet" href="/static/css/login-popup.css?<%=Date.now()%>" />
+  <div class="overlay"></div>
+  <div class="new-popup">
+    <div class="login-primary-wrapper">
+      <div class="login-sub-wrapper">
+        <div class="df aic new-popup-header" style="border-bottom: none">
+          <div>
+            <p class="fs30 title">Signup</p>
+            <p class="text-center fs16">
+                Already have an account? <button class="a-button" onclick="toggleLoginPopup()">Log In</button>
+            </p>
+          </div>
+          <div
+            class="df acc mla close-button pointer close"
+            style="--bg-color: #84b9e01a %>; --bg-color-hover: #84b9e033 %>"
+            onclick="closeSignupPopup()"
+          >
+            <i
+              class="fa-regular fa-xmark"
+              style="color: <%= user.account.brand.colors.primary %>"
+            ></i>
+          </div>
+        </div>
+
+
+        <div class="df login-wrapper">
+
+        <form action="/signup" method="post" class="mx-auto signup-form position-relative">
+            <input type="hidden" name="form" value="signup">
+            <div class="">      
+                <div class="text-danger text-center" data-field="signup"></div>    
+                <div class="row">
+                    <div class="col-12 col-lg-6 mb-4">
+                        <div class="input-group input-group-lg">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text bg-white">                                
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="21.69" height="21.597" viewBox="0 0 21.69 21.597"><g transform="translate(3.932 15.283)"><path d="M1574.265,1020.352h-.015a.352.352,0,0,1-.337-.366l.23-5.609a.352.352,0,0,1,.7.029l-.23,5.609A.352.352,0,0,1,1574.265,1020.352Z" transform="translate(-1573.912 -1014.038)" fill="#b6bacb"/></g><g transform="translate(16.824 15.282)"><path d="M1598.073,1020.351a.352.352,0,0,1-.352-.338l-.23-5.609a.352.352,0,1,1,.7-.029l.23,5.609a.352.352,0,0,1-.337.366Z" transform="translate(-1597.491 -1014.037)" fill="#b6bacb"/></g><g transform="translate(0 10.417)"><path d="M1586.355,1016.318h-17.577a2.056,2.056,0,0,1-2.045-2.276l.658-6.1a3.261,3.261,0,0,1,3.242-2.8h5.216a.353.353,0,0,1,.35.392l-.049.434a1.806,1.806,0,0,0,.319,1.146,1.428,1.428,0,0,0,2.184,0,1.8,1.8,0,0,0,.319-1.146l-.049-.434a.353.353,0,0,1,.35-.392h5.225a3.259,3.259,0,0,1,3.241,2.787l.659,6.115a2.056,2.056,0,0,1-2.044,2.277Zm-15.721-10.475a2.558,2.558,0,0,0-2.544,2.188l-.656,6.087a1.351,1.351,0,0,0,1.344,1.5h17.577a1.353,1.353,0,0,0,1.344-1.5l-.658-6.1a2.556,2.556,0,0,0-2.543-2.173h-4.831l0,.042a2.485,2.485,0,0,1-.482,1.681,2.133,2.133,0,0,1-3.258,0,2.486,2.486,0,0,1-.482-1.681l0-.042Z" transform="translate(-1566.722 -1005.139)" fill="#b6bacb"/></g><g transform="translate(8.708 8.698)"><path d="M1584.78,1006.9a2.129,2.129,0,0,1-2.119-2.37l.251-2.218a.352.352,0,0,1,.446-.3,3.657,3.657,0,0,0,1,.143h.839a3.659,3.659,0,0,0,1-.143.353.353,0,0,1,.446.3l.251,2.218h0a2.129,2.129,0,0,1-2.118,2.37Zm-1.212-4.115-.207,1.824a1.428,1.428,0,1,0,2.837,0l-.206-1.824a4.282,4.282,0,0,1-.793.074h-.839A4.281,4.281,0,0,1,1583.568,1002.78Z" transform="translate(-1582.648 -1001.994)" fill="#b6bacb"/></g><g transform="translate(6.061)"><path d="M1583.006,995.645h-.839a4.37,4.37,0,0,1-4.36-4.359V989.76a3.677,3.677,0,0,1,3.674-3.673h2.211a3.677,3.677,0,0,1,3.674,3.673v1.526a4.37,4.37,0,0,1-4.36,4.359Zm-1.525-8.854a2.973,2.973,0,0,0-2.969,2.969v1.526a3.667,3.667,0,0,0,3.655,3.655h.839a3.667,3.667,0,0,0,3.656-3.655V989.76a2.972,2.972,0,0,0-2.969-2.969Z" transform="translate(-1577.807 -986.087)" fill="#b6bacb"/></g></svg>
+                              </span>
+                            </div>
+                            <input type="text" name="first_name" placeholder="First Name" class="form-control" required>
+                        </div>
+                        <div class="text-danger" data-field="first_name"></div>
+                    </div>
+                    <div class="col-12 col-lg-6 mb-4">
+                        <div class="input-group input-group-lg">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text bg-white">                                
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="21.69" height="21.597" viewBox="0 0 21.69 21.597"><g transform="translate(3.932 15.283)"><path d="M1574.265,1020.352h-.015a.352.352,0,0,1-.337-.366l.23-5.609a.352.352,0,0,1,.7.029l-.23,5.609A.352.352,0,0,1,1574.265,1020.352Z" transform="translate(-1573.912 -1014.038)" fill="#b6bacb"/></g><g transform="translate(16.824 15.282)"><path d="M1598.073,1020.351a.352.352,0,0,1-.352-.338l-.23-5.609a.352.352,0,1,1,.7-.029l.23,5.609a.352.352,0,0,1-.337.366Z" transform="translate(-1597.491 -1014.037)" fill="#b6bacb"/></g><g transform="translate(0 10.417)"><path d="M1586.355,1016.318h-17.577a2.056,2.056,0,0,1-2.045-2.276l.658-6.1a3.261,3.261,0,0,1,3.242-2.8h5.216a.353.353,0,0,1,.35.392l-.049.434a1.806,1.806,0,0,0,.319,1.146,1.428,1.428,0,0,0,2.184,0,1.8,1.8,0,0,0,.319-1.146l-.049-.434a.353.353,0,0,1,.35-.392h5.225a3.259,3.259,0,0,1,3.241,2.787l.659,6.115a2.056,2.056,0,0,1-2.044,2.277Zm-15.721-10.475a2.558,2.558,0,0,0-2.544,2.188l-.656,6.087a1.351,1.351,0,0,0,1.344,1.5h17.577a1.353,1.353,0,0,0,1.344-1.5l-.658-6.1a2.556,2.556,0,0,0-2.543-2.173h-4.831l0,.042a2.485,2.485,0,0,1-.482,1.681,2.133,2.133,0,0,1-3.258,0,2.486,2.486,0,0,1-.482-1.681l0-.042Z" transform="translate(-1566.722 -1005.139)" fill="#b6bacb"/></g><g transform="translate(8.708 8.698)"><path d="M1584.78,1006.9a2.129,2.129,0,0,1-2.119-2.37l.251-2.218a.352.352,0,0,1,.446-.3,3.657,3.657,0,0,0,1,.143h.839a3.659,3.659,0,0,0,1-.143.353.353,0,0,1,.446.3l.251,2.218h0a2.129,2.129,0,0,1-2.118,2.37Zm-1.212-4.115-.207,1.824a1.428,1.428,0,1,0,2.837,0l-.206-1.824a4.282,4.282,0,0,1-.793.074h-.839A4.281,4.281,0,0,1,1583.568,1002.78Z" transform="translate(-1582.648 -1001.994)" fill="#b6bacb"/></g><g transform="translate(6.061)"><path d="M1583.006,995.645h-.839a4.37,4.37,0,0,1-4.36-4.359V989.76a3.677,3.677,0,0,1,3.674-3.673h2.211a3.677,3.677,0,0,1,3.674,3.673v1.526a4.37,4.37,0,0,1-4.36,4.359Zm-1.525-8.854a2.973,2.973,0,0,0-2.969,2.969v1.526a3.667,3.667,0,0,0,3.655,3.655h.839a3.667,3.667,0,0,0,3.656-3.655V989.76a2.972,2.972,0,0,0-2.969-2.969Z" transform="translate(-1577.807 -986.087)" fill="#b6bacb"/></g></svg>
+                              </span>
+                            </div>
+                            <input type="text" name="last_name" placeholder="Last Name" class="form-control" required>
+                        </div>
+                        <div class="text-danger" data-field="last_name"></div>
+                    </div>
+                </div>                       
+            </div>
+            <div class="mb-4">
+                        <div class="input-group input-group-lg">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text bg-white">                                
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20.952" height="14.029" viewBox="0 0 20.952 14.029"><g transform="translate(0)"><path d="M1587.194,915.388h-20.247a.352.352,0,0,1-.352-.352V901.711a.352.352,0,0,1,.352-.352h20.247a.352.352,0,0,1,.352.352v13.325A.352.352,0,0,1,1587.194,915.388Zm-19.9-.7h19.543v-12.62H1567.3Z" transform="translate(-1566.595 -901.359)" fill="#b6bacb"/></g><g transform="translate(0)"><path d="M1577.071,911.288a.352.352,0,0,1-.237-.092l-10.123-9.225a.352.352,0,0,1,.237-.612h20.247a.352.352,0,0,1,.237.612l-10.124,9.225A.352.352,0,0,1,1577.071,911.288Zm-9.214-9.225,9.214,8.4,9.214-8.4Z" transform="translate(-1566.595 -901.359)" fill="#b6bacb"/></g><g transform="translate(0 7.31)"><path d="M1587.194,921.447h-20.247a.352.352,0,0,1-.211-.634l8.022-6.015a.352.352,0,1,1,.423.564L1568,920.742h18.133l-7.086-5.313a.352.352,0,0,1,.422-.564l7.932,5.947a.352.352,0,0,1-.211.634Z" transform="translate(-1566.595 -914.728)" fill="#b6bacb"/></g></svg>
+                              </span>
+                            </div>
+                            <input type="email" name="email" placeholder="Email" class="form-control" required>
+                        </div>
+                        <div class="text-danger" data-field="email"></div>
+                    </div>
+            <div class="mb-4">
+                    <div class="input-group input-group-lg">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text bg-white">                            
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14.113" height="17.824" viewBox="0 0 14.113 17.824"><g transform="translate(-2160.614 -1073.09)"><g transform="translate(2160.614 1073.09)"><path d="M2172.853,1090.914h-10.364a1.877,1.877,0,0,1-1.875-1.874V1082a1.879,1.879,0,0,1,1.271-1.769v-1.358a5.786,5.786,0,1,1,11.572,0v1.358a1.88,1.88,0,0,1,1.271,1.767v7.038A1.877,1.877,0,0,1,2172.853,1090.914Zm-5.182-17.2a5.171,5.171,0,0,0-5.165,5.165v1.854l-.252.048a1.255,1.255,0,0,0-1.018,1.227v7.035a1.254,1.254,0,0,0,1.253,1.252h10.364a1.254,1.254,0,0,0,1.253-1.252V1082a1.255,1.255,0,0,0-1.018-1.225l-.252-.048v-1.854A5.17,5.17,0,0,0,2167.671,1073.712Zm.9,14.86h-1.8v-2.316h-.113l.113-.046v-.068a1.874,1.874,0,1,1,2.635-.944,1.885,1.885,0,0,1-.835.94Zm-1.178-.621h.557v-1.695h-.557Zm.275-4.709a1.253,1.253,0,0,0-.47,2.415l.194.079v.223l.745-.3a1.253,1.253,0,0,0,0-2.323A1.245,1.245,0,0,0,2167.668,1083.242Zm3.438-2.492h-6.875v-1.874a3.438,3.438,0,1,1,6.875,0Zm-6.254-.621h5.633v-1.253a2.816,2.816,0,1,0-5.633,0Z" transform="translate(-2160.614 -1073.09)" fill="#b6bacb"/></g></g></svg>
+                          </span>
+                        </div>
+                        <input type="password" name="password" placeholder="Password" class="form-control" required>
+                    </div>
+                    <div class="text-danger" data-field="password"></div>
+                </div>
+                <div class="mb-4">
+                    <div class="input-group input-group-lg">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text bg-white">                            
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14.113" height="17.824" viewBox="0 0 14.113 17.824"><g transform="translate(-2160.614 -1073.09)"><g transform="translate(2160.614 1073.09)"><path d="M2172.853,1090.914h-10.364a1.877,1.877,0,0,1-1.875-1.874V1082a1.879,1.879,0,0,1,1.271-1.769v-1.358a5.786,5.786,0,1,1,11.572,0v1.358a1.88,1.88,0,0,1,1.271,1.767v7.038A1.877,1.877,0,0,1,2172.853,1090.914Zm-5.182-17.2a5.171,5.171,0,0,0-5.165,5.165v1.854l-.252.048a1.255,1.255,0,0,0-1.018,1.227v7.035a1.254,1.254,0,0,0,1.253,1.252h10.364a1.254,1.254,0,0,0,1.253-1.252V1082a1.255,1.255,0,0,0-1.018-1.225l-.252-.048v-1.854A5.17,5.17,0,0,0,2167.671,1073.712Zm.9,14.86h-1.8v-2.316h-.113l.113-.046v-.068a1.874,1.874,0,1,1,2.635-.944,1.885,1.885,0,0,1-.835.94Zm-1.178-.621h.557v-1.695h-.557Zm.275-4.709a1.253,1.253,0,0,0-.47,2.415l.194.079v.223l.745-.3a1.253,1.253,0,0,0,0-2.323A1.245,1.245,0,0,0,2167.668,1083.242Zm3.438-2.492h-6.875v-1.874a3.438,3.438,0,1,1,6.875,0Zm-6.254-.621h5.633v-1.253a2.816,2.816,0,1,0-5.633,0Z" transform="translate(-2160.614 -1073.09)" fill="#b6bacb"/></g></g></svg>
+                          </span>
+                        </div>
+                        <input type="password" name="confirm_password" placeholder="Confirm Password" class="form-control" required>
+                    </div>  
+                    <div class="text-danger" data-field="confirm_password"></div>                  
+                </div>
+            
+            <div>
+                <input type="submit" value="Sign up" class="btn btn-block btn-primary">
+            </div>
+
+            <div class="form-loader">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                    viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+                    <rect fill="none" stroke="#F7176D" stroke-width="4" x="25" y="25" width="50" height="50">
+                        <animateTransform attributeName="transform" dur="0.5s" from="0 50 50" to="180 50 50" type="rotate"
+                            id="strokeBox" attributeType="XML" begin="rectBox.end" />
+                    </rect>
+                    <rect x="27" y="27" fill="#F7176D" width="46" height="50">
+                        <animate attributeName="height" dur="1.3s" attributeType="XML" from="50" to="0" id="rectBox"
+                            fill="freeze" begin="0s;strokeBox.end" />
+                    </rect>
+                </svg>
+            </div>
+        </form>
+
+        <div class="text-center px-3">
+            * By logging in, you agree to our <a href="/pages/term-of-use">Terms of Use</a> and to receive clyps emails & updates
+            <br class="d-none d-lg-block">
+            and acknowledge that you read our <a href="/pages/privacy-policy">Privacy Policy.</a>
+        </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    var user_location;
+
+    $(document).ready(function() {
+        $.ajax({
+            url: "https://geolocation-db.com/jsonp",
+            jsonpCallback: "callback",
+            dataType: "jsonp",
+            success: function(location) {
+                user_location = location
+                // $('#country').html(location.country_name);
+                // $('#state').html(location.state);
+                // $('#city').html(location.city);
+                // $('#latitude').html(location.latitude);
+                // $('#longitude').html(location.longitude);
+                // $('#ip').html(location.IPv4);
+            }
+        });
+    });
+
+    $(document).on('submit', '.signup-form', function(){
+        var $form = $(this),
+            data = $form.serializeArray();
+
+        if (user_location) {
+            const { country_name, state, city } = user_location;
+            if (country_name || state || city) {
+                data = [...data, {name: "country", value: country_name}, {name: "state", value: state}, {name: "city", value: city}];
+            }
+        }
+
+        $form.find('.form-loader').addClass('d-flex');
+        $.post($form.attr('action'), $.param(data), function(res) {
+            $form.find('.form-loader').removeClass('d-flex');
+            if (res.route) {
+                closeSignupPopup()
+                window.location.reload()
+            } else if (res.error) {
+                alert(JSON.stringify(res.error))
+            } else {
+                alert("Failed to signup!")
+            }
+        }).fail(function(res){
+            if(res.responseJSON && res.responseJSON.errors){
+                res.responseJSON.errors.forEach(function(error){
+                    $('[data-field="'+ error.param +'"]').text(error.msg);
+                })
+            }else if(res.responseJSON && res.responseJSON.error){
+                $('[data-field="signup"]').text(res.responseJSON.error.message);
+            }else{                
+                $('[data-field="signup"]').text(res.error || res.responseText);
+            }
+            $form.find('.form-loader').removeClass('d-flex');
+        })
+
+        return false;
+    })
+</script>

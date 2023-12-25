@@ -1,0 +1,206 @@
+<div class="app-nav">
+  <div class="mobile-nav-opener" onclick="toggleMobileNav()"><i class="fa-solid fa-ellipsis mobile-nav-open" style="color: #db3965; font-size: 18px;"></i></div>
+  <div class="all-wrpr mobile-hide">
+    <div class="overlay mobile-hide" onclick="toggleMobileNav()"></div>
+    <div class="nav-wrapper">
+      <div class="df logo-wrapper">
+        <!-- <img src="/site_static/images/logo.svg" alt="Clyps"> -->
+
+        <a href="/" class="logo-name">
+          <h2 class="page-title">clyps<span class="text-primary">.</span>io</h2>
+        </a>
+        <div onclick="toggleMobileNav()" class="mobile-close"><i class="fa-solid fa-xmark"></i></div>
+      </div>
+
+      <div class="df links-wrapper ffp fs14">
+        <div class="clip-row">
+          <div class="icon-text" style="margin-bottom: 20px;">
+            <p class="fs18 ffp" style="color: #db3965;">Just tell me what you<br>would like to post today.</p>
+          </div>
+        </div>
+        <p class="example-text">Examples.<br /><br />"Write me a Happy New Year Post from a health insurance agency."<br /><br />"Give me a post congratulating Steve White on being the top broker of the month."<br /><br />"Create a motivational post."</p>
+        <div class="clip-row clip-row-second">
+          <div class="icon-text icon-area">
+            <i class="fa-light fa-keyboard d-none"></i>
+            <textarea class="article-textarea ai_field" name="clyps" placeholder="Enter your text here"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="df actions-wrapper ffp fs18">
+        <div class="clip-column">
+          <button class="clip-button clip-wide-button" onclick="generateClyps()">Generate</button>
+          <p class="credits-left"><%= typeof generates_left != "undefined" ? generates_left === "Unlimited" ? generates_left + " credits" : generates_left + ' credits left' : undefined %></p>
+          <p class="small-text">Generation costs = 1 credit</p>
+        </div>
+      </div>
+      <script>
+        function setSelectedPath() {
+          $(`[data-path="${window.location.pathname}"]`).addClass("selected");
+        }
+        setSelectedPath();
+      </script>
+      <!-- <script>
+      $(document).ready(function () {
+        if (window.navigationCollapsed) {
+          let sideBar = document.querySelector(".nav-wrapper");
+          let arrowCollapse = document.querySelector("#logo-name__icon");
+          sideBar.classList.toggle("collapsed");
+          arrowCollapse.classList.toggle("collapsed");
+        }
+      })
+    </script> -->
+      <!-- <script type="text/javascript">
+        {
+          let sideBar = document.querySelector(".nav-wrapper");
+          let arrowCollapse = document.querySelector("#logo-name__icon");
+          let infoBox = document.querySelector(".info-box")
+          // let overlay = document.querySelector(".overlay");
+          arrowCollapse.onclick = () => {
+            sideBar.classList.toggle("collapsed");
+            arrowCollapse.classList.toggle("collapsed");
+            infoBox.classList.toggle("collapsed")
+            // overlay.classList.toggle("d-none");
+            if (arrowCollapse.classList.contains("collapsed")) {
+              // window.navigationCollapsed = true;
+              arrowCollapse.classList =
+                "fa-light fa-arrow-right-from-line logo-name__icon collapsed";
+            } else {
+              // window.navigationCollapsed = false;
+              arrowCollapse.classList =
+                "fa-light fa-arrow-left-from-line logo-name__icon";
+            }
+          };
+        }
+      </script> -->
+      <script>
+        function navClicked() {
+
+          topbar.config({
+            barThickness: 7,
+            barColors: {
+              '0': '#db3965',
+              '1.0': '#db3965'
+            },
+          })
+
+          topbar.show()
+        }
+
+        $("a").click(function() {
+          $(".tooltip").hide();
+        });
+
+        $(".link-wrapper, .action-wrapper").hover(
+          function() {
+            if ($(".nav-wrapper").hasClass("collapsed")) {
+              var frame = $(this).offset();
+              var txt = $(this).find(".icon-text").html();
+              if (!txt) {
+                txt = $(this).find(".action-icon-text").html();
+              }
+              var left = 60;
+              $(".tooltip")
+                .css("left", frame.left + $(this).width() + left)
+                .css("top", frame.top + $(this).height() / 2);
+              $(".tooltip").fadeIn();
+              $(".tooltip").html(txt);
+            }
+          },
+          function() {
+            $(".tooltip").hide();
+          }
+        );
+
+        function toggleMobileNav() {
+          $(".all-wrpr").toggleClass("mobile-hide");
+          $(".mobile-nav-opener").toggleClass("mobile-hide");
+          $(".overlay").toggleClass("mobile-hide");
+        }
+      </script>
+
+      <script>
+        var generates_left = <%- JSON.stringify(typeof generates_left !== "undefined" ? generates_left : 0) %>;
+
+        function generateClyps() {
+          if (!generates_left) {
+            openPlansPopup();
+            return
+          }
+
+          if ($('.list-wrapper').hasClass("d-none")) {
+            $(".page-content").loading();
+          }
+
+          $('.list-wrapper').load('/' + ' #templates_container', function() {
+            $(".page-content").stopLoading();
+            $(".list-wrapper").removeClass("d-none")
+
+            getCustomization({
+              runAI: true,
+              row_class_name: 'Clyps'
+            }, null, function(opts) {
+              if (opts.success) {
+                swiper = new Swiper(".swiper", {
+                  slidesPerView: "auto",
+                  spaceBetween: 14,
+                  mousewheel: true,
+                  observer: true,
+                  observeParents: true,
+                  rebuildOnUpdate: true,
+                  navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                  },
+                });
+
+                $(".item-wrapper").hover(function() {
+                  $(".swiper-button-prev").removeClass("hidden");
+                  $(".swiper-button-next").removeClass("hidden");
+                }, function() {
+                  $(".swiper-button-prev").addClass("hidden");
+                  $(".swiper-button-next").addClass("hidden");
+                });
+
+                $.post("/add-usage", {
+                  input: $(".ai_field").val()
+                }).then(function(success) {
+                  if (success?.credits?.generates) {
+                    generates_left = success?.credits?.generates;
+                    $(".credits-left").text(success?.credits?.generates + ' credits left')
+                  }
+                }).catch(function(error) {
+                  console.log(error)
+                });
+
+                $.post("/brand/mix-colors").then(function (success) {
+                  console.log(success)
+
+                  if (success && success.results && success.results) {
+                      var resPallete = success.results[success.results.length - 1];
+                      if (resPallete && resPallete.palette && resPallete.palette.length > 1) {
+                        $(".color-primary").css("background-color", resPallete.palette[0])
+                        $(".color-secondary").css("background-color", resPallete.palette[1])
+
+                        $("#primary").css("background-color", resPallete.palette[0])
+                        $("#secondary").css("background-color", resPallete.palette[1])
+
+                        $("#primary").attr("value", resPallete.palette[0])
+                        $("#secondary").attr("value", resPallete.palette[1])
+
+                        $("#primary").attr("data-secondary-color", resPallete.palette[0])
+                        $("#secondary").attr("data-secondary-color", resPallete.palette[1])
+                      }
+                    }
+                }).catch(function (e) {
+                  console.log(e)
+                })
+              }
+            });
+          });
+        }
+      </script>
+    </div>
+    <div class="tooltip"></div>
+  </div>
+</div>

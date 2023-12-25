@@ -1,0 +1,74 @@
+<div id="profilePopup" class="new-popup-wrapper d-none gt misc">
+  <link rel="stylesheet" href="/static/css/profile-popup.css?<%=Date.now()%>" />
+  <div class="overlay"></div>
+  <div class="new-popup">
+    <div class="profile-primary-wrapper">
+      <% if (!user.account.brand_email && !user.email) { %>
+        <div>
+          <div class="df aic new-popup-header" style="border-bottom: none">
+            <p class="fs30 title">Profile</p>
+            <div
+            class="df acc mla close-button pointer close"
+            style="--bg-color: #84b9e01a %>; --bg-color-hover: #84b9e033 %>"
+            onclick="closeProfilePopup()"
+            >
+              <i
+                class="fa-regular fa-xmark"
+                style="color: <%= user.account.brand.colors.primary %>"
+              ></i>
+            </div>
+          </div>
+        </div>
+        <button class="logout fs14" data-login onclick="login()">
+          <i class="fa-regular fa-left-from-bracket"></i>Login
+        </button>
+      <% } else { %>
+      <div>
+        <div class="df aic new-popup-header" style="border-bottom: none">
+          <p class="fs30 title">Profile</p>
+          <div
+            class="df acc mla close-button pointer close"
+            style="--bg-color: #84b9e01a %>; --bg-color-hover: #84b9e033 %>"
+            onclick="closeProfilePopup()"
+          >
+            <i
+              class="fa-regular fa-xmark"
+              style="color: <%= user.account.brand.colors.primary %>"
+            ></i>
+          </div>
+        </div>
+        <div class="df profile-wrapper">
+          <p>Email</p>
+          <p><%= user.account.brand_email || user.email %></p>
+          <%
+              function getIntervalAbbrev(interval) {
+                  switch(interval) {
+                      case "month":
+                          return "mo";
+                      case "year":
+                          return "yr";
+                  }
+              }
+          %>
+          <div class="mla" >
+              <div style="font-weight: 600;">$<%= subscription.plan.amount / 100 %>/<span style="font-weight: 400;"><%= getIntervalAbbrev(subscription.plan.interval) %></span></div>
+              <a href="/settings/plan/subscription" style="color: black;"><p style="padding-left: 1px;" class="ttuc fs12 text-underline mb-0">Plan details</p></a>
+          </div>
+        </div>
+      </div>
+      <button class="logout fs14" data-logout onclick="logout()">
+        <i class="fa-regular fa-right-from-bracket"></i>Logout
+      </button>
+      <% } %>
+    </div>
+  </div>
+</div>
+<script>
+  function logout() {
+    window.location.href = "/logout";
+  }
+
+  function login() {
+    window.location.href = "/logout";
+  }
+</script>

@@ -1,0 +1,150 @@
+<%- include('partials/header', {
+    async: true,
+    light : true, 
+    fixed_header:true
+}); %>
+<div class="form-page d-flex">
+    <!-- <div class="col-12 col-lg-6 form-left d-flex align-items-center justify-content-center">
+        <div class="mr-xl-5">
+            <div class="form-name text-white light"><%- form.name ? form.name.replace(/(?:\r\n|\r|\n)/g, '<br>') : ''%></div>
+            <p class="form-sub-title text-white light"><%- form.sub_title ? form.sub_title.replace(/(?:\r\n|\r|\n)/g, '<br>') : ''%></p>
+            <% if(form.image){ %>
+                <div class="form-image">
+                    <img src="<%= form.image %>?1" alt="">
+                </div>
+            <% } %>
+        </div>
+    </div> -->
+    <div class="col-12 form-right d-flex align-items-center justify-content-center">        
+        <form action="/form/<%=event%>/<%=size%>" method="post">
+
+            <div class="form-name fs60 text-center"><%- form.name %></div>
+
+            <% form.questions.forEach(question => { %>
+                <div class="position-relative form-control-container">
+                    <label for="" class="text-primary"><%=question.name%></label>
+                    <textarea class="form-control form-control-lg" maxlength="<%=question.max%>" name="<%=question.class%>" data-value="<%= question.placeholder %>" data-show-value="<%= question.showValue %>" oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"' rows="1"></textarea>                    
+                    <% if(question.max){ %>
+                    <div class="text-right maximum-characters-info">
+                        <span class="maximum-characters-info-message maximum-characters-info-counter">
+                            0/<%=question.max%>
+                        </span>
+                        <span class="maximum-characters-info-message maximum-characters-info-reached" style="display: none;">
+                            The maximum of <%=question.max%> characters reached <a href="/pages/maximum-characters" target="_blank" class="text-primary">Learn more</a>
+                        </span>
+                    </div>
+                    <% } %>
+                </div>
+
+                
+            <% }) %>
+
+            
+
+            <div class="<% if(!form.questions || !form.questions.length){ %> d-flex justify-content-center<%}%>">
+                <div class="form-file-upload">
+                    <button type="button" class="btn btn-outline-primary file-btn badge-pill px-4" data-toggle="modal" data-target="#fileModal">
+                        
+                        <svg xmlns="http://www.w3.org/2000/svg" width="29.167" height="23.672" viewBox="0 0 29.167 23.672"><g transform="translate(-98.783 -122.562)"><g transform="translate(98.783 122.562)"><path d="M114.881,140.743H100.607a1.826,1.826,0,0,1-1.824-1.824V124.386a1.826,1.826,0,0,1,1.824-1.824h20.028a1.826,1.826,0,0,1,1.824,1.824V133.1a.461.461,0,0,1-.923,0v-8.714a.9.9,0,0,0-.9-.9H100.607a.9.9,0,0,0-.9.9v14.533a.9.9,0,0,0,.9.9h14.274a.461.461,0,0,1,0,.923Z" transform="translate(-98.783 -122.562)" fill="currentColor"/><path d="M111.036,196.02a.461.461,0,0,1-.38-.723l6.9-10.037a.461.461,0,0,1,.373-.2.483.483,0,0,1,.379.189l3.494,4.789,2.26-2.212a.485.485,0,0,1,.337-.131.462.462,0,0,1,.328.152l2.687,2.979a.461.461,0,0,1-.685.618l-2.365-2.622-2.3,2.249a.444.444,0,0,1-.361.13.459.459,0,0,1-.334-.187l-3.424-4.693-6.534,9.5A.46.46,0,0,1,111.036,196.02Z" transform="translate(-109.213 -177.839)" fill="currentColor"/><path d="M229.9,159.562a2.187,2.187,0,1,1,2.187-2.187A2.189,2.189,0,0,1,229.9,159.562Zm0-3.452a1.264,1.264,0,1,0,1.265,1.265A1.266,1.266,0,0,0,229.9,156.111Z" transform="translate(-212.813 -151.418)" fill="currentColor"/></g><g transform="translate(116.045 134.329)"><path d="M254.135,236.309a5.952,5.952,0,1,1,5.952-5.952A5.959,5.959,0,0,1,254.135,236.309Zm0-10.982a5.03,5.03,0,1,0,5.03,5.03A5.036,5.036,0,0,0,254.135,225.326Z" transform="translate(-248.183 -224.404)" fill="currentColor"/><path d="M296.169,255.665a.461.461,0,0,1-.461-.461v-5.165a.461.461,0,1,1,.923,0V255.2A.461.461,0,0,1,296.169,255.665Z" transform="translate(-290.217 -246.669)" fill="currentColor"/><path d="M278.984,272.853h-5.165a.461.461,0,0,1,0-.923h5.165a.461.461,0,1,1,0,.923Z" transform="translate(-270.449 -266.439)" fill="currentColor"/></g></g></svg>
+                        <span class="ml-2">Add Image</span> 
+                    </button>
+                </div>
+    
+                <div class="form-file-uploaded d-none">
+                    <div class="d-flex align-items-center">
+    
+                        <input type="hidden" name="form_file">
+                        <div class="file-preview" data-toggle="modal" data-target="#fileModal">
+                        
+                        </div>
+    
+                        <a href="" class="text-dark ml-3" data-toggle="modal" data-target="#fileModal">Replace</a>
+                        <a href="" class="text-dark ml-3" data-remove>Remove</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-footer px-lg-4">
+                <div class="container">
+                    <div class="row align-items-center no-gutters">
+                        <div class="col-6">
+                            <a href="javascript:history.back()" class="fs25 d-inline-flex align-items-center text-dark">
+                                &larr;
+                                sorry, go back.
+                            </a>
+                        </div>
+                        <div class="col-6 text-right d-flex align-items-center justify-content-end">
+                            <!-- <a href="" class="fs25 text-dark">Skip</a> -->
+                            <button class="fs25 btn btn-primary badge-pill ml-lg-5 px-3 px-lg-4">go design it &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    
+</div> 
+
+<div class="modal-backdrop fade"></div>
+    <div id="fileModal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body p-3 p-lg-5">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"></span>
+                </button>
+
+                <label class="file-upload text-center">
+                    <input type="file" name="file" hidden  accept="image/*">
+                    <div>
+                        <div class="text-dark">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="76.22" height="61.86" viewBox="0 0 29.167 23.672"><g transform="translate(-98.783 -122.562)"><g transform="translate(98.783 122.562)"><path d="M114.881,140.743H100.607a1.826,1.826,0,0,1-1.824-1.824V124.386a1.826,1.826,0,0,1,1.824-1.824h20.028a1.826,1.826,0,0,1,1.824,1.824V133.1a.461.461,0,0,1-.923,0v-8.714a.9.9,0,0,0-.9-.9H100.607a.9.9,0,0,0-.9.9v14.533a.9.9,0,0,0,.9.9h14.274a.461.461,0,0,1,0,.923Z" transform="translate(-98.783 -122.562)" fill="currentColor"/><path d="M111.036,196.02a.461.461,0,0,1-.38-.723l6.9-10.037a.461.461,0,0,1,.373-.2.483.483,0,0,1,.379.189l3.494,4.789,2.26-2.212a.485.485,0,0,1,.337-.131.462.462,0,0,1,.328.152l2.687,2.979a.461.461,0,0,1-.685.618l-2.365-2.622-2.3,2.249a.444.444,0,0,1-.361.13.459.459,0,0,1-.334-.187l-3.424-4.693-6.534,9.5A.46.46,0,0,1,111.036,196.02Z" transform="translate(-109.213 -177.839)" fill="currentColor"/><path d="M229.9,159.562a2.187,2.187,0,1,1,2.187-2.187A2.189,2.189,0,0,1,229.9,159.562Zm0-3.452a1.264,1.264,0,1,0,1.265,1.265A1.266,1.266,0,0,0,229.9,156.111Z" transform="translate(-212.813 -151.418)" fill="currentColor"/></g><g transform="translate(116.045 134.329)"><path d="M254.135,236.309a5.952,5.952,0,1,1,5.952-5.952A5.959,5.959,0,0,1,254.135,236.309Zm0-10.982a5.03,5.03,0,1,0,5.03,5.03A5.036,5.036,0,0,0,254.135,225.326Z" transform="translate(-248.183 -224.404)" fill="currentColor"/><path d="M296.169,255.665a.461.461,0,0,1-.461-.461v-5.165a.461.461,0,1,1,.923,0V255.2A.461.461,0,0,1,296.169,255.665Z" transform="translate(-290.217 -246.669)" fill="currentColor"/><path d="M278.984,272.853h-5.165a.461.461,0,0,1,0-.923h5.165a.461.461,0,1,1,0,.923Z" transform="translate(-270.449 -266.439)" fill="currentColor"/></g></g></svg>
+                        </div>
+                        <div class="text-primary mt-3">
+                            Upload or drop image.
+                        </div>
+                    </div>
+
+                    <div class="file-loader d-none">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                            viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+                            <rect fill="none" stroke="#F7176D" stroke-width="4" x="25" y="25" width="50" height="50">
+                                <animateTransform attributeName="transform" dur="0.5s" from="0 50 50" to="180 50 50" type="rotate"
+                                    id="strokeBox" attributeType="XML" begin="rectBox.end" />
+                            </rect>
+                            <rect x="27" y="27" fill="#F7176D" width="46" height="50">
+                                <animate attributeName="height" dur="1.3s" attributeType="XML" from="50" to="0" id="rectBox"
+                                    fill="freeze" begin="0s;strokeBox.end" />
+                            </rect>
+                        </svg>
+                    </div>
+                </label>
+
+                <div class="unsplash">
+
+                    <div class="unsplash-search">
+                        <input type="text" name="search" autocomplete="new-password" class="" placeholder="Search stock photos">
+                    </div>
+
+                    <div class="unsplash-container mt-4">
+                        <div class="unsplash-list">
+                            
+                        </div>
+                    </div>
+
+                    <div class="text-right">
+                        <button class="btn btn-primary btn-sm px-4 badge-pill mt-5" disabled data-insert>Insert Image</button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer', {async: true}); %>
+
+
+<script src="/static/js/files.js?<%=Date.now()%>"></script>

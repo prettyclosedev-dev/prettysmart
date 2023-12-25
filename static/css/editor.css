@@ -1,0 +1,11 @@
+#editor {
+  width: 100% !important;
+  height: 100%;
+}
+#editor .page-title-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 20px;
+  padding-bottom: 13px;
+}/*# sourceMappingURL=editor.css.map */

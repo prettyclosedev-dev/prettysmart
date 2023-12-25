@@ -1,0 +1,14 @@
+<div
+  data-project="<%=project.project_id%>"
+  data-template="<%=project.template_id%>"
+  data-hash="<%=project.custom_hash%>"
+  data-export="<%=project.project_id%>"
+  class="template d-block rounded"
+  title="<%=project.project_title%>"
+>
+  <img
+    src="/files/<%=user.account._id%>/projects/<%=project.project_id%>.jpg?<%=Date.now()%>"
+    alt=""
+    class="rounded"
+  />
+</div>

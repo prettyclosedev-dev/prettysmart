@@ -1,0 +1,114 @@
+<div class="modal-backdrop fade"></div>
+<div id="exportModal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body ">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"></span>
+                </button>
+
+                <form name="export_form" class="export-form px-4 py-4" action="">
+                    
+                    <div class="row">
+                        <div class="col-12 col-lg-7">
+                            <div class="template">
+                                
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-5 d-flex flex-column justify-content-end">
+                                    
+                            <h3 class="mb-3"></h3>
+
+                                <div>
+                                    <div class="row">
+                                        <div class="col-12 col-lg-12 mb-4">
+                                            <div class="row">
+                                                <div class="col-8">
+                                                    <label
+                                                        class="fs14 mb-0 fs14 text-grey border rounded pt-2 pr-3 h-100 w-100 d-block">
+                                                        <span class="pl-3">
+                                                            File Name
+                                                        </span>
+                                                        <input type="text" name="file_name"
+                                                            class="d-block border-0 fs16 text-dark pl-3 w-100">
+                                                    </label>
+                                                </div>
+                                                <div class="col-4 pl-lg-0">
+                                                    <label
+                                                        class="fs14 mb-0 fs14 text-grey border rounded pt-2 pr-3 h-100 w-100 d-block">
+                                                        <span class="pl-3">
+                                                            File Type
+                                                        </span>
+                                                        <select name="file_type" class="d-block border-0 bg-white fs16 text-dark pl-2 w-100">
+                                                            <option value="jpg">.jpg</option>
+                                                            <option value="png" selected>.png</option>
+                                                            <option value="pdf">.pdf</option>
+                                                            <option value="pdf_flattened">.pdf - Flattened</option>
+                                                        </select>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="export-crop-marks bg-secondary text-white p-3 mb-4 d-none">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" class="custom-control-input" id="file_crop">
+                                                    <label class="custom-control-label" for="file_crop">Include crop marks and bleed</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="row">
+                                                <div class="col-12 col-lg-6">
+                                                    <button type="submit" class="btn btn-primary btn-block">Download</button>
+                                                </div>
+                                                <div class="col-12 col-lg-6">
+                                                    <a href="" data-editor class="btn btn-outline-primary btn-block">
+                                                        Open in editor
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="export-proggress d-none">
+                                        <div>
+                                            <div class="export-proggress-title">
+                                                Exporting
+                                                <div class="export-proggress-title-inner">
+                                                    Exporting
+                                                </div>
+                                            </div>
+                                            <div class="export-progress-cancel text-primary fs14 text-center mt-4">
+                                                Cancel
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex align-items-center justify-content-between mt-4">
+                                        <span class="export-progress-cancel d-flex align-items-center pointer">                                            
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" viewBox="0 0 10.404 7.316"><path d="M3.4,4.784a.369.369,0,0,1,.524.519L1.264,7.962h8.773a.365.365,0,0,1,.367.367.369.369,0,0,1-.367.372H1.264l2.659,2.654a.376.376,0,0,1,0,.524.367.367,0,0,1-.524,0L.11,8.592a.361.361,0,0,1,0-.519Z" transform="translate(0 -4.674)"/></svg>
+                                            <span class="ml-2 mt-1">
+                                                Go back
+                                            </span>
+                                        </span>
+                                        <a href="/templates/39" class="text-secondary d-flex align-items-center pointer">                                            
+                                            
+                                            <span class="mr-2 mt-1">
+                                                See all ready to use
+                                            </span>
+                                            
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" viewBox="0 0 10.404 7.316"><path d="M3.4,4.784a.369.369,0,0,1,.524.519L1.264,7.962h8.773a.365.365,0,0,1,.367.367.369.369,0,0,1-.367.372H1.264l2.659,2.654a.376.376,0,0,1,0,.524.367.367,0,0,1-.524,0L.11,8.592a.361.361,0,0,1,0-.519Z" transform="translate(10.404 11.99) rotate(180)" fill="currentColor"/></svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            
+
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

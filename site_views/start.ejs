@@ -1,0 +1,42 @@
+<%- include('partials/header', {async: true, fixed_header:true}); %>
+<div class="start-page d-flex align-items-center justify-content-center">
+    <div class="w-100">
+        <div class="title text-center">
+            Welcome. We’re ready to get you pretty and smart.
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-6 start-option smart-bot-option text-center">
+                    <div class="fs26 text-primary">Smart bot!</div>
+                    <h2 class="fs55">
+                        Let SmartBot create 
+                        <br>
+                        your design.
+                    </h2>
+                    <p class="fs22">
+                        Just answer a few little questions and SmartBot will 
+                        <br>
+                        automatically design something pretty  in a few little seconds.
+                    </p>
+
+                    <a href="/events" class="btn btn-primary badge-pill btn-lg">Go SmartBot, Go!</a>
+                </div>
+                <div class="col-12 col-lg-6 start-option templates-bot-option text-center">
+                    <div class="fs26 text-secondary">Pretty Templates!</div>
+                    <h2 class="fs55">
+                        Find a template and 
+                        <br>
+                        create your own.
+                    </h2>
+                    <p class="fs22">
+                        With 1,000s of templates to choose from and easy drag and 
+                        <br>
+                        drop tools you can create pretty work in minutes.
+                    </p>
+                    <a href="/templates" class="btn btn-secondary badge-pill btn-lg">Explore Pretty Templates!</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>        
+<%- include('partials/footer', {async: true}); %>

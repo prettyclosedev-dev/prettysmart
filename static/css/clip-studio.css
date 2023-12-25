@@ -1,0 +1,461 @@
+.clip-header {
+  height: 4rem;
+  padding: 1.8rem;
+  border-bottom: 0.07rem solid #e0e0e0;
+  position: absolute;
+  top: 0;
+  width: -webkit-fill-available;
+  width: -moz-available;
+  width: fill-available;
+  background-color: white;
+  align-items: center;
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+}
+.clip-header .dropdown-toggle::after {
+  display: none;
+}
+.clip-header .clip-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.clip-header .plan-button {
+  background-color: #e0b311;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-radius: 5px;
+  color: white;
+  border: none;
+  font-size: 10px;
+}
+.clip-header .plan-button i {
+  margin-right: 5px;
+}
+.clip-header .update-button {
+  color: #db3965;
+  border: none;
+  background-color: white;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-left: 10px;
+}
+.clip-header .update-button p {
+  margin: 0;
+  padding: 0;
+  height: 22px;
+}
+.clip-header .update-button i {
+  margin-right: 10px;
+}
+.clip-header .user-button {
+  background-color: black;
+  padding: 10px;
+  color: white;
+  border: none;
+  border-radius: 12.5px;
+  height: 25px;
+  width: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+}
+.clip-header .dropdown {
+  border-radius: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border: #e1e1e1 1px solid;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: white;
+  font-family: "Poppins";
+}
+.clip-header .dropdown p {
+  margin: 0;
+  padding: 0;
+}
+.clip-header .dropdown .color-primary {
+  height: 20px;
+  width: 20px;
+  margin-right: 10px;
+  position: relative;
+  border-radius: 5px;
+}
+.clip-header .dropdown .color-primary .color-secondary {
+  height: 8px;
+  width: 8px;
+  left: 2.5px;
+  top: 2.5px;
+  position: absolute;
+  border-radius: 2.5px;
+}
+.clip-header .dropdown .arrow {
+  margin-left: 20px;
+}
+.clip-header .dropdown i {
+  color: #b6b6b6;
+}
+.clip-header .dropdown .font-icon {
+  margin-right: 10px;
+  background-color: #ebebeb;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  border-radius: 5px;
+}
+.clip-header .dropdown .font-icon i {
+  color: #a3a3a3;
+}
+.clip-header .dropdown-fonts {
+  margin-left: 10px;
+}
+
+@media screen and (max-width: 768px) {
+  .clip-header {
+    left: 0px;
+  }
+  .clip-header .dropdown .color-primary {
+    margin-right: 0px;
+  }
+  .clip-header .dropdown .font-icon {
+    margin-right: 0px;
+  }
+  .clip-header .dropdown .arrow {
+    margin-left: 5px;
+  }
+  .clip-header .dropdown p {
+    display: none;
+  }
+}
+.page-wrapper .page-content {
+  margin-top: 4rem;
+  padding-top: 52px;
+}
+.page-wrapper .nav-wrapper {
+  width: 18rem;
+}
+.page-wrapper .nav-wrapper .logo-wrapper {
+  height: 4rem;
+  padding: 1.8rem;
+  margin: 0;
+}
+.page-wrapper .nav-wrapper .logo-wrapper h2 {
+  margin-bottom: 0px;
+  font-size: 24px;
+}
+.page-wrapper .links-wrapper {
+  height: 100%;
+  flex-direction: column;
+  display: flex;
+  padding: 0px !important;
+}
+.page-wrapper .example-text {
+  color: #757575;
+  margin: 20px;
+  margin-top: 14px;
+  font-size: 11px;
+  line-height: 22px;
+}
+.page-wrapper .example-text .list-wrrp {
+  display: flex;
+  flex-flow: column;
+}
+.page-wrapper .example-text .list-wrrp p {
+  display: inline;
+  margin: 6px auto;
+  padding: 0px 10px;
+  border-radius: 4px;
+}
+.page-wrapper .example-text .list-wrrp p:nth-child(1) {
+  background-color: rgba(255, 0, 0, 0.09);
+}
+.page-wrapper .example-text .list-wrrp p:nth-child(2) {
+  background-color: rgba(0, 0, 255, 0.09);
+}
+.page-wrapper .example-text .list-wrrp p:nth-child(3) {
+  background-color: rgba(0, 128, 0, 0.09);
+}
+.page-wrapper .clip-column {
+  display: flex;
+  flex-direction: column;
+  padding: 0px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+.page-wrapper .clip-column .clip-button {
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-radius: 5px;
+  color: white;
+  background-color: black;
+  font-size: 10px;
+  border: none;
+}
+.page-wrapper .clip-column .clip-wide-button {
+  width: 100%;
+  font-size: 20px;
+}
+.page-wrapper .clip-column .credits-left {
+  color: #db3965;
+  margin-top: 20px;
+}
+.page-wrapper .clip-column .small-text {
+  font-size: 10px;
+}
+.page-wrapper .clip-column p {
+  margin-top: unset;
+  margin-bottom: unset;
+}
+.page-wrapper .clip-row-second {
+  padding-top: 0px !important;
+  flex: 1;
+}
+.page-wrapper .clip-row {
+  font-size: 10px;
+  display: flex;
+  flex-direction: row;
+  padding: 20px;
+  padding-bottom: 0px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.page-wrapper .clip-row .icon-text {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  margin-right: 10px;
+}
+.page-wrapper .clip-row .icon-text i {
+  color: #ffd2de !important;
+  margin-right: 10px;
+}
+.page-wrapper .clip-row .icon-text input {
+  border: none;
+  display: flex;
+  flex: 1;
+}
+.page-wrapper .clip-row .icon-text textarea {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  line-height: 1.2;
+  width: unset;
+  max-width: unset;
+  padding: 10px;
+  font-size: 15px;
+}
+.page-wrapper .clip-row .icon-area {
+  align-items: flex-start;
+  height: 100%;
+}
+.page-wrapper .clip-row .icon-area i {
+  font-size: 17px;
+}
+.page-wrapper .clip-row .clip-button {
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-radius: 5px;
+  color: white;
+  background-color: black;
+  border: none;
+}
+.page-wrapper .clip-row .clip-wide-button {
+  width: 100%;
+}
+.page-wrapper .lined-text {
+  width: 100%;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+  line-height: 0.1em;
+  margin: 10px 0 20px;
+  font-size: 10px;
+}
+.page-wrapper .lined-text span {
+  background: #fff;
+  padding: 0 10px;
+}
+
+.credits-available {
+  font-family: "Poppins";
+}
+.credits-available .sec {
+  margin: 0px 24px;
+}
+.credits-available .sec .number {
+  color: #1a1a1a;
+  font-size: 30px;
+  font-weight: 700;
+  font-size: 38px;
+  margin-right: 6px;
+}
+.credits-available .sec .val {
+  font-size: 11px;
+  margin-top: 2px;
+}
+.credits-available .sec i {
+  font-size: 15px;
+}
+
+.text-center {
+  margin-top: 10px;
+}
+
+.clips-form-page .overlay {
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  background: rgba(0, 0, 0, 0.2509803922);
+  height: 100%;
+  width: 100%;
+  z-index: 12;
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+.clips-form-page .clips-form {
+  background: white;
+  width: 640px;
+  max-width: calc(100% - 30px);
+  max-height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 13;
+  padding: 58px 60px 30px;
+  border: 1px solid rgba(0, 0, 0, 0.1607843137);
+  border-radius: 20px;
+}
+.clips-form-page .clips-form .form-popup-header {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: calc(100% - 28px);
+}
+.clips-form-page .clips-form .form-popup-header .sign-in-wrpr {
+  display: flex;
+  height: 30px;
+  font-size: 12px;
+  background: rgba(219, 57, 101, 0.12);
+  color: #db3965;
+  border-radius: 30px;
+  align-items: center;
+  justify-content: center;
+  padding: 0px 12px;
+  margin-right: 16px;
+}
+.clips-form-page .clips-form .form-popup-header .close-icon-wrpr {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ebebeb;
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.clips-form-page .clips-form .form-name {
+  font-family: Poppins;
+  font-weight: 500;
+  margin-bottom: 34px;
+  font-size: 35px;
+  margin-top: 40px;
+}
+.clips-form-page .clips-form .icon-wrpr {
+  display: flex;
+  justify-content: center;
+}
+.clips-form-page .clips-form .icon-wrpr svg {
+  margin: 0px auto;
+  height: 94px;
+  width: 94px;
+}
+.clips-form-page .clips-form textarea {
+  border: none;
+  border-bottom: 1px solid #000;
+  background-color: #ffffff;
+  min-height: 156px;
+  max-height: 200px;
+  border-radius: 0;
+  padding-left: 0;
+  background-color: transparent;
+  font-size: 24px;
+  padding-top: 0;
+  max-width: initial;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 10px 18px;
+  border-radius: 6px;
+  margin-top: 26px;
+  resize: none;
+  border-bottom: none;
+}
+.clips-form-page .clips-form textarea::-moz-placeholder {
+  font-size: 14px;
+}
+.clips-form-page .clips-form textarea::placeholder {
+  font-size: 14px;
+}
+.clips-form-page .clips-form .clips-form-footer {
+  margin-top: 26px;
+}
+.clips-form-page .clips-form .clips-form-footer button {
+  width: 100%;
+  background: black;
+  border-color: inherit;
+  font-size: 20px;
+}
+
+.studio-footer {
+  bottom: 0px;
+  position: fixed;
+  left: 0px;
+  width: 100%;
+  border-top: 1px solid #e0e0e0;
+  height: 64px;
+  background: white;
+  z-index: 3;
+  padding: 0px 30px;
+  justify-content: space-between;
+}
+.studio-footer button {
+  border: none;
+  border-radius: 4px;
+  padding: 8px 18px;
+  font-size: 15px;
+}
+.studio-footer button img {
+  margin-right: 8px;
+}
+.studio-footer button:disabled {
+  opacity: 0.4;
+  cursor: no-drop;
+}
+.studio-footer .edit-propmpt-button {
+  background-color: #f5f5f5;
+  color: #240c23;
+}
+.studio-footer .regenerate-button {
+  background-color: #240c23;
+  color: #fff;
+}/*# sourceMappingURL=clip-studio.css.map */

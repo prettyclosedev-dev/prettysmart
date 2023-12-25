@@ -1,0 +1,9 @@
+<%- include('partials/header', {async: true}); %>
+<div class="container py-5">
+  <h1>Welcome: <%= user.email %></h1>
+  <a href="/app/categories" class="btn btn-primary mr-3 mt-3">Categories</a>
+  <a href="/app/brand" class="btn btn-primary mt-3 mr-3 ">Brand</a>
+  <a href="/app/editor" class="btn btn-primary mt-3 mr-3 ">Custom</a>
+</div>
+
+<%- include('partials/footer', {async: true}); %>

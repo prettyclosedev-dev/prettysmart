@@ -1,0 +1,281 @@
+<style>
+  @import url("https://fonts.googleapis.com/css?family=Poppins:400,500,600");
+
+  .ios13-segmented-control {
+    border-radius: 0.6rem;
+    margin: 0;
+    padding: 0.3rem;
+    padding-right: 0.18rem;
+    border: none;
+    outline: none;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .regular-background {
+    --background: #f5f5f5;
+    background: var(--background);
+  }
+
+  .inverted-background {
+    --background: white;
+    background: var(--background);
+  }
+
+  .ios13-segmented-control .option {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .ios13-segmented-control .option:hover input:not(:checked) + label span,
+  .ios13-segmented-control .option:active input:not(:checked) + label span,
+  .ios13-segmented-control .option:focus input:not(:checked) + label span {
+    opacity: 0.6;
+  }
+
+  .ios13-segmented-control .option:active input:not(:checked) + label span {
+    transform: scale(0.95);
+  }
+
+  .ios13-segmented-control .option label {
+    position: relative;
+    display: block;
+    text-align: center;
+    padding: 0.55rem 4vmin;
+    background: rgba(255, 255, 255, 0);
+    font-family: Poppins;
+    font-style: normal;
+    font-size: 1rem;
+    color: rgba(0, 0, 0, 1);
+    font-size: 1rem;
+    line-height: 1rem;
+    margin-bottom: 0;
+  }
+
+  .ios13-segmented-control .option label::before,
+  .ios13-segmented-control .option label::after {
+    content: "";
+    width: 0.07rem;
+    background: rgba(142, 142, 147, 0.15);
+    position: absolute;
+    top: 14%;
+    bottom: 14%;
+    border-radius: 0.7rem;
+    will-change: background;
+    -webkit-transition: background 0.2s ease;
+    transition: background 0.2s ease;
+  }
+
+  .ios13-segmented-control .option label::before {
+    left: 0;
+    transform: translateX(-0.035rem);
+  }
+
+  .ios13-segmented-control .option label::after {
+    right: 0;
+    transform: translateX(0.035rem);
+  }
+
+  .ios13-segmented-control .option:first-of-type {
+    grid-column: 1;
+    grid-row: 1;
+    box-shadow: none;
+  }
+
+  .ios13-segmented-control .option:first-of-type label::before {
+    opacity: 0;
+  }
+
+  .ios13-segmented-control .option:last-of-type label::after {
+    opacity: 0;
+  }
+
+  .ios13-segmented-control .option input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    outline: none;
+    border: none;
+    opacity: 0;
+  }
+
+  .ios13-segmented-control .selection {
+    /* border: 0; */
+    /* box-shadow: 0 0.2rem 0.55rem 0 rgba(0, 0, 0, 0.12),
+      0 0.2rem 0.07rem 0 rgba(0, 0, 0, 0.04); */
+    border-radius: 0.48rem;
+    grid-column: 1;
+    grid-row: 1;
+    z-index: 2;
+    will-change: transform;
+    -webkit-transition: transform 0.2s ease;
+    transition: transform 0.2s ease;
+  }
+
+  .regular-selection {
+    background: white;
+  }
+
+  .inverted-selection {
+    background: #f5f5f5;
+  }
+
+  .ios13-segmented-control .option label span {
+    position: relative;
+    z-index: 2;
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+    will-change: transform;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ios13-segmented-control .option input:checked + label::before,
+  .ios13-segmented-control .option input:checked + label::after {
+    background: var(--background);
+    z-index: 1;
+  }
+
+  .ios13-segmented-control .option input:checked + label {
+    cursor: default;
+    font-weight: 600;
+  }
+
+  .ios13-segmented-control .option input + label span:after {
+    cursor: default;
+    /* font-weight: 600; */
+
+    content: attr(data-text);
+    content: attr(data-text) / "";
+    height: 0;
+    visibility: hidden;
+    overflow: hidden;
+    user-select: none;
+    pointer-events: none;
+    font-weight: 600;
+  }
+</style>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    checkSize();
+    updatePillPosition();
+    // window.addEventListener("resize", updatePillPosition);
+    $(".<%= segmentID %> .option input").each(function (index, value) {
+      $(this).change(function () {
+        var $input = $(this);
+        if ($input.is(":checked")) {
+          var $selection = $(".<%= segmentID %> .selection");
+          $selection.css(
+            "transform",
+            "translateX(" + $input.width() * index + "px)"
+          );
+
+          // var options = <%- JSON.stringify(options) %>;
+          // var option = options[index];
+          // window.location.href = `/templates/${option.row.templates_category}?size=${option.size._id}&limit=4&search=${option.row.default_tag}&row=${option.row._id}`;
+
+          // $.ajax({
+          //   type: "POST",
+          //   url: "templates",
+          //   data: {
+          //     size: option.size._id,
+          //     row: option.row._id,
+          //   },
+          //   dataType: "json",
+          //   contentType: "application/json",
+          //   success: function (classes) {
+
+          //   },
+          //   error: (err) => {
+          //     console.log(err);
+          //   },
+          // });
+        }
+      });
+    });
+  });
+
+  function updatePillPosition() {
+    $(".<%= segmentID %> .option input").each(function (index, value) {
+      var $input = $(this);
+      if ($input.is(":checked")) {
+        var $selection = $(".<%= segmentID %> .selection");
+        $selection.css(
+          "transform",
+          "translateX(" + $input.width() * index + "px)"
+        );
+      }
+    });
+  }
+
+  function getIcon(text) {
+    switch (text) {
+      case "Square":
+        return "\u25A1";
+      case "Horizontal":
+        return "\u25AD";
+      case "Vertical":
+        return "\u25AF";
+    }
+  }
+
+  function checkSize() {
+    updatePillPosition();
+    if ($(window).width() < 575.98) {
+      $(".<%= segmentID %> .option label span").each(function (index, value) {
+        var $span = $(this);
+        var icon = getIcon($span.text());
+        if (icon) {
+          $span.text(icon);
+        }
+      });
+    } else {
+      $(".<%= segmentID %> .option label span").each(function (index, value) {
+        var $span = $(this);
+        var options = <%- JSON.stringify(options) %>
+        $span.text(options[index].value);
+      });
+    }
+  }
+
+  $(window).resize(function () {
+    checkSize();
+  });
+</script>
+
+<div
+  id="segment-controller"
+  class="<%= segmentID %> ios13-segmented-control <%= typeof(inverted) != 'undefined' && inverted ? 'inverted-background' : 'regular-background' %>"
+>
+  <span
+    class="selection <%= typeof(inverted) != 'undefined' && inverted ? 'inverted-selection' : 'regular-selection' %>"
+  ></span>
+
+  <% options.forEach(function(option) { %>
+  <div class="option">
+    <input type="radio" id="<%= segmentID %>-<%= option.id %>"
+    class="segment-item" name="segment" value="<%= option.value %>" <%=
+    option.selected ? "checked" : "" %> />
+    <label for="<%= segmentID %>-<%= option.id %>"
+      ><span data-text="<%= option.value %>"><%= option.value %></span></label
+    >
+  </div>
+  <% }); %>
+</div>
