@@ -3,6 +3,7 @@ const formidable = require('formidable');
 const File = require('../schemas/file');
 const express = require('express');
 const router = express.Router();
+const config = require('../config.json');
 
 module.exports = () => {
 
@@ -37,7 +38,7 @@ module.exports = () => {
         req.files.file.mv(upload_path, () => {
             newFile.save().then(function(doc){
                 res.send({
-					path : 'https://prettysmart.co/files/' + req.user.account._id + '/' + doc.name,
+					path : config.BASE_URL + '/files/' + req.user.account._id + '/' + doc.name, // https://prettyclose.co
 					file : doc
 				});
             }).catch(function(e){

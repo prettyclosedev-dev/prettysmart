@@ -88,7 +88,7 @@
                         </div>
                         <div class="text-danger" data-field="tagline"></div>
                     </div>
-                    <div class="col-12 col-lg-12 mb-4">
+                    <!-- <div class="col-12 col-lg-12 mb-4">
                         <div class="input-group input-group-lg">
                             <div class="input-group-prepend">
                               <span class="input-group-text bg-white">                                
@@ -103,7 +103,7 @@
                               </div>
                         </div>
                         <div class="text-danger" data-field="industry_description"></div>
-                    </div>
+                    </div> -->
                     
                 </div>
             </div>
@@ -154,7 +154,7 @@
         <div class="text-center px-3">
             * By logging in, you agree to our <a href="/pages/term-of-use">Terms of Use</a> and to 
             <br class="d-none d-lg-block">
-            receive prettysmart  emails & updates and acknowledge 
+            receive prettyclose  emails & updates and acknowledge 
             <br class="d-none d-lg-block">
             that you read our <a href="/pages/privacy-policy">Privacy Policy.</a>
         </div>
@@ -193,11 +193,20 @@
             }
         }
 
-            $form.find('.form-loader').addClass('d-flex');
+        $form.find('.form-loader').addClass('d-flex');
         $.post($form.attr('action'), $.param(data), function(res){
             $form.find('.form-loader').removeClass('d-flex');
+
             if (res.route) {
-                window.location.href = res.route;
+                if (typeof tap !== 'undefined' && typeof tap.push === 'function') {
+                // Tapfiliate tracking for signups
+                    tap.push(["conversion", { conversion_type: "signup", amount: 0 }]);
+                }
+
+                // Redirect after tracking
+                setTimeout(() => {
+                    window.location.href = res.route;
+                }, 500); // Give some time for tracking to register
             } else if (res.error) {
                 alert(JSON.stringify(res.error))
             } else {
@@ -214,8 +223,8 @@
                 $('[data-field="signup"]').text(res.error || res.responseText);
             }
             $form.find('.form-loader').removeClass('d-flex');
-        })
+        });
 
         return false;
-    })
+    });
 </script>

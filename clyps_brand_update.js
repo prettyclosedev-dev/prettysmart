@@ -40,6 +40,25 @@ const findUserQuery = `
     }
 `;
 
+const findUserFavoritesQuery = `
+    query findUserByEmail($email: String!) {
+        user(where: { email: $email }) {
+            id
+            email
+            name
+            favorites {
+                id
+                name
+                categories {
+                  id
+                  name
+                  tags
+                }
+            }
+        }
+    }
+`;
+
 const createUserMutation = `
     mutation createOneUser($data: UserCreateInput!) {
         createOneUser(data: $data) {
@@ -86,6 +105,7 @@ const updateUserMutation = `
             email
             name
             role
+            avatar
             brands {
                 id
                 prettySmartId
@@ -118,6 +138,33 @@ const updateUserMutation = `
     }
 `;
 
+const updateUserFavoritesMutation = `
+    mutation updateOneUser($data: UserUpdateInput!, $where: UserWhereUniqueInput!) {
+        updateOneUser(data: $data, where: $where) {
+            id
+            email
+            name
+            favorites {
+                id
+                name
+                categories {
+                  id
+                  name
+                  tags
+                }
+            }
+        }
+    }
+`;
+
+async function findUserByEmail(email, favorites) {
+  const query = favorites ? findUserFavoritesQuery : findUserQuery;
+  const variables = { email };
+
+  const response = await graphqlRequest(query, variables);
+  return response.user;
+}
+
 function mapAssetPath(user, type, fileName) {
   let assetPath =
     config.BASE_URL +
@@ -131,7 +178,7 @@ function mapAssetPath(user, type, fileName) {
 }
 
 function mapAccountToGraphQLBrand(user, account, existingBrands = null) {
-  const isUpdate = existingBrands != null;
+  let isUpdate = existingBrands != null;
 
   const findMatchingBrand = (accountId) => {
     return existingBrands.find((brand) => brand.prettySmartId === accountId);
@@ -142,7 +189,7 @@ function mapAccountToGraphQLBrand(user, account, existingBrands = null) {
     : null;
 
   if (isUpdate && !matchedBrand) {
-    throw new Error("No matching brand found!");
+    isUpdate = false;
   }
 
   const mappedFonts = Object.keys(account.brand.fonts).map((fontKey) => {
@@ -162,14 +209,11 @@ function mapAccountToGraphQLBrand(user, account, existingBrands = null) {
 
     if (isUpdate && matchedBrand) {
       const existingFont = matchedBrand.fonts.find((f) => {
-        const isBold = fontKey.includes("Bold") && f.bold;
-        const isItalic = fontKey.includes("Italic") && f.italic;
-        const isRegular =
-          !fontKey.includes("Bold") &&
-          !fontKey.includes("Italic") &&
-          !f.bold &&
-          !f.italic;
-        return (isBold || isItalic || isRegular) && f.name === font.name;
+        const isBold = fontKey === "Bold" && f.bold && !f.italic;
+        const isItalic = fontKey === "Italic" && f.italic && !f.bold;
+        const isRegular = fontKey === "Regular" && !f.bold && !f.italic;
+        const isBoldItalic = fontKey === "BoldItalic" && f.bold && f.italic;
+        return isBold || isItalic || isRegular || isBoldItalic;
       });
 
       if (existingFont) {
@@ -177,11 +221,15 @@ function mapAccountToGraphQLBrand(user, account, existingBrands = null) {
           where: { id: existingFont.id },
           data: fontData,
         };
+      } else {
+        return null;
       }
     }
 
     return fontData;
   });
+
+  mappedFonts.filter((f) => f != null);
 
   const mappedColors = [];
   if (account.brand.colors.primary) {
@@ -290,32 +338,72 @@ async function handleBrandChange(user) {
     let userExists = await graphqlRequest(findUserQuery, { email: user.email });
 
     if (userExists && userExists.user) {
+      let updates = [];
+      let creates = [];
+
+      if (user.multiAccounts && user.multiAccounts.length) {
+        user.multiAccounts.forEach((account) => {
+          const result = mapAccountToGraphQLBrand(
+            user,
+            account,
+            userExists.user.brands
+          );
+          if (result.where) {
+            updates.push(result);
+          } else {
+            creates.push(result);
+          }
+        });
+      } else {
+        const result = mapAccountToGraphQLBrand(
+          user,
+          user.account,
+          userExists.user.brands
+        );
+
+        if (result.where) {
+          updates.push(result);
+        } else {
+          creates.push(result);
+        }
+      }
+
       const updateData = {
         where: { id: userExists.user.id },
         data: {
-          email: { set: user.email },
+          // email: { set: user.email }, // causes unique constraint error for same user email
           name: { set: user.name },
-          role: { set: user.role === "user" ? "VIEWER" : "ADMIN" },
+          avatar: user.avatar ? { set: config.BASE_URL + user.avatar } : null,
+          role: { set: (user.role === "owner" || user.role === "admin") ? "ADMIN" : "VIEWER" },
           brands: {
-            update:
-              user.multiAccounts && user.multiAccounts.length
-                ? user.multiAccounts.map((account) =>
-                    mapAccountToGraphQLBrand(
-                      user,
-                      account,
-                      userExists.user.brands
-                    )
-                  )
-                : [
-                    mapAccountToGraphQLBrand(
-                      user,
-                      user.account,
-                      userExists.user.brands
-                    ),
-                  ],
+            update: updates,
+            create: creates,
           },
         },
       };
+
+      if (userExists.user.email !== user.email) {
+        updateData.data.email = { set: user.email };
+      }
+
+      // Use map to modify each brand update and conditionally remove the email field
+      updateData.data.brands.update = updateData.data.brands.update.map(
+        (brandUpdate) => {
+          const existingBrand = userExists.user.brands.find(
+            (b) => b.id === brandUpdate.where.id
+          );
+
+          // Only update the email if it's different
+          if (brandUpdate.data.email) {
+            if (brandUpdate.data.email.set === existingBrand.email) {
+              delete brandUpdate.data.email; // Remove the email update if it's the same
+            }
+          }
+
+          return brandUpdate; // Return the modified brandUpdate object
+        }
+      );
+
       console.log("\n\nupdateData\n===", JSON.stringify(updateData), "===\n\n");
       await graphqlRequest(updateUserMutation, updateData);
     } else {
@@ -323,7 +411,8 @@ async function handleBrandChange(user) {
         data: {
           email: user.email,
           name: user.name,
-          role: user.role === "user" ? "VIEWER" : "ADMIN",
+          avatar: user.avatar ? config.BASE_URL + user.avatar : null,
+          role: (user.role === "owner" || user.role === "admin") ? "ADMIN" : "VIEWER",
           brands: {
             create:
               user.multiAccounts && user.multiAccounts.length
@@ -342,6 +431,90 @@ async function handleBrandChange(user) {
   }
 }
 
+async function updateUserFavorites(
+  userId,
+  favoritesToConnect,
+  favoritesToDisconnect
+) {
+  const query = updateUserFavoritesMutation;
+
+  const variables = {
+    where: { id: userId },
+    data: {
+      favorites: {
+        connect: favoritesToConnect.filter((fav) => !isNaN(fav.id)), // Ensure valid IDs
+        disconnect: favoritesToDisconnect.filter((fav) => !isNaN(fav.id)), // Ensure valid IDs
+      },
+    },
+  };
+
+  return graphqlRequest(query, variables);
+}
+
+async function addFavorite(userEmail, designId) {
+  const user = await findUserByEmail(userEmail, true);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const favorites = user.favorites || [];
+  const parsedDesignId = parseInt(designId);
+  if (isNaN(parsedDesignId)) {
+    throw new Error("Invalid designId");
+  }
+
+  if (!favorites.some((fav) => fav.id === parsedDesignId)) {
+    const favoritesToConnect = [{ id: parsedDesignId }];
+    const favoritesToDisconnect = []; // No need to disconnect any favorites
+
+    return updateUserFavorites(
+      user.id,
+      favoritesToConnect,
+      favoritesToDisconnect
+    );
+  }
+
+  return { message: "Favorite already exists" };
+}
+
+async function removeFavorite(userEmail, designId) {
+  const user = await findUserByEmail(userEmail, true);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const favorites = user.favorites || [];
+  const parsedDesignId = parseInt(designId);
+  if (isNaN(parsedDesignId)) {
+    throw new Error("Invalid designId");
+  }
+
+  if (favorites.some((fav) => fav.id === parsedDesignId)) {
+    const favoritesToConnect = []; // No need to connect any favorites
+    const favoritesToDisconnect = [{ id: parsedDesignId }];
+
+    return updateUserFavorites(
+      user.id,
+      favoritesToConnect,
+      favoritesToDisconnect
+    );
+  }
+
+  return { message: "Favorite not found" };
+}
+
+async function getUserFavorites(userEmail) {
+  const query = findUserFavoritesQuery;
+  const variables = { email: userEmail };
+
+  const response = await graphqlRequest(query, variables);
+  if (!response.user) {
+    throw new Error("User not found");
+  }
+
+  return response.user.favorites || [];
+}
+
 async function graphqlRequest(query, variables) {
   const options = {
     headers: {
@@ -355,7 +528,7 @@ async function graphqlRequest(query, variables) {
 
   return request(options)
     .then((response) => {
-      console.log(JSON.stringify(response));
+      // console.log(JSON.stringify(response));
       return response.data;
     })
     .catch((error) => console.log(error));
@@ -363,4 +536,7 @@ async function graphqlRequest(query, variables) {
 
 module.exports = {
   handleBrandChange,
+  addFavorite,
+  removeFavorite,
+  getUserFavorites,
 };

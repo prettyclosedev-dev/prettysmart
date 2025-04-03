@@ -24,6 +24,7 @@
     "hebcal": "^2.3.2",
     "jimp": "^0.16.1",
     "lodash": "^4.17.21",
+    "@mailchimp/mailchimp_transactional": "^1.0.59",
     "moment": "^2.29.4",
     "mongoose": "^6.0.13",
     "mongoose-delete": "^0.5.4",

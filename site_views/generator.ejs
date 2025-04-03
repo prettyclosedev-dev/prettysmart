@@ -1,133 +1,61 @@
 <%- include('partials/header', {async: true}); %>
-    <link rel="stylesheet" href="/static/css/generator.css?<%=Date.now()%>">
-    <div class="df page-wrapper df ffp">
- 
-      <%- include('partials/nav', {async: true}); %>
-      <div class="page-content">
-        <div class="new-dashboard-page">
-          <div class="page-content-wrapper">
-          <h2 class="ffp page-title" style="padding-bottom: 0px">Generator<span class="text-primary">.</span></h2>
-          <p style="padding-bottom: 32px" class="page-title-sub">Type in a keyword to generate copy and design.</p>
-          <div class="list-wrapper">
-            <div class="line">
-              <div class="cards-wrapper">
-                <% if (typeof rows != "undefined" && rows) { %>
-                  <% rows.forEach((row, idx) => { %>
-                      <%
-                        function getRowFields(row) {
-                          let output = row.category
-                          if (row.ai_field && row.ai_field.length) {
-                            const row_class_name = row.filterRefs && row.filterRefs.length
-                            ? row.filterRefs[0].name
-                            : row.name;
-                            output += `?engine=${row_class_name}&input=${row.ai_field}&placeholder=${row.ai_field_placeholder}`
-                          }
-                          return output;
-                        }
-
-                        function getFormId(tags) {
-                          const formTag = tags.find(t => t.indexOf("type_form") > -1);
-                          if (formTag && formTag.length) {
-                            const split = formTag.split("_");
-                            return split[split.length - 1];
-                          }
-
-                          return ''
-                        }
-
-                        function getFormUrl(row) {
-                          const formId = getFormId(row.tags)
-                          if (formId) {
-                            return `/new-form/${formId}/${row.category}`
-                          } else {
-                            return '#'
-                          }
-                        }
-                      %>
-                      <div class="df ffc my-card" style="--bg-color: <%= row.color + '1a' %>; --bg-color-hover:<%= row.color + '33' %>;" onclick="templateLoading(); <% if (row.name.includes('Chanukah')) { %>  location.href='/chanukah' <% } else if (row.tags && row.tags.includes('type_templates')) { %> location.href='/templates/category/<%=getRowFields(row)%>' <% } else if (row.tags && row.tags.find(t => t.indexOf('type_form') > -1)) { %> location.href='<%=getFormUrl(row)%>' <% } else { %> location.href='/generator/<%=row._id%>' <% } %>">
-                        <div class="tag fs14 ttuc" style="background-color: <%= row.color + 'cc' %>;">New!</div>
-                        <div class="df svg-wrapper">
-                            <img src="<%= 'https://admin.prettysmart.co' + row.image %>" />
-                        </div>
-                        <div class="ftr">
-                        <div class="title" style="color: <%= row.color %>;"><%= row.name %></div>
-                        <p class="sub-text" style="color: <%= row.color + 'e6' %>;"><%= row.sub_title %></p>
-                        </div>
-                      </div>
-                  <% }); %>
-                <% } else { %>
-                  <div class="title">No Data</div>
-                <% } %>
-              </div>
+<link rel="stylesheet" href="/static/css/generator.css?<%=Date.now()%>">
+<div class="df page-wrapper df ffp">
+  <%- include('partials/nav', {async: true}); %>
+  <div class="page-content">
+    <div class="new-dashboard-page">
+      <div class="page-content-wrapper">
+        <h2 class="ffp page-title" style="padding-bottom: 0px">Generator<span class="text-primary">.</span></h2>
+        <div class="list-wrapper">
+          <div class="line">
+            <div class="cards-wrapper">
+              <% if (typeof rows != "undefined" && rows.length) { %>
+                <% rows.forEach((row, idx) => { %>
+                  <div class="df ffc my-card" style="--bg-color: <%= row.color + '1a' %>; --bg-color-hover:<%= row.color + '33' %>;" onclick="templateLoading(); location.href='<%= row.form ? `/new-form/${row.form}/${row.id}` : `https://prettyclose.co/templates/category/${row.id}` %>'">
+                    <% if (row.isNew) { %>
+                      <div class="tag fs14 ttuc" style="background-color: <%= row.color + 'cc' %>;">New!</div>
+                    <% } %>
+                    <div class="df svg-wrapper">
+                      <img src="<%= row.icon %>" />
+                    </div>
+                    <div class="ftr">
+                      <div class="title" style="color: <%= row.color %>;"><%= row.name %></div>
+                      <p class="sub-text" style="color: <%= row.color + 'e6' %>;"><%= row.description %></p>
+                    </div>
+                  </div>
+                <% }); %>
+              <% } else { %>
+                <div class="title">No Data</div>
+              <% } %>
             </div>
-        
           </div>
         </div>
-      </div>
-      </div>
-    
       </div>
     </div>
-    <% if (typeof selectedRow != "undefined" && selectedRow && selectedRow._id) { %>
-      <div class="new-popup-wrapper gt">
-        <div class="overlay"></div>
-        <div class="new-popup" style="aspect-ratio: <%= !selectedRow.ai_field ? 'unset' : '1/1' %>;" >
-          <div class="df aic new-popup-header" style="border-color: <%= selectedRow.color + '33' %>">
-            <div class="back-button d-none pointer" onclick="toggleStep('generate')" data-step="template"><i style="color: <%= selectedRow.color %>" class="fa-regular fa-chevron-left"></i></div>
-            <p class="fs30 title" style="color: <%= selectedRow.color %>"><%= selectedRow.name %></p>
-            <div class="df acc mla close-button pointer" style="--bg-color: <%= selectedRow.color + '1a' %>; --bg-color-hover:<%= selectedRow.color + '33' %>;" onclick="templateLoading(); location.href='/generator'">
-              <i class="fa-regular fa-xmark" style="color: <%= selectedRow.color %>"></i>
-            </div>
-          </div>
-          <div class="new-popup-content generator-popup">
-            <div data-step="generate" class="ai-input-wrapper">
-              <% if (selectedRow.ai_field) { %>
-                <p class="fs16"><%= selectedRow.name === "Snippet" ? "Paste the url of the article you would like to share." :  "Type a hint for the AI" %></p>
-                <textarea class="ai_field" name="<%= selectedRow.ai_field %>"></textarea>
-              <% } %>
-              <div class="orientation-selection-wrapper">
-                <% 
-                  function sizeOptions(selectedRow) {
-                    return selectedRow.sizes.map(function (size, index) {
-                      return {value: size.name, id: size._id, selected: size._id === selectedRow.default_size};
-                    }) 
-                  }
-                %>
-                <%- include('partials/segment-control', {async: true, options: sizeOptions(selectedRow), inverted: false, segmentID: "gen-seg"}); %>
-              </div>
-            </div>
-          </div>
-          <div class="df acc new-popup-footer">
-            <button data-step="generate" onclick="generate(<%= JSON.stringify(selectedRow) %>)" class="generate-button primary-btn fs16" style="background-color: <%= selectedRow.color %>"><i class="fa-regular fa-refresh"></i>Generate</button>
-          </div>
-          </div>
-        </div>
-      </div>
-    <%} %>
+  </div>
+</div>
+<%- include('partials/export-template', {async: true, backButton: true}); %>
 
-    <%- include('partials/export-template', {async: true, backButton: true}); %>
-    
-    <script>
-        var TOKEN = '<%=user.token.access_token%>';
-    </script>
-    <script src="/static/js/templates.js?<%=Date.now()%>"></script>
-    <script src="/static/js/loader.js"></script>
-    <script>
-      if (window.location.search.includes("ob=1")) {
-        fbq('track', 'Purchase', {plan: "<%= plan_name %>", currency: "USD", price: "<%- currentPrice / 100 || 0 %>"})
-      }
+<script>
+  
+  function templateLoading() {
+    topbar.config({
+      barThickness: 7,
+      barColors: {
+        '0': '#db3965',
+        '1.0': '#db3965'
+      },
+    });
 
-      function templateLoading() {
-        topbar.config({
-            barThickness : 7,
-            barColors    : {
-              '0'        : '#db3965',
-              '1.0'      : '#db3965'
-            },
-          })
-          
-          topbar.show()
-      }
-    </script>
-  </body>
+    topbar.show();
+  }
+</script>
+<script src="/static/js/templates.js?<%=Date.now()%>"></script>
+<script src="/static/js/loader.js"></script>
+<script>
+  if (window.location.search.includes("ob=1")) {
+    fbq('track', 'Purchase', { plan: "<%= plan_name %>", currency: "USD", price: "<%- currentPrice / 100 || 0 %>" });
+  }
+</script>
+</body>
 </html>

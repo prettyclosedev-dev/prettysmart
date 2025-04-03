@@ -1,74 +1,169 @@
 <%- include('partials/header', {async: true}); %>
-<link rel="stylesheet" href="/static/css/recents.css?<%=Date.now()%>" />
-<!-- <link rel="stylesheet" href="/static/css/settings.css?1" /> -->
+<link rel="stylesheet" href="/static/css/jquery-ui.min.css">
+<link rel="stylesheet" href="/static/css/recents.css?<%=Date.now()%>">
+<link rel="stylesheet" href="/static/css/templates-page.css?<%=Date.now()%>">
+<script src="/static/js/jquery-ui.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<style>
+  .ui-autocomplete-loading {
+    background: white url("/static/images/ui-anim_basic_16x16.gif") right center no-repeat;
+  }
+</style>
 <div class="df page-wrapper df ffp">
   <%- include('partials/nav', {async: true}); %>
-
-    <div class="page-content">
-        <div class="recents-page">
-            <div class="page-content-wrapper">
-                <h2 class="page-title">Recents<span class="text-primary">.</span></h2>
-                <div class="content-wrapper">
-                    <% if (todayProjects.length) { %>
-                        <div class="section-wrapper">
-                            <div class="df aic  section-header">
-                                <p class="section-title">Today</p>   
-                            </div>
-                            <div class="square section-list">
-                                <% todayProjects.forEach(project => { %>
-                                <div class="item template">
-                                    <%- include('partials/project', {async: true, project:project}); %>
-                                </div>
-                                <% }) %>
-                            </div>
-                        </div>
-                    <% } %>
-                    <% if (earlierProjects.length) { %>
-                        <div class="section-wrapper">
-                            <div class="df aic  section-header">
-                                <p class="section-title">Earlier this week</p>   
-                            </div>
-                            <div class="square section-list">
-                                <% earlierProjects.forEach(project => { %>
-                                <div class="item template">
-                                    <%- include('partials/project', {async: true, project:project}); %>
-                                </div>
-                                <% }) %>
-                            </div>
-                        </div>
-                    <% } %>
-                    <% if (!todayProjects.length && !earlierProjects.length) { %>
-                        <div class="section-wrapper">
-                            <div class="upgrade-wrapper">
-                                <p>
-                                Your recent templates will appear here.
-                                </p>
-                                <a onclick="navClicked()" href="/templates" class="upgrade-btn">Templates</a>
-                            </div>
-                        </div>
-                    <% } %>
+  <div class="page-content">
+    <div class="templates-page recents-page">
+      <div class="page-content-wrapper">
+        <h2 class="page-title">Recents<span class="text-primary">.</span></h2>
+        <div class="content-wrapper">
+          <% if (templates.length) { %>
+            <%
+              function isAllowedDownload(file_name) {
+                  return (
+                      (plan_name && plan_name !== "Free" && !payment_failed) ||
+                      file_name.includes("_free")
+                  );
+              }
+            %>
+          <div class="list-wrapper">
+            <div id="templates_container">
+              <% templates.forEach((templateType, index) => { %>
+              <div id="<%= templateType.id %>" class="item-wrapper">
+                <div class="df aic item-header">
+                  <p><%- templateType.name %></p>
+                  <div class="mla">
+                    <div class="orientation-selection-wrapper">
+                      <% 
+                        function sizeOptions(selectedRow) {
+                          return selectedRow.sizes.map(function (size, index) {
+                            return {value: size.name, id: size.id, selected: size.id === selectedRow.default_size, row: selectedRow, size};
+                          }) 
+                        }
+                      %>
+                      <% if (templateType.sizes) { %>
+                      <%- include('partials/segment-control', {async: true, options: sizeOptions(templateType), inverted: false, segmentID: index + "-seg"}); %>
+                      <% } %>
+                    </div>
+                  </div>
                 </div>
+                <div class="swiper" style="width: 100%;">
+                  <div class="swiper-wrapper">
+                    <% templateType.templates.forEach((template, idx) => { %>
+                    <div class="swiper-slide">
+                      <div class="template">
+                        <%- include('partials/template', {async: true, template: template}); %>
+                        <div class="favorite-wrapper <%= template.isFavorite ? 'liked' : '' %>">
+                          <span class="like-icon">
+                            <div class="heart-animation-1"></div>
+                            <div class="heart-animation-2"></div>
+                          </span>
+                          Favorite
+                        </div>
+                        <% if (template.name.includes("_free")) { %>
+                        <div class="tag fs14 ttuc" style="background-color: #db3965;">Free!</div>
+                        <% } %>
+                        <div class="download-wrapper">
+                          <div class="download-button primary-btn btn-group dropup" style="display: inline-flex;">
+                            <button class="btn btn-med download-button-item" value="jpg" type="button" <% if (!isAllowedDownload(template.name)) { %> style="justify-content: center;" onclick="location.href='/plans';" <% } %>>
+                              <%= isAllowedDownload(template.name) ? 'Download JPG' : 'Upgrade plan' %>
+                            </button>
+                            <% if (isAllowedDownload(template.name)) { %>
+                            <button type="button" class="btn btn-med dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              <span class="sr-only">Select download type</span>
+                              <i class="fa-regular fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right">
+                              <button class="dropdown-item download-button-item" value="png">Download PNG</button>
+                              <button class="dropdown-item download-button-item" value="pdf">Download PDF</button>
+                              <button class="dropdown-item download-button-item" value="pdf_flattened">Download PDF Flattened</button>
+                            </div>
+                            <% } %>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <% }) %>
+                  </div>
+                  <div class="swiper-button-prev hidden"></div>
+                  <div class="swiper-button-next hidden"></div>
+                </div>
+              </div>
+              <% }) %>
             </div>
+          </div>
+          <% } else { %>
+          <div class="upgrade-wrapper">
+            <p>Your recent templates will appear here.</p>
+            <a onclick="navClicked()" href="/templates" class="upgrade-btn">Templates</a>
+          </div>
+          <% } %>
         </div>
+      </div>
     </div>
-    <%- include('partials/export-template', {async: true}); %>
+  </div>
+  <%- include('partials/export-template', {async: true}); %>
 </div>
 
 <script>
-    var TOKEN = '<%=user.token.access_token%>';
-    function navClicked() {
-         topbar.config({
-            barThickness : 7,
-            barColors    : {
-              '0'        : '#db3965',
-              '1.0'      : '#db3965'
-            },
-          })
-          
-          topbar.show()
-        }
+  var swiper = new Swiper('.swiper', {
+    slidesPerView: 'auto',
+    spaceBetween: 14,
+    mousewheel: true,
+    observer: true, 
+    observeParents: true,
+    rebuildOnUpdate: true,
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+  });
+
+  $(".item-wrapper").hover(function() {
+    $(".swiper-button-prev").removeClass("hidden");
+    $(".swiper-button-next").removeClass("hidden");
+  }, function() {
+    $(".swiper-button-prev").addClass("hidden");
+    $(".swiper-button-next").addClass("hidden");
+  });
+
+  $('.favorite-wrapper').on('click', function(e) {
+    if (!user.account.plan_id) {
+      alert("You need a paid account to save your favorite templates.")
+    } else {
+      $(this).toggleClass('liked');
+      if ($(this).hasClass("liked")) {
+        onAddFavorite($(this))
+      } else {
+        onRemoveFavorite($(this))
+      }
+    }
+  });
+
+  function navClicked() {
+    topbar.config({
+      barThickness: 7,
+      barColors: {
+        '0': '#db3965',
+        '1.0': '#db3965'
+      },
+    })
+    topbar.show()
+  }
+
+  function isAllowedDownload(file_name) {
+    var plan_name = <%- JSON.stringify(plan_name) %>;
+    var payment_failed = <%- JSON.stringify(payment_failed) %>;
+
+    return (plan_name && plan_name !== "Free" && !payment_failed) || file_name.includes("_free");
+  }
+</script>
+
+<script>
+  
+  var user = <%- JSON.stringify(user) %>;
 </script>
 <script src="/static/js/templates.js?<%=Date.now()%>"></script>
-
+<script src="/static/js/loader.js"></script>
 </body>
 </html>

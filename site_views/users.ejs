@@ -52,11 +52,16 @@
 
                     <div class="border-top py-3">
                         <div class="row align-items-center">
-                            
                             <div class="col text-right">
-                                <a href="/account/users/new" class="btn btn-outline-primary btn-sm badge-pill px-3">
-                                    Add User
-                                </a>
+                                <% if (typeof reachedUsersLimit != "undefined" && !reachedUsersLimit) { %>
+                                    <!-- Show "Add User" button if the plan is in TEAM_PRICES -->
+                                    <a href="/account/users/new" class="btn btn-outline-primary btn-sm badge-pill px-3">
+                                        Add User
+                                    </a>
+                                <% } else { %>
+                                    <!-- Show message for upgrading if not a Teams plan -->
+                                    <p class="text-danger">You need to upgrade to the Teams plan to add more users.</p>
+                                <% } %>
                             </div>
                         </div>
                     </div>

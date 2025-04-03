@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#db3965">
     <meta name="facebook-domain-verification" content="zlaeu6fmgfkjgbb89xfuaru9ipf8y5" />
-    <title>Prettysmart</title>
+    <title>Prettyclose</title>
     <script src="/site_static/js/jquery-3.5.1.min.js"></script>
     <script type="text/javascript" src="/site_static/js/script.js?4"></script>
     <script src="/site_static/js/slick.min.js"></script>
@@ -145,7 +145,7 @@
       <div class="section-content" style="border-bottom: none;">
         <div class="row-space wowo fadeInUp inner-content" style="width: 100%;">
           <div class="text-btn-wrpr">
-            <p class="large-text huge-text" style="color: white; margin-bottom: 7vh;">
+            <p class="large-text huge-text" style="color: white; margin-bottom: 7vh; line-height: 1.1;">
               <%- text %>
             </p>
             <%= renderSignUp(true); %>
@@ -165,7 +165,7 @@
 
   <body id="landing-page">
     <section id="header" class="row-space padding-horizontal">
-      <a href="/"><img id="logo" src="/site_static/images/logo.svg" alt="Prettysmart"/></a>
+      <a href="/"><img id="logo" src="/site_static/images/logo.svg" alt="Prettyclose"/></a>
       <i onclick="setMobileNav()" class="fa-solid fa-ellipsis mobile-nav-open" style="color: #db3965; font-size: 18px;"></i>
       <div class="row-space navs-wrpr" id="navs-wrpr">
         <div class="close-wrpr">
@@ -190,16 +190,22 @@
     </section>
     <section id="intro" class="row-space padding-horizontal">
       <div id="intro-text" class="wowo fadeInUp">
-        <p class="tiny-red">Get your copy and design in seconds.</p>
+        <p class="tiny-red">Real Estate design in seconds.</p>
         <p class="large-text margin-vertical-2">
-          The fastest social&nbsp;media<br/>creator in the&nbsp;world.
+          Effortlessly grow your real estate brand on social media—quickly, affordably, and with no hassle.
         </p>
         <br/>
         <p class="plain-text margin-bottom-2">
-          We use artificial intelligence to write your copy and use your brand collateral to create the design.
+          Become a real estate expert with Prettyclose. Gain followers, close more deals, and attract new customers—without the effort!
         </p>
         <br/>
         <%= renderSignUp(); %>
+        <br/>
+        <br/>
+        <br/>
+        <p class="tiny-red tiny-text" style="font-size: 0.7rem;">
+          Start your 7 day free trial now—no charge until after the first week!
+        </p>
       </div>
       <img
         id="img-1"
@@ -214,48 +220,49 @@
           id="img-2"
           class="wowo fadeInUp"
           src="/site_static/images/landing/2.png"
+          style="object-fit: contain; width: 100%; height: auto;"
         />
       </div>
     </section>
     <section id="why" class="section">
       <div id="why-anchor" class="anchor"></div>
       <div class="section-content">
-        <p class="tiny-red section-title">Why Prettysmart?</p>
+        <p class="tiny-red section-title">Why Prettyclose?</p>
         <div class="grid wowo fadeInUp why-pretty-smart-grid">
           <div class="sec">
             <img src="/site_static/images/landing/seamless-design.svg" style="z-index: 1;" />
-            <h5 class="ffp">Seamless Design</h5>
-            <p class="ffp">Upload your brand collateral, and prettysmart will design your posts according to your brand.</p>
+            <h5 class="ffp">Fully Branded</h5>
+            <p class="ffp">Every post showcases your name, photo, and contact info for a polished look.</p>
           </div>
           
           <div class="sec">
             <img src="/site_static/images/landing/ai-copywriter.svg" style="z-index: 1;" />
-            <h5 class="ffp">A.I. Copywriter</h5>
-            <p class="ffp">Just tell us what you want to say, and the AI will write the posts in literally seconds.</p>
+            <h5 class="ffp">Quick Listings</h5>
+            <p class="ffp">Enter property details and instantly receive a ready-to-share post.</p>
           </div>
 
           <div class="sec">
             <img src="/site_static/images/landing/tons-of-templates.svg" style="z-index: 1;" />
-            <h5 class="ffp">Tons of Templates</h5>
-            <p class="ffp">Whether it's a holiday greeting or a sale, choose a template and write your copy.</p>
+            <h5 class="ffp">Daily Expertise</h5>
+            <p class="ffp">Share helpful tips or advice to establish yourself as the go-to expert.</p>
           </div>
 
           <div class="sec">
             <img src="/site_static/images/landing/super-scalable.svg" style="z-index: 1;" />
-            <h5 class="ffp">Super scalable</h5>
-            <p class="ffp">With the fastest tool on earth, you can create hundreds of posts a day.</p>
+            <h5 class="ffp">Interest Rates</h5>
+            <p class="ffp">Easily post the latest mortgage rates to keep your audience informed.</p>
           </div>
 
           <div class="sec">
             <img src="/site_static/images/landing/free-stock-photos.svg" style="z-index: 1;" />
-            <h5 class="ffp">Free stock photos</h5>
-            <p class="ffp">Get access to thousands of free stock photos when creating your posts.</p>
+            <h5 class="ffp">Unlimited Posts</h5>
+            <p class="ffp">Enjoy endless ready-to-use content for your social media.</p>
           </div>
 
           <div class="sec">
             <img src="/site_static/images/landing/easy-editor.svg" style="z-index: 1;" />
-            <h5 class="ffp">Easy Editor</h5>
-            <p class="ffp">Our editor is easy and enjoyable, from minor to major changes.</p>
+            <h5 class="ffp">Emails and printables</h5>
+            <p class="ffp">If you need it for your marketing, we will surely have it!</p>
           </div>
         </div>
       </div>
@@ -273,6 +280,7 @@
                 allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" 
                 allowfullscreen 
                 allow="autoplay"
+                muted
               />
               Your browser does not support HTML video.
             </video>
@@ -300,20 +308,20 @@
           <div class="swiper wowo fadeInUp" style="width: 100%;">
               <div class="swiper-wrapper">
                 <div class="swiper-slide" style="width: 35%;">
-                    <% renderTestimonial("I used a fantastic agency for my social media posts. However, I waited days for every stupid post. I was ready to hire an in-house designer to get my design done fast - when a friend recommended prettysmart. I now spend under 3 minutes per post, do it myself, and truthfully they are just as nice.", "P. Schwartz", "Castling"); %>
+                    <% renderTestimonial("I used a fantastic agency for my social media posts. However, I waited days for every stupid post. I was ready to hire an in-house designer to get my design done fast - when a friend recommended prettyclose. I now spend under 3 minutes per post, do it myself, and truthfully they are just as nice.", "P. Schwartz", "Castling"); %>
                 </div>
                 <div class="swiper-slide" style="width: 35%;">
-                    <% renderTestimonial("Time in business is money. That is why I love PrettySmart, and I get beautiful designs done in seconds. The copy and design are impressive; it took my brand to the next level.", "Ari Greenfeld", "GreenTouch Media"); %>
+                    <% renderTestimonial("Time in business is money. That is why I love Prettyclose, and I get beautiful designs done in seconds. The copy and design are impressive; it took my brand to the next level.", "Ari Greenfeld", "GreenTouch Media"); %>
                 </div>
                 <div class="swiper-slide" style="width: 35%;">
-                    <% renderTestimonial("As a business owner, I really, really appreciate prettysmart. There is absolutely no reason to hire a designer or copywriter when you can get it done for a fraction of the time and price.", "Mel Schlesinger", ""); %>
+                    <% renderTestimonial("As a business owner, I really, really appreciate prettyclose. There is absolutely no reason to hire a designer or copywriter when you can get it done for a fraction of the time and price.", "Mel Schlesinger", ""); %>
                 </div>
               </div>
           </div>
         </div>
       </div>
     </section>
-    <% renderBanner("PrettySmart<br>is absolute<br>genius.", "img-4", "/site_static/images/landing/4.png") %>
+    <% renderBanner("Your clients should be following you.<br/>You shouldn't be following them.<br/>No more cold calling and running after leads.", "img-4", "/site_static/images/landing/4.png") %>
     <section id="pricing" class="section">
       <div id="pricing-anchor" class="anchor"></div>
       <div class="section-content">
@@ -348,16 +356,20 @@
         <div class="faq-content wowo fadeInLeft">
           <%
             const faqs = [{
-              title: "What are credits?", 
-              desc: "Each time you generate a post you use one credit."
+              title: "What happens after I sign up?", 
+              desc: "Once you sign up, we'll get to work on setting up your brand. We'll notify you as soon as your dashboard is ready, giving you access to thousands of templates and all the tools you'll need for your marketing efforts."
             },
             {
-              title: "Can I change my logo, font or color once it’s uploaded?", 
-              desc: "Go to My Brand page and feel free to change your brand."
+              title: "I need a specific post or flyer, but I don't see it on the dashboard. Can you add it?", 
+              desc: "We're always updating with new designs and concepts, and we’d love to hear your suggestions. Let us know what you're looking for, and we may be able to add it!"
             }, 
             {
-              title: "I want the AI to write better copy. What can I do?", 
-              desc: "The AI write the copy according to your business description, if the A.I is not accurate you might want to change your description."
+              title: "Do you have a minimum commitment?", 
+              desc: "We offer a month to month service where you can cancel anytime to prevent future billing! However, for even more value savings, we do offer longer term memberships as well."
+            },
+            {
+              title: "Do you offer refunds?", 
+              desc: "No, we do not offer refunds. You can always cancel in the first seven days of your free trial not to be billed at all, otherwise you can cancel during any time and you will not be billed at the next billing cycle."
             }]
           %>
           <% faqs.map(faq => { %>
@@ -371,7 +383,7 @@
         </div>
       </div>
     </section>
-    <% renderBanner("We're Pretty<br>Smart, if we<br>may say so.", "img-5", "/site_static/images/landing/5.png") %>
+    <% renderBanner("Get agency level posts<br>Let them think you have an<br>in-house social media genius.", "img-5", "/site_static/images/landing/5.png") %>
     <%- include('partials/footer', {async: true, authenticated}); %>
   </body>
 </html>

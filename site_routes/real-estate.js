@@ -29,7 +29,7 @@ const staticRows = [
     name: "Just Closed",
     sub_title: "Closed a loan? Share it with your audience.",
     image: "Asset 1",
-    href: "new-form/6109abdabf3052623ddb04a5/45",
+    href: "new-form/660c06f953c7810580543ba7/81",
     available: true,
   },
 ];

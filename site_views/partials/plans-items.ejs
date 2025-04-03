@@ -20,8 +20,20 @@
       <% }); %>
     </div>
   </div>
-  <button onclick="fbq('track', 'AddToCart', {currency: 'USD', value: <%- price || 0 %>}); location.href='<%= price ? `/payment/update/` + id : `/payment/free` %>';" id="plan-button" class="price-button tiny-text" style="background-color: <%= secondColor %>;">
-    <p style="color: <%= darkText || primeColor %>;"><%= button %></p>
+  <button 
+    onclick="fbq('track', 'AddToCart', {currency: 'USD', value: <%= price || 0 %>});
+        if (typeof tap !== 'undefined' && typeof tap.push === 'function') {
+            tap.push(['conversion', { 
+                conversion_type: 'subscription', 
+                plan_id: '<%= id %>', 
+                plan_name: '<%= title %>', 
+                price: <%= price || 0 %>, 
+                currency: 'USD' 
+            }]);
+        }
+        location.href='<%= price ? `/payment/update/` + id : `/payment/free` %>';"  
+    id="plan-button" class="price-button tiny-text" style="background-color: <%= secondColor %>;">
+        <p style="color: <%= darkText || primeColor %>;"><%= button %></p>
   </button>
 </div>
 <% } %>
@@ -55,7 +67,7 @@
             if (priceType && priceType.amount) {
                 var finalAmount = priceType.amount;
                 if (finalAmount) {
-                    return interval === "month" ? `${finalAmount / 100}.00` : `${(finalAmount / 100) / 12}.00`;
+                    return interval === "month" ? (finalAmount / 100).toFixed(2) : ((finalAmount / 100) / 12).toFixed(2);
                 }
             }
         }
@@ -111,7 +123,7 @@
                         });
 
                         if (product.prices[interval] && product.prices[interval].id) {
-                            renderPriceItem(product.prices[interval].id, getFirstColor(index), getSecondColor(index), "PrettySmart " + name, getPreText(product) + " • " + (price ? "$" + price + "/" + getIntervalAbbrev() : "Free Forever" ), icons, index === 0 ? "black" : undefined, price, getCanceledStatus(product))
+                            renderPriceItem(product.prices[interval].id, getFirstColor(index), getSecondColor(index), "PrettyClose " + name, getPreText(product) + " • " + (price ? "$" + price + "/" + getIntervalAbbrev() : "Free Forever" ), icons, index === 0 ? "black" : undefined, price, getCanceledStatus(product))
                         }
                     }
                 }

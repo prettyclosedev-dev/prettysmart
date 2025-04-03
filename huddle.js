@@ -1454,7 +1454,7 @@ function getNextDayOfWeek(dayOfWeek) {
 
 async function getBrandObject(account) {
   let brand = account.brand ? account.brand.toJSON() : {};
-
+  
   for (let item in brand.logos) {
     try {
       brand.logos[item] = await getSingleBrandObject(

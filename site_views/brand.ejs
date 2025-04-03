@@ -524,13 +524,6 @@
                                 </div>
                             </div>
                         </div>
-
-                    <div class="right-sec">
-                        <div class="onboarding-templates-preview">
-                            <div class="df acc tab ffp" style="margin-bottom: 32.5px; margin-top: 10px;">Brand Preview</div>
-                            <%- include('partials/template', {async: true, template:templates[0], showNewLoader: true}); %>
-                        </div>
-                    </div>
                 </div>
                
                 <!-- <%- include('brand-help', {async: true}); %>                   -->
@@ -610,14 +603,12 @@
       </div>
 
       <script>
-        var TOKEN = '<%=locals.user ? locals.user.token.access_token : ''%>';
         var draft_brand = <%- JSON.stringify(brand) %>;
      </script>
 
     <script src="/static/js/jquery.js"></script>
     <script src="/static/js/loader.js"></script>
-    <script type="text/javascript" src="https://cdn.designhuddle.com/editor/v1/lib.js"></script>
-    <script src="https://unpkg.com/vue@next"></script>
+    <script src="https://unpkg.com/vue@^3.4.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/svg-drag-select@0.4.2"></script>
     <script>
 

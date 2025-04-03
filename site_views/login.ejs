@@ -56,7 +56,7 @@
         <div class="text-center px-3">
             * By logging in, you agree to our <a href="/pages/term-of-use">Terms of Use</a> and to 
             <br class="d-none d-lg-block">
-            receive prettysmart  emails & updates and acknowledge 
+            receive prettyclose  emails & updates and acknowledge 
             <br class="d-none d-lg-block">
             that you read our <a href="/pages/privacy-policy">Privacy Policy.</a>
         </div>
@@ -99,6 +99,9 @@
         $.post($form.attr('action'), $.param(data), function(res) {
             $form.find('.form-loader').removeClass('d-flex');
             if (res.route) {
+                if (typeof tap !== 'undefined' && typeof tap.push === 'function') {
+                    tap.push(["event", "login"]);
+                }
                 window.location.href = res.route;
             } else if (res.error) {
                 alert(JSON.stringify(res.error))

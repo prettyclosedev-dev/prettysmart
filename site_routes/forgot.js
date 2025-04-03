@@ -2,9 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../schemas/user");
 const config = require("../config");
-const sgMail = require("@sendgrid/mail");
-
-sgMail.setApiKey(config.sendgrid.token);
+const mailchimp = require("@mailchimp/mailchimp_transactional")(config.mandrill.apiKey);
 
 module.exports = () => {
   router.get("/", async (req, res) => {
@@ -19,28 +17,35 @@ module.exports = () => {
     });
 
     if (user) {
-      const msg = {
-        to: req.body.email, // Change to your recipient
-        from: "hi@prettysmart.co", // Change to your verified sender
-        subject: "Reset Password",
-        template_id: "d-135aeb46b34f47548662aed5f7f3c6a3",
-        dynamic_template_data: {
-          TOKEN: user._id,
-        },
+      const message = {
+        from_email: "hi@prettyclose.co", // Your verified sender
+        to: [{ email: req.body.email, type: "to" }],
+        subject: "Reset Password", // Optional: You can omit this if your template has a default subject
+        global_merge_vars: [
+          {
+            name: "TOKEN", // Matches *|TOKEN|* in your template
+            content: user._id, // Dynamic value to replace
+          },
+        ],
       };
 
-      sgMail
-        .send(msg)
-        .then(() => {
-          console.log("Email sent");
-        })
-        .catch((error) => {
-          console.error(error);
+      try {
+        const response = await mailchimp.messages.sendTemplate({
+          template_name: "Reset Password", // Your Mailchimp template name
+          template_content: [], // Optional: leave empty unless overriding specific content
+          message: message,
         });
 
-      res.render("forgot", {
-        sent: true,
-      });
+        console.log("Email sent via Mailchimp:", response);
+        res.render("forgot", {
+          sent: true,
+        });
+      } catch (error) {
+        console.error("Error sending email via Mailchimp:", error);
+        res.render("forgot", {
+          sent: false,
+        });
+      }
     } else {
       res.render("forgot", {
         sent: false,

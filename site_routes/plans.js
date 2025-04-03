@@ -167,7 +167,7 @@ module.exports = () => {
 
 async function getPlans() {
   try {
-    const plans = await stripe.plans.list({ active: true, limit: 20 });
+    const plans = await stripe.plans.list({ active: true, limit: 40 });
     const products = await stripe.products.list({ active: true });
 
     const indexOfBasic = products.data
@@ -201,12 +201,38 @@ async function getPlans() {
       products.data.splice(indexOfUnlimited, 1);
     }
 
+    const indexOfPro = products.data
+      .map((p) => p.name)
+      .indexOf("Pro");
+    if (indexOfPro > -1) {
+      products.data.splice(indexOfPro, 1);
+    }
+
+    const indexOfBusiness = products.data
+      .map((p) => p.name)
+      .indexOf("Business");
+    if (indexOfBusiness > -1) {
+      products.data.splice(indexOfBusiness, 1);
+    }
+
+    const indexOfAgency = products.data
+      .map((p) => p.name)
+      .indexOf("Agency");
+    if (indexOfAgency > -1) {
+      products.data.splice(indexOfAgency, 1);
+    }
+
     if (products && products.data) {
       products.data.map((product) => {
         product.prices = {
           year: getPricePerProduct(product.id, plans, "year"),
           month: getPricePerProduct(product.id, plans, "month"),
         };
+
+        if (product.name === "Team") {
+          product.prices.month.amount *= 2; // Minimum of 2 agents
+          product.prices.year.amount *= 2; // Minimum of 2 agents
+        }
       });
 
       products.data.sort((a, b) => {

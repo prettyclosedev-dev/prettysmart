@@ -1,10 +1,3 @@
-var object_hash;
-
-DSHDEditorLib.configure({
-  access_token: TOKEN,
-  domain: "prettysmart.designhuddle.com",
-});
-
 var locations = [
   "templates",
   "zmanim",
@@ -21,8 +14,6 @@ var locations = [
 
 if (
   !window.location.pathname.includes("generator") &&
-  !window.location.pathname.includes("recents") &&
-  !window.location.pathname.includes("favorites") &&
   !window.location.pathname.includes("editor") &&
   !window.location.pathname.includes("clip-studio")
 ) {
@@ -131,9 +122,7 @@ $(document)
     var $template = $(this).closest(".template").find("[data-export]"),
       file_name = $template.attr("title"),
       img = $template.find("img").not(".loader").attr("src"),
-      project_id = $template.data("project"),
       template_id = $template.data("template"),
-      object_hash = $template.data("hash"),
       original_title = $template.attr("original_title"),
       file_type = $(this).val();
 
@@ -148,8 +137,6 @@ $(document)
     }
 
     directDownload({
-      project_id,
-      object_hash,
       template_id,
       file_name,
       file_type,
@@ -159,33 +146,8 @@ $(document)
   })
   .on("click", "[data-editor]", function () {
     var $form = $(this).closest("form"),
-      project_id = $form.data("project"),
-      object_hash = $form.data("hash"),
       template_id = $form.data("template");
-
-    $(".export-proggress").removeClass("d-none");
-
-    if (project_id) {
-      openEditor(project_id, template_id, object_hash);
-    } else {
-      DSHDEditorLib.createProject(
-        {
-          template_id: template_id,
-          customizations_hash: object_hash,
-        },
-        function (error, project) {
-          if (!error) {
-            saveProject(project.project_id, false, template_id, object_hash);
-            $form.data("project", project.project_id);
-            $('[data-template="' + template_id + '"]').data(
-              "project",
-              project.project_id
-            );
-            openEditor(project.project_id, template_id, object_hash);
-          }
-        }
-      );
-    }
+    window.location.href = "/editor/branded-design/" + template_id;
 
     return false;
   })
@@ -214,9 +176,8 @@ $(document)
       .closest(".item-wrapper")
       .find(".swiper")
       .load(
-        encodeURI(
-          window.location.pathname + "/resize?row=" + rowID + "&size=" + sizeID
-        ) + " .single-swiper-wrapper",
+        encodeURI("/templates/resize?row=" + rowID + "&size=" + sizeID) +
+          " .single-swiper-wrapper",
         function (res) {
           window.refreshRow = $this;
           getCustomization({}, function () {
@@ -226,6 +187,156 @@ $(document)
       );
     //     break;
     // }
+  })
+  .on("click", ".load-more", function () {
+    var $button = $(this);
+
+    var originalText = $button.html();
+
+    $button
+      .addClass("loading-anim")
+      .html('Loading... <i class="fa fa-spinner spinner"></i>');
+
+    var categoryId = $button.data("category-id");
+    var currentPage = parseInt($button.attr("data-current-page"), 10);
+    var totalPages = parseInt($button.attr("data-total-pages"), 10);
+
+    var $itemWrapper = $button.closest(".item-wrapper");
+    var segment = $itemWrapper.find(
+      ".segment-item:checked, .segment-item[checked]"
+    );
+    if (segment.length > 1) {
+      segment = segment.eq(1);
+    }
+    const selectedSize = segment.val();
+    console.log("selectedSize", selectedSize);
+
+    if (currentPage < totalPages) {
+      $.ajax({
+        url: `/templates/load-more/${categoryId}`,
+        type: "GET",
+        data: {
+          page: currentPage + 1,
+          sizeName: selectedSize, // Pass the selected size name
+        },
+        success: function (response) {
+          if (response.length > 0) {
+            var $templatesContainer = $(`#swiper-wrapper-${categoryId}`);
+            var $loadMoreSlide = $(`#load-more-slide-${categoryId}`);
+
+            $loadMoreSlide.remove();
+
+            var newTemplates = [];
+
+            response.forEach(function (template) {
+              var templateHtml = `
+                <div class="swiper-slide">
+                  <div class="template">
+                    <div
+                      data-template="${template.id}"
+                      data-export
+                      class="template d-block rounded"
+                      original_title="${template.name.replace("_free", "")}"
+                      title="${template.name.replace("_free", "")}"
+                    >
+                      <img
+                        src="${template.preview}"
+                        alt=""
+                        class="rounded LoNotSensitive"
+                      />
+                      <div class="template-loader">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                          viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+                          <rect fill="none" stroke="#F7176D" stroke-width="4" x="25" y="25" width="50" height="50">
+                            <animateTransform attributeName="transform" dur="0.5s" from="0 50 50" to="180 50 50" type="rotate"
+                              id="strokeBox" attributeType="XML" begin="rectBox.end" />
+                          </rect>
+                          <rect x="27" y="27" fill="#F7176D" width="46" height="50">
+                            <animate attributeName="height" dur="1.3s" attributeType="XML" from="50" to="0" id="rectBox"
+                              fill="freeze" begin="0s;strokeBox.end" />
+                          </rect>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="favorite-wrapper ${
+                      template.isFavorite ? "liked" : ""
+                    }">
+                      <span class="like-icon">
+                        <div class="heart-animation-1"></div>
+                        <div class="heart-animation-2"></div>
+                      </span>
+                      Favorite
+                    </div>
+                    ${
+                      template.name.includes("_free")
+                        ? '<div class="tag fs14 ttuc" style="background-color: #db3965;">Free!</div>'
+                        : ""
+                    }
+                    <div class="download-wrapper">
+                      <div class="download-button primary-btn btn-group dropup" style="display: inline-flex;">
+                        <button class="btn btn-med download-button-item" value="jpg" type="button" ${
+                          !isAllowedDownload(template.name)
+                            ? 'style="justify-content: center;" onclick="location.href=\'/plans\';"'
+                            : ""
+                        }>
+                          ${
+                            isAllowedDownload(template.name)
+                              ? "Download JPG"
+                              : "Upgrade plan"
+                          }
+                        </button>
+                        ${
+                          isAllowedDownload(template.name)
+                            ? `
+                        <button type="button" class="btn btn-med dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <span class="sr-only">Select download type</span>
+                          <i class="fa-regular fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                          <button class="dropdown-item download-button-item" value="png">Download PNG</button>
+                          <button class="dropdown-item download-button-item" value="pdf">Download PDF</button>
+                          <button class="dropdown-item download-button-item" value="pdf_flattened">Download PDF Flattened</button>
+                        </div>`
+                            : ""
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>`;
+
+              var $templateElement = $(templateHtml);
+              $templatesContainer.append($templateElement);
+
+              // Push only the .template div to the newTemplates array
+              newTemplates.push($templateElement.find(".template")[1]);
+            });
+
+            $templatesContainer.append($loadMoreSlide);
+
+            currentPage += 1;
+            $button.attr("data-current-page", currentPage);
+
+            if (currentPage >= totalPages) {
+              $loadMoreSlide.hide();
+            }
+
+            var swiperInstance = getSwiperInstanceFromButton($itemWrapper);
+            swiperInstance.update();
+
+            // Call getCustomization with only the newly added .template elements
+            getCustomization({ templates: newTemplates });
+          } else {
+            $(`#load-more-slide-${categoryId}`).hide();
+          }
+        },
+        error: function (error) {
+          console.error("Error loading more templates:", error);
+        },
+        complete: function () {
+          $button.removeClass("loading-anim").html(originalText);
+        },
+      });
+    }
   })
   .on("click", "[data-ready-size]", function (e) {
     e.preventDefault();
@@ -268,307 +379,142 @@ $(document)
     return false;
   });
 
-async function getCustomization(options, cb, icb) {
-  var ai_fields = {},
-    queryFields = [],
-    news_fields = {};
+function getSwiperInstanceFromButton($itemWrapper) {
+  var swiperContainer = $itemWrapper.find(".swiper");
 
-  var promises = [];
+  // Create a Swiper instance based on that container
+  var swiperInstance =
+    swiperContainer.length > 0 ? swiperContainer[0].swiper : null;
 
-  var failed = false;
+  return swiperInstance;
+}
 
-  $(".ai_field").each(function () {
-    var dfd = $.Deferred();
+function getCustomization(options, cb, icb) {
+  var $templates;
 
-    var $this = $(this);
+  if (options && options.templates && options.templates.length > 0) {
+    $templates = $(options.templates); // Use the provided templates
+  } else {
+    $templates = $(".template"); // Fallback to all elements with class .template
+  }
 
-    if ($this.val()) {
-      if (
-        options &&
-        (options.row_class_name === "Link" ||
-          (options.row_class_name === "Newsroom" &&
-            $this.val().includes("http")))
-      ) {
-        $.post("/generator/parse?url=" + $this.val())
-          .then(function (data) {
-            if (data.success && data.body) {
-              var html = document.createElement("html");
-              html.innerHTML = data.body;
+  // Create an IntersectionObserver instance
+  const observer = new IntersectionObserver((entries, observer) => {
+    // Collect promises for visible templates
+    const requests = entries
+      .filter((entry) => entry.isIntersecting) // Only process templates in view
+      .map((entry) => {
+        const $template = $(entry.target);
+        const template_id = $template.data("template");
+        if (!template_id) {
+          observer.unobserve(entry.target); // Stop observing if no template_id
+          return Promise.resolve(); // Return a resolved promise for skipped templates
+        }
 
-              var body = $(html).find("body:first");
-              var finalText = body
-                .text()
-                .substr(0, 1800)
-                .replace(/[^\w ]/, "")
-                .replace(/  |\r\n|\n|\r/gm, ""); // cut chars and next lines etc
-              if (options.row_class_name === "Link") {
-                ai_fields[$this.attr("name")] = finalText;
-              } else {
-                ai_fields.news = finalText;
-              }
+        const $itemWrapper = $template.closest(".item-wrapper");
+        var segment = $itemWrapper.find(
+          ".segment-item:checked, .segment-item[checked]"
+        );
+        if (segment.length > 1) {
+          segment = segment.eq(1);
+        }
+        const selectedSize = segment.val();
+        const defaultSize = $itemWrapper.data("default-size");
 
-              news_fields = {
-                title: data.title,
-                body: finalText,
-                media: data.image,
-                source: data.domain,
-                isUrl: $this.val().includes("http"),
-              };
+        let templateHeight = defaultSize ? defaultSize : "300px";
+
+        // Check if the URL includes 'collateral'
+        if (window.location.href.includes("collateral")) {
+          const itemId = $itemWrapper.attr("id");
+          if (!defaultSize) {
+            if (itemId === "105") {
+              templateHeight = "100px"; // Facebook cover
+            } else if (itemId === "112" || itemId === "114") {
+              templateHeight = "150px"; // Business card, Zoom background
             } else {
-              var $template = $(".template");
-              hideLoader($template);
-              closeExportModal();
-              toggleStep("generate");
-              alert(
-                Object.keys(data.error).length > 0
-                  ? "There was a problem parsing the url!\n" +
-                      JSON.stringify(data.error)
-                  : "There was a problem parsing the url!"
-              );
-              failed = true;
-              return;
+              templateHeight = "300px"; // Default for collateral pages
             }
-            dfd.resolve();
+          }
+        } else {
+          // Use segment size if it's different from default size
+          if (selectedSize && selectedSize !== defaultSize) {
+            switch (selectedSize) {
+              case "Horizontal":
+                templateHeight = "250px";
+                break;
+              case "Vertical":
+                templateHeight = "525px";
+                break;
+              case "Square":
+                templateHeight = "300px";
+                break;
+            }
+          }
+        }
+
+        $template.css("min-height", templateHeight);
+
+        // Fetch preview for the template
+        const request = $.get("/templates/preview/" + template_id)
+          .then(function (preview) {
+            var preview_image = new Image();
+            preview_image.src = preview.includes("data:image")
+              ? preview
+              : "data:image/png;base64," + preview;
+            preview_image.onload = function () {
+              $template.find("img").not(".loader").replaceWith(preview_image);
+              $("img").bind("contextmenu", function (e) {
+                return false;
+              });
+            };
+            preview_image.onerror = function () {
+              hideLoader($template);
+              $template
+                .find("img")
+                .not(".loader")
+                .attr(
+                  "src",
+                  `/static/images/failed_${
+                    selectedSize ? selectedSize.toLowerCase() : "horizontal"
+                  }@4x.jpg`
+                );
+            };
+            hideLoader($template);
           })
           .catch(function (e) {
-            var $template = $(".template");
+            console.log(e);
             hideLoader($template);
-            closeExportModal();
-            toggleStep("generate");
-            alert(
-              Object.keys(e).length > 0
-                ? "There was a problem parsing the url!\n" + JSON.stringify(e)
-                : "There was a problem parsing the url!"
-            );
-            failed = true;
-            return;
+            $template
+              .find("img")
+              .not(".loader")
+              .attr(
+                "src",
+                `/static/images/failed_${
+                  selectedSize ? selectedSize.toLowerCase() : "horizontal"
+                }@4x.jpg`
+              );
+            hideLoader($template);
           });
-      } else {
-        ai_fields[$this.attr("name")] = $this.val();
-        dfd.resolve();
-      }
-    } else {
-      dfd.resolve();
-    }
 
-    promises.push(dfd);
+        observer.unobserve(entry.target); // Stop observing once loaded
+
+        return request; // Return the promise
+      });
+
+    // Wait for all visible template previews to load
+    Promise.all(requests).then(() => {
+      if (cb) cb(); // Callback after all previews are loaded
+      if (icb) icb(); // Another callback if needed
+    });
   });
 
-  $.when.apply($, promises).done(function () {
-    if (failed) {
-      return;
-    }
-
-    if (options && options.ignoreCache) {
-      queryFields.push("ignoreCache=" + options.ignoreCache);
-    }
-
-    if (options && options.row_class_name) {
-      queryFields.push("row_class_name=" + options.row_class_name);
-    } else if (location.pathname.indexOf("mortgage-news") > -1) {
-      queryFields.push("row_class_name=mu");
-      if (typeof articles !== "undefined" && articles && articles.length) {
-        articles.forEach(function (article, index) {
-          ai_fields["mu_" + (index + 1)] = article.body;
-          ai_fields["mu_title_" + (index + 1)] = article.title;
-        });
-      }
-    } else if (location.pathname.indexOf("mortgage-rates") > -1) {
-      if (typeof rates !== "undefined" && rates && rates.length) {
-        const data = rates[0].large_chart_data;
-        if (data && data.length) {
-          $("body").append(
-            `<div id="chart-container" style="display: none; width: 600px; height: 400px; margin: 0 auto"></div>`
-          );
-
-          try {
-            const chart = Highcharts.chart("chart-container", {
-              chart: {
-                zoomType: "x",
-              },
-              title: {
-                text: user.account.name,
-              },
-              // subtitle: {
-              //     text: '${user.email || user.account.brand_email}'
-              // },
-              xAxis: {
-                type: "datetime",
-              },
-              yAxis: {
-                opposite: true,
-                title: {
-                  text: "30 Year Fixed",
-                },
-              },
-              legend: {
-                enabled: false,
-              },
-              plotOptions: {
-                series: {
-                  marker: {
-                    enabled: false,
-                  },
-                },
-                area: {
-                  fillColor: {
-                    linearGradient: {
-                      x1: 0,
-                      y1: 0,
-                      x2: 0,
-                      y2: 1,
-                    },
-                    stops: [
-                      [0, user.account.brand.colors.primary + "cc"],
-                      [1, user.account.brand.colors.secondary + "cc"],
-                    ],
-                  },
-                  marker: {
-                    radius: 2,
-                  },
-                  lineWidth: 1,
-                  states: {
-                    hover: {
-                      lineWidth: 1,
-                    },
-                  },
-                  threshold: null,
-                },
-              },
-              credits: {
-                enabled: false,
-              },
-              series: [
-                {
-                  type: "area",
-                  turboThreshold: data.length,
-                  name: "30 Year Fixed",
-                  color: user.account.brand.colors.primary,
-                  data: data.map((obs) => {
-                    return {
-                      x: new Date(obs.date),
-                      y: parseFloat(obs.value),
-                    };
-                  }),
-                },
-              ],
-            });
-
-            var svg = chart.getSVG();
-            rates[0].large_chart = "data:image/svg+xml;utf8," + svg;
-            $("#chart-container").remove();
-          } catch (e) {
-            console.log(e);
-          }
-        }
-      }
-    } else if (location.pathname.indexOf("chanukah") > -1) {
-      queryFields.push("row_class_name=Chanukah");
-    } else if (location.pathname.indexOf("clip-studio") > -1) {
-      queryFields.push("row_class_name=Clyps");
-    }
-
-    var skipAI = options && !options.runAI;
-
-    if (
-      location.pathname.indexOf("onboarding") > -1 ||
-      (location.pathname.indexOf("brand") > -1 && skipAI) ||
-      (location.pathname == "/templates" && skipAI) ||
-      location.pathname.indexOf("quotes") > -1 || // not needed skipping because of Quote row name
-      location.pathname.indexOf("collateral") > -1 ||
-      location.pathname.indexOf("zmanim") > -1 ||
-      (location.pathname.indexOf("newsroom") > -1 && skipAI) ||
-      (location.pathname.indexOf("reviews") > -1 && skipAI) ||
-      (location.pathname.indexOf("q&a") > -1 && skipAI) ||
-      location.pathname.indexOf("real-estate") > -1 ||
-      location.pathname.indexOf("mortgage-rates") > -1 ||
-      location.pathname.indexOf("45") > -1
-    ) {
-      queryFields.push("onboarding=1");
-    }
-
-    $.ajax({
-      type: "POST",
-      url: "/customization?" + queryFields.join("&"),
-      data: JSON.stringify({
-        ai_fields: ai_fields,
-        news_fields: news_fields,
-        articles:
-          location.pathname.indexOf("mortgage-news") &&
-          typeof articles !== "undefined"
-            ? articles
-            : undefined,
-        rates:
-          location.pathname.indexOf("mortgage-rates") &&
-          typeof rates !== "undefined"
-            ? rates
-            : undefined,
-        brand: options && options.brand,
-      }),
-      dataType: "json",
-      contentType: "application/json",
-      success: function (res) {
-        if (res.ai_error) {
-          $("body").append(`<div class="info-box df aic ffp fs13">
-            <p class="mb-0">There is currently an issue with OpenAI. <a href="https://status.openai.com">Check the status here.</a></p>
-            <button onclick="hideInfoBox()" class="df acc mla" style="color: white; border: none; background-color: transparent;"><i class="fa-regular fa-xmark"></i></button>
-          </div>`);
-        }
-
-        DSHDEditorLib.storeTemplateCustomizationObject(
-          {
-            object: {
-              classes: res.classes,
-            },
-          },
-          function (err, data) {
-            if (data && data.object_hash) {
-              object_hash = data.object_hash;
-
-              if (!window.location.pathname.includes("generator")) {
-                initTemplates(
-                  { reviews_amount: res.reviews_amount },
-                  function (response) {
-                    if (icb) {
-                      icb(response);
-                    }
-                  }
-                );
-              } else {
-                if (icb) {
-                  icb(err);
-                }
-              }
-            }
-
-            if (cb) {
-              cb(data, err);
-            }
-
-            if (err) {
-              console.log(err);
-            }
-          }
-        );
-      },
-      error: (err) => {
-        console.log(err);
-        if (cb) {
-          cb(null, err);
-        }
-
-        if (icb) {
-          icb(err);
-        }
-      },
-    });
+  // Observe each template
+  $templates.each(function () {
+    observer.observe(this); // Start observing the template
   });
 }
 
 function initTemplates(opts, cb) {
-  if (!object_hash) {
-    return;
-  }
   var $templates = window.refreshRow
     ? window.refreshRow.closest(".item-wrapper").find("[data-template]")
     : $("[data-template]");
@@ -606,69 +552,6 @@ function initTemplates(opts, cb) {
         }
       }
     }
-
-    DSHDEditorLib.getVariableTemplatePreviewURL(
-      {
-        template_id: template_id,
-        customizations_hash: object_hash,
-        width: $templates.length < 7 ? 1000 : 600,
-      },
-      function (error, image_url) {
-        if (!error) {
-          var preview_image = new Image();
-          preview_image.src = image_url;
-          preview_image.onload = function () {
-            $template.data("hash", object_hash);
-            $template.find("img").not(".loader").replaceWith(preview_image);
-            $("img").bind("contextmenu", function (e) {
-              return false;
-            });
-            hideLoader($template);
-          };
-          preview_image.onerror = function () {
-            hideLoader($template);
-            // alert("Failed to load template.");
-            var segment = $template
-              .closest(".item-wrapper")
-              .find(".segment-item:checked, .segment-item[checked]");
-            if (segment.length > 1) {
-              segment = segment.eq(1);
-            }
-            const selectedSize = segment.val();
-            $template
-              .find("img")
-              .not(".loader")
-              .attr(
-                "src",
-                `/static/images/failed_${
-                  selectedSize ? selectedSize.toLowerCase() : "horizontal"
-                }@4x.jpg`
-              );
-          };
-
-          didSucceed = true;
-        } else {
-          var segment = $template
-            .closest(".item-wrapper")
-            .find(".segment-item:checked, .segment-item[checked]");
-          if (segment.length > 1) {
-            segment = segment.eq(1);
-          }
-          const selectedSize = segment.val();
-          $template
-            .find("img")
-            .not(".loader")
-            .attr(
-              "src",
-              `/static/images/failed_${
-                selectedSize ? selectedSize.toLowerCase() : "horizontal"
-              }@4x.png`
-            );
-
-          didSucceed = false;
-        }
-      }
-    );
   });
 
   if (cb) {
@@ -732,13 +615,13 @@ function openTemplateModal(options) {
     return false;
   });
   $('[name="export_form"] .title').text(options.fileName);
-  // $('[name="file_name"]').val(options.fileName);
-  // $("body").addClass("modal-open");
-  // $(".modal-backdrop").addClass("show d-block");
-  // $("#exportModal").addClass("show d-block");
+
   $("[data-step]").addClass("d-none");
   $('[data-step="template"]').removeClass("d-none");
   $(".new-popup-wrapper").not(".misc").removeClass("d-none");
+
+  // Reset progress bar at start
+  $(".export-proggress-title-inner").width("0%");
 }
 
 function closeExportModal() {
@@ -748,142 +631,69 @@ function closeExportModal() {
   $('[name="export_form"]').data("project", "");
   $('[name="export_form"]').data("file_name", "");
   $('[name="export_form"]').data("original_title", "");
-  // $("body").removeClass("modal-open");
-  // $(".modal-backdrop").removeClass("show d-block");
-  // $("#exportModal").removeClass("show d-block");
   $(".export-proggress").addClass("d-none");
   $(".export-proggress-title-inner").width("0%");
-  $("[data-step]").addClass("d-none");
-  $('[data-step="template"]').removeClass("d-none");
   $(".new-popup-wrapper").addClass("d-none");
   toggleStep("generate");
 }
 
-function openEditor(project_id, template_id, object_hash) {
-  window.location = "/editor/" + project_id; // + "/" + template_id + "/" + object_hash;
-}
-
-function createProject(template_id, object_hash, cb) {
-  DSHDEditorLib.createProject(
-    {
-      template_id: template_id,
-      customizations_hash: object_hash,
-    },
-    function (error, project) {
-      if (cb) {
-        cb(error, project);
-      }
-    }
-  );
-}
-
-function onAddFavorite(button) {
-  var $template = $(button).siblings("[data-export]"),
-    file_name = $template.attr("title"),
-    img = $template.find("img").not(".loader").attr("src"),
-    project_id = $template.data("project"),
-    template_id = $template.data("template"),
-    object_hash = $template.data("hash");
-
-  fbq("trackCustom", "AddedFavorite", { template: file_name });
-
-  createProject(template_id, object_hash, function (error, project) {
-    if (!error) {
-      saveProject(project.project_id, true, template_id, object_hash);
-    }
-  });
-}
-
-function onRemoveFavorite(button) {
-  var $template = $(button).siblings("[data-export]"),
-    file_name = $template.attr("title"),
-    img = $template.find("img").not(".loader").attr("src"),
-    project_id = $template.data("project"),
-    template_id = $template.data("template"),
-    object_hash = $template.data("hash");
-
-  fbq("trackCustom", "RemovedFavorite", { template: file_name });
-}
-
 function formParams(form) {
-  var $form = $(form),
-    project_id = $form.data("project"),
-    object_hash = $form.data("hash"),
-    template_id = $form.data("template"),
-    file_name = $form.data("file_name"),
-    file_type = $form.data("file_type"),
-    original_title = $form.data("original_title");
+  const $form = $(form);
+  const template_id = $form.data("template");
+  const file_name = $form.data("file_name").replace("_free", "");
+  const file_type = $form.data("file_type");
+
   return {
-    project_id,
-    object_hash,
     template_id,
     file_name,
     file_type,
     form: $form,
-    ...$form,
   };
 }
 
-function submitted({
-  project_id,
-  object_hash,
-  template_id,
-  file_name,
-  file_type,
-  form,
-}) {
-  file_name = file_name.replace("_free", "");
-  var export_params = `file_name=${file_name}&file_type=${file_type}`;
+function simulateProgress() {
+  let progress = 0;
+  const progressInterval = setInterval(function () {
+    if (progress >= 95) {
+      clearInterval(progressInterval); // Stop the progress before it reaches 100%
+    } else {
+      progress += Math.random() * 5; // Increment the progress bar
+      $(".export-proggress-title-inner").width(`${progress}%`);
+    }
+  }, 500); // Update progress every 500ms
+}
 
+function submitted({ template_id, file_name, file_type, form }) {
+  file_name = file_name.replace("_free", ""); // Clean up the file name
+  const export_params = `file_name=${file_name}&file_type=${file_type}`;
+
+  // Start the progress UI immediately
   $(".export-proggress").removeClass("d-none");
 
-  if (project_id) {
-    exportProject(project_id, export_params);
-  } else {
-    createProject(template_id, object_hash, function (error, project) {
-      if (!error) {
-        saveProject(project.project_id, false, template_id, object_hash);
-        $(form).data("project", project.project_id);
-        $('[data-template="' + template_id + '"]').data(
-          "project",
-          project.project_id
-        );
-        exportProject(project.project_id, export_params);
-      }
-    });
-  }
+  // Simulate the progress bar moving forward
+  simulateProgress();
+
+  // Start the export process
+  exportTemplate(template_id, export_params);
 
   return false;
 }
 
-function directDownload({
-  project_id,
-  object_hash,
-  template_id,
-  file_name,
-  file_type,
-  templateDiv,
-}) {
-  file_name = file_name.replace("_free", "");
-  var export_params = `file_name=${file_name}&file_type=${file_type}`;
+function directDownload({ template_id, file_name, file_type, templateDiv }) {
+  file_name = file_name.replace("_free", ""); // Clean up the file name
+  const export_params = `file_name=${file_name}&file_type=${file_type}`;
 
+  // Start the loading indicator on the template div
   $(templateDiv).loading();
 
-  if (project_id) {
-    directExport(project_id, export_params, templateDiv);
-  } else {
-    createProject(template_id, object_hash, function (error, project) {
-      if (!error) {
-        saveProject(project.project_id, false, template_id, object_hash);
-        $(templateDiv).data("project", project.project_id);
-        $('[data-template="' + template_id + '"]').data(
-          "project",
-          project.project_id
-        );
-        directExport(project.project_id, export_params, templateDiv);
-      }
-    });
-  }
+  // Show the progress UI
+  $(".export-proggress").removeClass("d-none");
+
+  // Simulate progress
+  simulateProgress();
+
+  // Initiate the direct export
+  directExport(template_id, export_params, templateDiv);
 
   return false;
 }
@@ -897,57 +707,89 @@ function getParameterByName(name, url = window.location.href) {
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-function directExport(project_id, export_params, templateDiv) {
-  var export_link = "/templates/export/" + project_id;
-  var url = encodeURI(export_link + "?" + export_params);
-  url = url.replace(/#/g, "%23");
-  $.get(url, function (res) {
-    var downloaded = false;
-    window.exportInterval = setInterval(function () {
-      $.get(`${res.data.link}`, function (res) {
-        if (res.data.download_url && !downloaded) {
+function directExport(template_id, export_params, templateDiv) {
+  const export_link = `/templates/export/${template_id}`;
+  const url = encodeURI(`${export_link}?${export_params}`);
+
+  // Make the request to export the file
+  $.get({
+    url: url,
+    xhrFields: {
+      responseType: "blob", // Expect binary data (Blob) as the response
+    },
+    success: function (res) {
+      let downloaded = false;
+
+      window.exportInterval = setInterval(function () {
+        if (!downloaded) {
           downloaded = true;
           cancelExport();
-          window.exportTimeout = setTimeout(function () {
+
+          setTimeout(function () {
+            // Stop the loading indicator and progress UI
             $(templateDiv).stopLoading();
-            if (res.data.local) {
-              const link = document.createElement("a");
-              link.href = res.data.download_url;
-              const params = new Proxy(new URLSearchParams(url), {
-                get: (searchParams, prop) => searchParams.get(prop),
-              });
-              link.download = getParameterByName("file_name", url);
-              link.click();
-            } else {
-              window.location.href = res.data.download_url;
-            }
+            $(".export-proggress-title-inner").width("100%");
+
+            // Create a Blob from the response data (res is already a Blob)
+            const blob = new Blob([res], { type: res.type });
+            const link = document.createElement("a");
+            const fileName = getParameterByName("file_name", url); // Extract filename from params
+
+            // Create a download link
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName || "downloaded_file";
+            link.click();
+
+            // Close the export modal after a short delay
+            setTimeout(closeExportModal, 1000);
           }, 1000);
         }
-      });
-    }, 1000);
+      }, 1000);
+    },
+    error: function () {
+      console.error("Error during file export");
+    },
   });
 }
 
-function exportProject(project_id, params) {
-  var export_link = "/templates/export/" + project_id;
-  var url = encodeURI(export_link + "?" + params);
-  url = url.replace(/#/g, "%23");
-  $.get(url, function (res) {
-    if ($(".export-proggress").is(":visible")) {
-      checkJobProggress(`${res.data.link}`, url);
-    }
+function exportTemplate(template_id, export_params) {
+  const export_link = `/templates/export/${template_id}`;
+  const url = encodeURI(`${export_link}?${export_params}`);
+
+  // Make the request to export the file with Blob handling
+  $.get({
+    url: url,
+    xhrFields: {
+      responseType: "blob", // Expect binary data as Blob
+    },
+    success: function (res) {
+      $(".export-proggress-title-inner").width("100%");
+
+      const blob = new Blob([res], { type: res.type });
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = getParameterByName("file_name", url) || "downloaded_file";
+      link.click();
+      
+      setTimeout(closeExportModal, 1000);
+    },
+    error: function () {
+      console.error("Error during file export");
+    },
   });
 }
 
-function checkJobProggress(link, url) {
-  var downloaded = false;
+function checkJobProgress(link, url) {
+  let downloaded = false;
+
   window.exportInterval = setInterval(function () {
     $.get(link, function (res) {
       if (res.data.download_url && !downloaded) {
         downloaded = true;
         cancelExport();
         $(".export-proggress-title-inner").width("100%");
-        window.exportTimeout = setTimeout(function () {
+
+        setTimeout(function () {
           if (res.data.local) {
             const link = document.createElement("a");
             link.href = res.data.download_url;
@@ -958,9 +800,10 @@ function checkJobProggress(link, url) {
           }
           closeExportModal();
         }, 1000);
-      } else {
+      } else if (res.data.progress_percentage) {
+        // Update progress based on backend
         $(".export-proggress-title-inner").width(
-          res.data.progress_percentage + "%"
+          `${res.data.progress_percentage}%`
         );
       }
     });
@@ -972,11 +815,36 @@ function cancelExport() {
   clearTimeout(window.exportTimeout);
 }
 
-function saveProject(projectId, isFavorite, template_id, custom_hash) {
-  $.post("/projects/save/" + projectId + "?favorite=" + (isFavorite || false), {
-    template_id,
-    custom_hash,
+function saveProject(isFavorite, designId) {
+  const endpoint = isFavorite
+    ? "/templates/addFavorite"
+    : "/templates/removeFavorite";
+
+  $.post(endpoint, { designId }, function (response) {
+    if (response.success) {
+      console.log("Favorite updated successfully");
+    } else {
+      console.error("Error updating favorite:", response.error);
+    }
   });
+}
+
+function onAddFavorite(button) {
+  const $template = $(button).siblings("[data-export]");
+  const designId = $template.data("template");
+
+  fbq("trackCustom", "AddedFavorite", { template: designId });
+
+  saveProject(true, designId);
+}
+
+function onRemoveFavorite(button) {
+  const $template = $(button).siblings("[data-export]");
+  const designId = $template.data("template ");
+
+  fbq("trackCustom", "RemovedFavorite", { template: designId });
+
+  saveProject(false, designId);
 }
 
 function validate_ai_field(row_class_name) {
@@ -1155,61 +1023,7 @@ function generate(row) {
           getCustomization(
             { row_class_name: row_class_name },
             function (data, err) {
-              if (data && data.object_hash) {
-                DSHDEditorLib.getVariableTemplatePreviewURL(
-                  {
-                    template_id: template.template_id,
-                    customizations_hash: data.object_hash,
-                    width: 600,
-                  },
-                  function (error, image_url) {
-                    if (!error) {
-                      var preview_image = new Image();
-                      preview_image.src = image_url;
-                      preview_image.style.objectFit = "cover";
-                      preview_image.onload = function () {
-                        // var $form = $template.closest('[name="export_form"]');
-
-                        $form.find(".new-popup-footer").css({
-                          opacity: 1.0,
-                          "pointer-events": "auto",
-                        });
-
-                        $form.data("hash", data.object_hash);
-                        $template.data("hash", data.object_hash);
-                        $template
-                          .find("img")
-                          .not(".loader")
-                          .replaceWith(preview_image);
-                        $("img").bind("contextmenu", function (e) {
-                          return false;
-                        });
-                        $template
-                          .find("img")
-                          .not(".loader")
-                          .first()
-                          .addClass("blur-template");
-                        hideLoader($template);
-                      };
-                      preview_image.onerror = function () {
-                        hideLoader($template);
-                        closeExportModal();
-                        toggleStep("generate");
-                        alert("Failed to load template.");
-                        const usage = res.usage;
-                        $.post(`/generator/usage/${usage._id}/delete`);
-                        return;
-                      };
-                    } else {
-                      console.log(error);
-                      hideLoader($template);
-                      closeExportModal();
-                      toggleStep("generate");
-                      alert(JSON.stringify(error));
-                      return;
-                    }
-                  }
-                );
+              if (data) {
               } else {
                 console.log(data, err);
                 hideLoader($template);

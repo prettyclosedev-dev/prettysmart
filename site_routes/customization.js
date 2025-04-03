@@ -214,6 +214,7 @@ module.exports = () => {
                               ai_error = open_ai_content.find(
                                 (ai) => ai.failed
                               );
+                              console.log("ai_error", ai_error)
                               if (ai_error) {
                                 open_ai_content.splice(
                                   open_ai_content.indexOf(ai_error),

@@ -1,257 +1,314 @@
 const express = require("express");
 const router = express.Router();
-const Huddle = require("../huddle");
 const fs = require("fs");
 const config = require("../config.json");
-const serverUrl = config.BASE_URL;
 const path = require("path");
-const rp = require("request-promise");
+const {
+  getDesigns,
+  getDesignsCount,
+  getBrandedDesign,
+  getBrandedDesigns,
+} = require("../clyps_api");
+const fetchSizesMiddleware = require("./sizes-middleware");
+const { getUserFavorites } = require("../clyps_brand_update");
 
 module.exports = () => {
+  router.use(fetchSizesMiddleware);
+
   router.get("/", async (req, res) => {
-    db.pages.find(
-      {
-        type: "size",
-      },
-      async function (err, sizes) {
-        sizes = _.orderBy(sizes, "order");
-        let carouselQuery = getCarouselQuery(sizes);
+    const sizes = req.session.sizes;
+    const sizeNames = sizes.map((size) => size.name);
+    let categorizedDesigns = [];
+    const userEmail = req.user.email;
 
-        db.pages.find(carouselQuery, async function (err, rows) {
-          await Promise.all(
-            rows.map(async (row) => {
-              let rowQuery = getQuery(req, row, sizes);
-              let rowTemplates = await Huddle.getTemplates(rowQuery);
-              let templateItems = rowTemplates.data.items;
-              row.templates = templateItems;
-              row.rowQuery = rowQuery;
-            })
-          );
+    try {
+      const favoritesData = await getUserFavorites(userEmail);
+      const favoriteIds = favoritesData
+        ? favoritesData.map((fav) => fav.id)
+        : [];
 
-          res.render("templates", {
-            sizes: sizes,
-            templates: _.orderBy(rows, "position"),
-            row: { templates: [] },
-            cache: true,
-            filename: "templates",
-            pageTitle: "Brand Collateral",
+      const designsData = await getDesigns({
+        where: {
+          AND: [
+            {
+              categories: {
+                some: {
+                  availableOnPages: {
+                    has: "Collateral",
+                  },
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      if (designsData && designsData.designs) {
+        designsData.designs.forEach((design) => {
+          design.isFavorite = favoriteIds.includes(design.id);
+          design.categories.forEach((category) => {
+            if (!sizeNames.includes(category.name)) {
+              let categoryIndex = categorizedDesigns.findIndex(
+                (cat) => cat.name === category.name
+              );
+
+              if (categoryIndex === -1) {
+                categorizedDesigns.push({
+                  id: category.id,
+                  name: category.name,
+                  creatorId: category.creatorId,
+                  public: category.public,
+                  tags: category.tags,
+                  templates: [design],
+                  sizes: [],
+                  default_size: category.size || 40,
+                });
+              } else {
+                categorizedDesigns[categoryIndex].templates.push(design);
+              }
+            }
           });
         });
       }
-    );
+    } catch (error) {
+      console.log(error);
+    }
+
+    return res.render("templates", {
+      sizes: sizes,
+      templates: categorizedDesigns,
+      row: { templates: [] },
+      cache: true,
+      filename: "templates",
+      pageTitle: "Brand Collateral",
+    });
   });
 
   router.post("/refetch?", async (req, res) => {
-    db.pages.find(
-      {
-        type: "size",
-      },
-      async function (err, sizes) {
-        sizes = _.orderBy(sizes, "order");
-        let carouselQuery = getCarouselQuery(sizes, req.body.row_name);
+    const sizes = req.session.sizes;
+    const sizeNames = sizes.map((size) => size.name);
+    let categorizedDesigns = [];
 
-        db.pages.find(carouselQuery, async function (err, rows) {
-          await Promise.all(
-            rows.map(async (row) => {
-              let rowQuery = getQuery(req, row, sizes);
-              let rowTemplates = await Huddle.getTemplates(rowQuery);
-              let templateItems = rowTemplates.data.items;
-              row.templates = templateItems;
-              row.rowQuery = rowQuery;
-            })
-          );
+    try {
+      const designsData = await getDesigns({
+        where: {
+          AND: [
+            {
+              categories: {
+                some: {
+                  availableOnPages: {
+                    has: "Collateral",
+                  },
+                },
+              },
+            },
+            {
+              categories: {
+                some: {
+                  name: {
+                    contains: req.body.row_name,
+                    mode: "insensitive",
+                  },
+                },
+              },
+            },
+          ],
+        },
+      });
 
-          res.render("templates", {
-            sizes: sizes,
-            templates: [],
-            row: rows[0],
-            cache: true,
-            filename: "templates",
-            pageTitle: "Brand Collateral",
+      if (designsData && designsData.designs) {
+        designsData.designs.forEach((design) => {
+          design.categories.forEach((category) => {
+            if (!sizeNames.includes(category.name)) {
+              let categoryIndex = categorizedDesigns.findIndex(
+                (cat) => cat.name === category.name
+              );
+
+              if (categoryIndex === -1) {
+                categorizedDesigns.push({
+                  id: category.id,
+                  name: category.name,
+                  creatorId: category.creatorId,
+                  public: category.public,
+                  tags: category.tags,
+                  templates: [design],
+                  sizes: [],
+                  default_size: category.size || 40,
+                });
+              } else {
+                categorizedDesigns[categoryIndex].templates.push(design);
+              }
+            }
           });
         });
       }
-    );
-  });
+    } catch (error) {
+      console.log(error);
+    }
 
-  router.get("/resize?", (req, res) => {
-    db.pages.findOne(
-      {
-        _id: req.query.row,
-        type: "carousel",
-      },
-      function (err, row) {
-        db.pages.find(
-          {
-            type: "size",
-          },
-          async function (err, sizes) {
-            if (row.sizes && row.sizes.length) {
-              row.sizes = row.sizes.map((size) => {
-                return sizes.find((s) => s._id === size);
-              });
-            }
-
-            let rowQuery = {
-              user: req.user,
-              category: row.templates_category,
-            };
-
-            if (req.query.size && row.sizes && row.sizes.length) {
-              let default_size = row.sizes.find((size) => {
-                return size._id === req.query.size;
-              });
-
-              if (default_size) {
-                rowQuery.size = {
-                  width: default_size.width,
-                  height: default_size.height,
-                };
-                // row.default_size = default_size;
-              } else {
-                rowQuery.size = {
-                  width: row.sizes[0].width,
-                  height: row.sizes[0].height,
-                };
-              }
-            }
-
-            if (row.default_tag) {
-              rowQuery.search = row.default_tag;
-            }
-
-            let templates = await Huddle.getTemplates(rowQuery);
-            let templateItems = templates.data.items;
-            row.templates = templateItems;
-
-            res.render("templates", {
-              row: row,
-              templates: [],
-              cache: true,
-              filename: "templates",
-              pageTitle: "Brand Collateral",
+    await Promise.all(
+      categorizedDesigns.map(async (category) => {
+        const sizePromises = sizes.map(async (size) => {
+          try {
+            const designsCountData = await getDesignsCount({
+              where: {
+                AND: [
+                  {
+                    categories: {
+                      some: {
+                        name: { contains: category.name, mode: "insensitive" },
+                      },
+                    },
+                  },
+                  {
+                    categories: {
+                      some: {
+                        name: { contains: size.name, mode: "insensitive" },
+                      },
+                    },
+                  },
+                  {
+                    categories: {
+                      some: {
+                        availableOnPages: { has: "Collateral" },
+                      },
+                    },
+                  },
+                ],
+              },
             });
+
+            if (designsCountData.designsCount > 0) {
+              return size; // Return size if a match is found
+            }
+          } catch (error) {
+            console.log(error);
+            return null; // Return null in case of an error
           }
-        );
-      }
+
+          return null; // Return null if no designs are found
+        });
+
+        // Wait for all size checks and filter valid sizes
+        const validSizes = (await Promise.all(sizePromises)).filter(Boolean);
+        category.sizes.push(...validSizes); // Push valid sizes to the category
+      })
     );
+
+    return res.render("templates", {
+      sizes,
+      templates: [],
+      row: categorizedDesigns[0],
+      cache: true,
+      filename: "templates",
+      pageTitle: "Brand Collateral",
+    });
   });
 
-  router.get("/export/:project", async function (req, res) {
-    let project_export_job = await Huddle.newExportJob({
-      user: req.user,
-      project: req.params.project,
-      format: req.query.file_type,
-      filename: req.query.file_name,
-      cropmarks: req.query.file_crop,
-    });
+  router.get("/resize?", async (req, res) => {
+    const sizes = req.session.sizes;
+    const sizeNames = sizes.map((size) => size.name);
+    const { row, size } = req.query;
+    let newRow = {};
 
-    res.redirect(
-      `/templates/export/${req.params.project}/${project_export_job.data.job_id}`
-    );
-  });
-
-  router.get("/export/:project/:job", async function (req, res) {
-    let project_export_job = await Huddle.getExportJob({
-      user: req.user,
-      project: req.params.project,
-      job: req.params.job,
-    });
-
-    res.send({
-      data: Object.assign(
-        {
-          link: "/templates" + req.path,
+    try {
+      const designsData = await getDesigns({
+        where: {
+          AND: [
+            {
+              categories: {
+                some: {
+                  id: {
+                    equals: parseInt(row),
+                  },
+                },
+              },
+            },
+            {
+              categories: {
+                some: {
+                  name: {
+                    contains: size,
+                    mode: "insensitive",
+                  },
+                },
+              },
+            },
+            // {
+            //   categories: {
+            //     some: {
+            //       availableOnPages: {
+            //         has: "Collateral",
+            //       },
+            //     },
+            //   },
+            // },
+          ],
         },
-        project_export_job.data
-      ),
+      });
+
+      newRow = {
+        templates: designsData.designs,
+        sizes: [],
+      };
+
+      const sizePromises = sizes.map(async (size) => {
+        try {
+          const designsCountData = await getDesignsCount({
+            where: {
+              AND: [
+                {
+                  categories: {
+                    some: {
+                      id: { equals: parseInt(row) },
+                    },
+                  },
+                },
+                {
+                  categories: {
+                    some: {
+                      name: { contains: size.name, mode: "insensitive" },
+                    },
+                  },
+                },
+                // Uncomment this if needed
+                // {
+                //   categories: {
+                //     some: {
+                //       availableOnPages: { has: "Collateral" },
+                //     },
+                //   },
+                // },
+              ],
+            },
+          });
+
+          if (designsCountData.designsCount > 0) {
+            return size; // Return size if designs are found
+          }
+        } catch (error) {
+          console.log(error);
+          return null; // Return null if an error occurs
+        }
+        return null; // Return null if no designs are found
+      });
+
+      // Wait for all promises to complete and filter valid sizes
+      const validSizes = (await Promise.all(sizePromises)).filter(Boolean);
+      newRow.sizes.push(...validSizes); // Add valid sizes to newRow
+    } catch (error) {
+      console.error("Error fetching designs for new size:", error);
+      return res.status(500).send("An error occurred while resizing.");
+    }
+
+    res.render("templates", {
+      row: newRow,
+      templates: [],
+      cache: true,
+      filename: "templates",
+      pageTitle: "Brand Collateral",
     });
   });
 
   return router;
 };
-
-function getQuery(req, row, sizes) {
-  if (row.sizes && row.sizes.length) {
-    row.sizes = row.sizes.map((size) => {
-      return sizes.find((s) => s._id === size);
-    });
-  }
-
-  let rowQuery = {
-    user: req.user,
-    category: row.templates_category,
-  };
-
-  if (row.sizes && row.sizes.length) {
-    if (!row.default_size) {
-      row.default_size = row.sizes[0]._id;
-    }
-
-    let default_size = row.sizes.find((size) => {
-      return size._id === row.default_size;
-    });
-
-    if (default_size) {
-      rowQuery.size = {
-        width: default_size.width,
-        height: default_size.height,
-      };
-    } else {
-      rowQuery.size = {
-        width: row.sizes[0].width,
-        height: row.sizes[0].height,
-      };
-    }
-  }
-
-  if (row.default_tag) {
-    rowQuery.search = row.default_tag;
-  }
-
-  return rowQuery;
-}
-
-function getCarouselQuery(sizes, specific) {
-  let today = new Date();
-
-  let carouselQuery = {
-    type: "carousel",
-    templates_category: 41,
-    // name: specific || { $regex: "Collateral" },
-    $or: [
-      {
-        start_date: null,
-        end_date: null,
-      },
-      {
-        start_date: {
-          $lte: today,
-        },
-        end_date: {
-          $gte: today,
-        },
-      },
-      {
-        start_date: {
-          $lte: today,
-        },
-        end_date: null,
-      },
-      {
-        start_date: null,
-        end_date: {
-          $gte: today,
-        },
-      },
-    ],
-  };
-
-  if (!global.isDev) {
-    carouselQuery.isDev = {
-      $ne: true,
-    };
-  }
-
-  return carouselQuery;
-}

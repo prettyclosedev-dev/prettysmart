@@ -150,19 +150,24 @@ module.exports = () => {
   return router;
 };
 
-async function getPlans(affiliate) {
+async function getPlans() {
   try {
-    const plans = await stripe.plans.list({ active: true, limit: 20 });
+    const plans = await stripe.plans.list({ active: true, limit: 40 });
     const products = await stripe.products.list({ active: true });
 
     const indexOfBasic = products.data
       .map((prod) => prod.name)
       .indexOf("Basic");
-    products.data.splice(indexOfBasic, 1);
+    if (indexOfBasic > -1) {
+      products.data.splice(indexOfBasic, 1);
+    }
+
     const indexOfBrandHelpProd = products.data
       .map((prod) => prod.id)
       .indexOf("prod_LFnXWepOlSCWVD");
-    products.data.splice(indexOfBrandHelpProd, 1);
+    if (indexOfBrandHelpProd > -1) {
+      products.data.splice(indexOfBrandHelpProd, 1);
+    }
 
     const indexOfFree = products.data.map((p) => p.name).indexOf("Free");
     if (indexOfFree > -1) {
@@ -181,12 +186,34 @@ async function getPlans(affiliate) {
       products.data.splice(indexOfUnlimited, 1);
     }
 
+    const indexOfPro = products.data.map((p) => p.name).indexOf("Pro");
+    if (indexOfPro > -1) {
+      products.data.splice(indexOfPro, 1);
+    }
+
+    const indexOfBusiness = products.data
+      .map((p) => p.name)
+      .indexOf("Business");
+    if (indexOfBusiness > -1) {
+      products.data.splice(indexOfBusiness, 1);
+    }
+
+    const indexOfAgency = products.data.map((p) => p.name).indexOf("Agency");
+    if (indexOfAgency > -1) {
+      products.data.splice(indexOfAgency, 1);
+    }
+
     if (products && products.data) {
       products.data.map((product) => {
         product.prices = {
           year: getPricePerProduct(product.id, plans, "year"),
           month: getPricePerProduct(product.id, plans, "month"),
         };
+
+        if (product.name === "Team") {
+          product.prices.month.amount *= 2; // Minimum of 2 agents
+          product.prices.year.amount *= 2; // Minimum of 2 agents
+        }
       });
 
       products.data.sort((a, b) => {

@@ -1,20 +1,14 @@
 const express = require("express");
 const Huddle = require("../huddle");
 const router = express.Router();
-const User = require("../schemas/user");
 const Account = require("../schemas/account");
 const fs = require("fs");
 const rp = require("request-promise");
 const config = require("../config.json");
 const HuddleAdmin = require("../admin_huddle");
 const TextToSVG = require("text-to-svg");
-const vectorExpress = require("@smidyo/vectorexpress-nodejs");
 const path = require("path");
-const openAi = require("../openAi");
-const _ = require("lodash");
-const sgMail = require("@sendgrid/mail");
 const { searchContactByEmail, updateContact } = require("../hubspot");
-const stripe = require("stripe")(config.stripe.prod.secret);
 
 var attributes = {
   fill: "#1A428A",
@@ -359,41 +353,34 @@ async function setDefaultFonts(req, user_path) {
 
     fontFamily = fontFamily.charAt(0).toUpperCase() + fontFamily.slice(1);
 
-    if (!req.user.account.brands || !req.user.account.brands.length) {
-      req.user.account.brands = [config.huddle_account.brand]; // TODO: - ADD TO ACCOUNT
-    }
-
-    // Already in huddle
-    let brand_id = req.user.account.brands[0].brand_id;
-
-    await uploadFontToHuddle({
-      name: "Regular",
-      brand_id,
-      upload_path: font_path + regName + type,
-      font_family_name: fontFamily,
-      font_file_name: regName + type,
-    });
-    await uploadFontToHuddle({
-      name: "Italic",
-      brand_id,
-      upload_path: font_path + italicName + type,
-      font_family_name: fontFamily,
-      font_file_name: italicName + type,
-    });
-    await uploadFontToHuddle({
-      name: "Bold",
-      brand_id,
-      upload_path: font_path + boldName + type,
-      font_family_name: fontFamily,
-      font_file_name: boldName + type,
-    });
-    await uploadFontToHuddle({
-      name: "BoldItalic",
-      brand_id,
-      upload_path: font_path + boldItalicName + type,
-      font_family_name: fontFamily,
-      font_file_name: boldItalicName + type,
-    });
+    // await uploadFontToHuddle({
+    //   name: "Regular",
+    //   brand_id,
+    //   upload_path: font_path + regName + type,
+    //   font_family_name: fontFamily,
+    //   font_file_name: regName + type,
+    // });
+    // await uploadFontToHuddle({
+    //   name: "Italic",
+    //   brand_id,
+    //   upload_path: font_path + italicName + type,
+    //   font_family_name: fontFamily,
+    //   font_file_name: italicName + type,
+    // });
+    // await uploadFontToHuddle({
+    //   name: "Bold",
+    //   brand_id,
+    //   upload_path: font_path + boldName + type,
+    //   font_family_name: fontFamily,
+    //   font_file_name: boldName + type,
+    // });
+    // await uploadFontToHuddle({
+    //   name: "BoldItalic",
+    //   brand_id,
+    //   upload_path: font_path + boldItalicName + type,
+    //   font_family_name: fontFamily,
+    //   font_file_name: boldItalicName + type,
+    // });
 
     await syncFontsWithAccount(req, ["poppins"]);
   }

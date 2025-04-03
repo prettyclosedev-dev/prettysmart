@@ -1,22 +1,14 @@
 const fs = require("fs");
 const express = require("express");
 const router = express.Router();
-const rp = require("request-promise");
 const config = require("../config.json");
-const HuddleAdmin = require("../admin_huddle");
 const Huddle = require("../huddle");
 const Account = require("../schemas/account");
-const TextToSVG = require("text-to-svg");
 const vectorExpress = require("@smidyo/vectorexpress-nodejs");
-const sgMail = require("@sendgrid/mail");
-const {
-  searchContactByEmail,
-  getContactById,
-  updateBrandColor,
-  updateBrandLogo,
-  updateBrandFont,
-} = require("../hubspot");
 const stripe = require("stripe")(config.stripe.prod.secret);
+const mailchimp = require("@mailchimp/mailchimp_transactional")(
+  config.mandrill.apiKey
+);
 
 const attributes = {
   fill: "#1A428A",
@@ -47,11 +39,6 @@ module.exports = () => {
 
     // let name = req.user.account.name;
     // let user_path = __dirname + "/../files/" + req.user.account._id;
-
-    let templates = await Huddle.getTemplates({
-      category: 44,
-      user: req.user,
-    });
 
     // if (!fs.existsSync(user_path)) {
     //   fs.mkdirSync(user_path);
@@ -174,7 +161,7 @@ module.exports = () => {
     //   );
     // } else {
     res.render("onboarding", {
-      templates: templates.data.items,
+      templates: [],
       brand: await Huddle.getBrandObject(req.user.account),
       cache: true,
       filename: "onboarding",
@@ -219,7 +206,7 @@ module.exports = () => {
           return res.redirect("back");
         })
         .catch((error) => {
-          console.log(error)
+          console.log(error);
           return res.send(error);
         });
 
@@ -232,9 +219,9 @@ module.exports = () => {
 
   router.get("/transfer", async (req, res) => {
     let user_path = __dirname + "/../files/" + req.user.account._id;
-    let colors = await Huddle.getColors(req.user);
-    let logos = await Huddle.getLogos(req.user);
-    let fonts = await Huddle.getFonts(req.user);
+    let colors,
+      logos,
+      fonts = { data: { items: [] } };
 
     if (!logos.data.items.length) {
       return res.redirect("/onboarding");
@@ -497,167 +484,150 @@ module.exports = () => {
   });
 
   router.post("/font", async (req, res) => {
-    if (!req.user.account.brands || !req.user.account.brands.length) {
-      req.user.account.brands = [config.huddle_account.brand]; // TODO: - ADD TO ACCOUNT
-    }
+    try {
+      let family;
+      let name = req.body.name;
+      let familyFolder;
+      let fontFileName;
+      let font_path;
+      let folder;
+      let value;
+      let isGoogle;
 
-    if (req.user.account.brands && req.user.account.brands.length) {
-      try {
-        let family;
-        let name = req.body.name;
-        let brand_id = req.user.account.brands[0].brand_id;
-        let familyFolder;
-        let fontFileName;
-        let font_path;
-        let folder;
-        let value;
-        let isGoogle;
+      if (req.files && req.files[name]) {
+        let fileName = req.files[req.body.name].name;
+        let fileExt = fileName.split(".").pop();
+        fontFileName = fileName;
+        font_path = __dirname + "/../files/" + req.user.account._id;
+        family = fileName.split(".")[0];
+        familyFolder = family;
 
-        if (req.files && req.files[name]) {
-          let fileName = req.files[req.body.name].name;
-          let fileExt = fileName.split(".").pop();
-          fontFileName = fileName;
-          font_path = __dirname + "/../files/" + req.user.account._id;
-          family = fileName.split(".")[0];
-          familyFolder = family;
-
-          if (fileExt !== "ttf") {
-            return res.send({
-              message: "Invalid font file use ttf",
-              success: false,
-            });
-          }
-
-          if (!fs.existsSync(font_path)) {
-            fs.mkdirSync(font_path);
-          }
-
-          font_path += "/fonts";
-
-          if (!fs.existsSync(font_path)) {
-            fs.mkdirSync(font_path);
-          }
-
-          font_path += "/" + family;
-
-          if (!fs.existsSync(font_path)) {
-            fs.mkdirSync(font_path);
-          }
-
-          let upload_path = font_path + "/" + fileName;
-          folder = await new Promise((resolve, reject) => {
-            req.files[name].mv(upload_path, () => {
-              resolve(upload_path);
-            });
+        if (fileExt !== "ttf") {
+          return res.send({
+            message: "Invalid font file use ttf",
+            success: false,
           });
-        } else {
-          family = req.body.family.replace(/ /g, "");
-          familyFolder = family.replace(/ /g, "").toLowerCase();
-          fontFileName = family + "-" + name + ".ttf";
-          font_path = "./google-fonts/" + familyFolder;
-          value = req.body.value;
-          isGoogle = true;
+        }
 
-          let folderExsist = fs.existsSync(font_path);
-          if (folderExsist) {
-            let fileExsist = fs.existsSync(font_path + "/" + fontFileName);
+        if (!fs.existsSync(font_path)) {
+          fs.mkdirSync(font_path);
+        }
+
+        font_path += "/fonts";
+
+        if (!fs.existsSync(font_path)) {
+          fs.mkdirSync(font_path);
+        }
+
+        font_path += "/" + family;
+
+        if (!fs.existsSync(font_path)) {
+          fs.mkdirSync(font_path);
+        }
+
+        let upload_path = font_path + "/" + fileName;
+        folder = await new Promise((resolve, reject) => {
+          req.files[name].mv(upload_path, () => {
+            resolve(upload_path);
+          });
+        });
+      } else {
+        family = req.body.family.replace(/ /g, "");
+        familyFolder = family.replace(/ /g, "").toLowerCase();
+        fontFileName = family + "-" + name + ".ttf";
+        font_path = "./google-fonts/" + familyFolder;
+        value = req.body.value;
+        isGoogle = true;
+
+        let folderExsist = fs.existsSync(font_path);
+        if (folderExsist) {
+          let fileExsist = fs.existsSync(font_path + "/" + fontFileName);
+          if (fileExsist) {
+            folder = fs.readdirSync(font_path);
+          } else {
+            let fontFiles = fs.readdirSync(font_path);
+            fontFiles = fontFiles.filter((file) => file.endsWith(".ttf"));
+            fontFileName = fontFiles.find((file) => {
+              if (req.body.fontStyle === "italic") {
+                return file.includes(family) && file.includes("Italic");
+              } else {
+                return file.includes(family) && !file.includes("Italic");
+              }
+            });
+
+            if (fontFileName) {
+              console.log(fontFileName);
+            } else {
+              //fontFileName = family + '-Regular.ttf';
+              fontFileName = fontFiles[0];
+            }
+
+            console.log(fontFileName);
+
+            fileExsist = fs.existsSync(font_path + "/" + fontFileName);
             if (fileExsist) {
               folder = fs.readdirSync(font_path);
-            } else {
-              let fontFiles = fs.readdirSync(font_path);
-              fontFiles = fontFiles.filter((file) => file.endsWith(".ttf"));
-              fontFileName = fontFiles.find((file) => {
-                if (req.body.fontStyle === "italic") {
-                  return file.includes(family) && file.includes("Italic");
-                } else {
-                  return file.includes(family) && !file.includes("Italic");
-                }
-              });
-
-              if (fontFileName) {
-                console.log(fontFileName);
-              } else {
-                //fontFileName = family + '-Regular.ttf';
-                fontFileName = fontFiles[0];
-              }
-
-              console.log(fontFileName);
-
-              fileExsist = fs.existsSync(font_path + "/" + fontFileName);
-              if (fileExsist) {
-                folder = fs.readdirSync(font_path);
-              }
             }
           }
         }
+      }
 
-        if (folder) {
-          try {
-            let upload = await HuddleAdmin.uploadFont({
-              name: name,
-              upload_path: font_path + "/" + fontFileName,
-              brand_id: brand_id,
-              font_family_name: family,
-              font_file_name: fontFileName,
+      if (folder) {
+        try {
+          if (req.query.draft) {
+            let account = req.user.account;
+            account.brand.fonts[`${req.body.name}`] = {
+              name: family,
+              value: value,
+              path: familyFolder + "/" + fontFileName,
+              google: isGoogle,
+            };
+
+            return res.send({
+              success: true,
+              brand: await Huddle.getBrandObject(account),
             });
-
-            if (req.query.draft) {
-              let account = req.user.account;
-              account.brand.fonts[`${req.body.name}`] = {
-                name: family,
-                value: value,
-                path: familyFolder + "/" + fontFileName,
-                google: isGoogle,
-              };
-
-              return res.send({
+          } else {
+            let updateObj = {};
+            updateObj[`brand.fonts.${req.body.name}`] = {
+              name: family,
+              value: value,
+              path: familyFolder + "/" + fontFileName,
+              google: isGoogle,
+            };
+            Account.findOneAndUpdate(
+              {
+                _id: req.user.account._id,
+              },
+              {
+                $set: updateObj,
+              },
+              {
+                new: true,
+              }
+            ).then(async (account) => {
+              res.send({
                 success: true,
                 brand: await Huddle.getBrandObject(account),
               });
-            } else {
-              let updateObj = {};
-              updateObj[`brand.fonts.${req.body.name}`] = {
-                name: family,
-                value: value,
-                path: familyFolder + "/" + fontFileName,
-                google: isGoogle,
-              };
-              Account.findOneAndUpdate(
-                {
-                  _id: req.user.account._id,
-                },
-                {
-                  $set: updateObj,
-                },
-                {
-                  new: true,
-                }
-              ).then(async (account) => {
-                res.send({
-                  success: true,
-                  brand: await Huddle.getBrandObject(account),
-                });
-              });
-            }
-          } catch (error) {
-            console.log(error.error ? error.error : error);
-            res.send({
-              success: false,
             });
           }
-        } else {
+        } catch (error) {
+          console.log(error.error ? error.error : error);
           res.send({
             success: false,
           });
         }
-      } catch (error) {
-        console.log(error.error ? error.error : error);
+      } else {
         res.send({
-          error: error.error ? error.error : error,
+          success: false,
         });
       }
-    } else {
-      res.send("Error");
+    } catch (error) {
+      console.log(error.error ? error.error : error);
+      res.send({
+        error: error.error ? error.error : error,
+      });
     }
   });
 
@@ -677,8 +647,8 @@ function sendBrandAssets(data) {
     });
 
     const msg = {
-      to: "brandhelp@prettysmart.co",
-      from: "hi@prettysmart.co",
+      to: "brandhelp@prettyclose.co",
+      from: "hi@prettyclose.co",
       subject: `Brand assets for ${data.user.name},`,
       html: `<div>Please see attached the brand assets for <p>${data.user.name}, email: ${data.user.email}</p></div>`,
       dynamic_template_data: {
@@ -699,5 +669,50 @@ function sendBrandAssets(data) {
       });
   } catch (e) {
     return Error(e);
+  }
+}
+function sendBrandAssets(data) {
+  try {
+    // Prepare attachments
+    const attachments = Object.keys(data.files).map((key) => ({
+      type: data.files[key].mimetype,
+      name: data.files[key].name,
+      content: data.files[key].data.toString("base64"),
+    }));
+
+    // Mailchimp message
+    const message = {
+      from_email: "hi@prettyclose.co", // Your verified sender
+      to: [
+        {
+          email: "brandhelp@prettyclose.co", // Recipient email
+          type: "to",
+        },
+      ],
+      subject: `Brand assets for ${data.user.name},`,
+      html: `<div>Please see attached the brand assets for <p>${data.user.name}, email: ${data.user.email}</p></div>`,
+      global_merge_vars: [
+        {
+          name: "TOKEN", // Matches *|TOKEN|* in your Mailchimp template
+          content: data.user._id, // Dynamic value
+        },
+      ],
+      attachments: attachments,
+    };
+
+    // Send via Mailchimp Transactional
+    mailchimp.messages
+      .send({ message })
+      .then((response) => {
+        console.log("Email sent via Mailchimp:", response);
+        return "done";
+      })
+      .catch((error) => {
+        console.error("Error sending email via Mailchimp:", error);
+        return new Error("error");
+      });
+  } catch (error) {
+    console.error("Unexpected error in sendBrandAssets:", error);
+    return new Error(error.message);
   }
 }

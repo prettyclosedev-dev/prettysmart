@@ -1,57 +1,59 @@
 const express = require("express");
-const fs = require("fs");
 const router = express.Router();
-const Huddle = require("../huddle");
-const Project = require("../schemas/project");
-const User = require("../schemas/user");
-const http = require("https");
+const { getDesigns } = require("../clyps_api");
+const fetchSizesMiddleware = require('./sizes-middleware');
 
 module.exports = () => {
+  router.use(fetchSizesMiddleware);
+
   router.get("/", async (req, res) => {
-    // let projects = await Project.find({
-    //   user: req.user,
-    // }).sort("-created_at");
+    const userEmail = req.user.email;
+    let categorizedDesigns = [];
+    const sizes = req.session.sizes;
 
-    var start = new Date();
-    start.setHours(0, 0, 0, 0);
+    try {
+      // Fetch all designs created by the user, ordered by publishedDate in descending order (latest first)
+      const userDesignsData = await getDesigns({
+        where: {
+          creator: { email: { equals: userEmail } },
+        },
+        orderBy: {
+          publishedDate: "desc",  // Order designs by publishedDate (latest first)
+        },
+      });
 
-    var end = new Date();
-    end.setHours(23, 59, 59, 999);
+      const userDesigns = userDesignsData.designs;
 
-    let todayProjects = await Project.find({
-      user: req.user,
-      created_at: { $gte: start, $lt: end },
-      favorite: {
-        $ne: true,
-      },
-    }).sort("-created_at");
+      if (userDesigns.length) {
+        // Iterate over the available sizes
+        for (const size of sizes) {
+          // Filter designs for the current size based on categories
+          const designsForSize = userDesigns.filter(design => 
+            design.categories.some(category =>
+              category.name.toLowerCase().includes(size.name.toLowerCase())
+            )
+          );
 
-    start.setDate(start.getDate() - 7);
-    end.setDate(end.getDate() - 1);
-
-    let earlierProjects = await Project.find({
-      user: req.user,
-      created_at: { $gte: start, $lt: end },
-      favorite: {
-        $ne: true,
-      },
-    }).sort("-created_at");
-
-    let folder = __dirname + "/../files/" + req.user.account._id + "/projects";
-
-    todayProjects = todayProjects.filter((project) => {
-      const finalPath = folder + "/" + project.project_id + ".jpg";
-      return fs.existsSync(finalPath);
-    });
-
-    earlierProjects = earlierProjects.filter((project) => {
-      const finalPath = folder + "/" + project.project_id + ".jpg";
-      return fs.existsSync(finalPath);
-    });
+          // Only add a category if there are designs for that size
+          if (designsForSize.length) {
+            categorizedDesigns.push({
+              id: size.id,
+              name: size.name,
+              templates: designsForSize,  // Designs already ordered by date
+              sizes: [size],
+              default_size: size.id,
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching designs:", error);
+    }
 
     res.render("recents", {
-      todayProjects: todayProjects,
-      earlierProjects: earlierProjects,
+      sizes,
+      templates: categorizedDesigns,
+      row: { templates: [] },
       cache: true,
       filename: "recents",
     });

@@ -1,0 +1,99 @@
+<%
+    function isAllowedDownload(file_name) {
+        return (
+            (plan_name && plan_name !== "Free" && !payment_failed) ||
+            file_name.includes("_free")
+        );
+    }
+%>
+<% templates.forEach((templateType, index) => { %>
+    <div id="<%= templateType.id %>" class="item-wrapper" data-default-size="<%= templateType.default_size %>">
+      <div class="df aic item-header">
+        <p><%-templateType.name%></p>
+        <div class="mla">
+          <%  if (templateType.name === "Newsroom" || templateType.name.includes("Reviews") || templateType.name.includes("Q&A")) { %>
+          <div class="orientation-selection-wrapper" style="margin-left: 20px;">
+            <% if(templateType.ai_field){ %>
+            <% if (templateType.name === 'Q&A') {  %>
+            <textarea style="margin-right: 20px; text-align:center;" type="text" class="ui-widget ai_field" placeholder="<%= templateType.ai_field_placeholder || templateType.name === 'Newsroom' ? 'Enter search term or full url' : templateType.name.includes('Reviews') ? 'Search for a place name or ID' : templateType.name === 'Q&A' ? 'Enter a url or text of article, text in a Q&A format or search for a topic' : '' %>" name="<%= templateType.ai_field %>"></textarea>
+            <% } else {  %>
+            <input style="margin-right: 20px; text-align:center;" type="text" class="ui-widget ai_field" placeholder="<%= templateType.ai_field_placeholder || templateType.name === 'Newsroom' ? 'Enter search term or full url' : templateType.name.includes('Reviews') ? 'Search for a place name or ID' : templateType.name === 'Q&A' ? 'Enter a url or text of article, text in a Q&A format or search for a topic' : '' %>" name="<%= templateType.ai_field %>"/>
+            <% }  %>
+            <a href="#" class="refresh-link px-lg-3 badge-pill text-white" onclick="generate(<%= JSON.stringify(templateType) %>)">
+              <span class="">
+                Generate
+              </span>
+            </a>
+            <% } %>
+          </div>
+          <% } else { %>
+          <div class="orientation-selection-wrapper">
+            <% 
+              function sizeOptions(selectedRow) {
+                return selectedRow.sizes.map(function (size, index) {
+                  return {value: size.name, id: size.id, selected: size.id === selectedRow.default_size, row: selectedRow, size};
+                }) 
+              }
+            %>
+            <% if (templateType.sizes) { %>
+            <%- include('segment-control', {async: true, options: sizeOptions(templateType), inverted: false, segmentID: index + "-seg"}); %>
+            <% } %>
+          </div>
+          <% } %>
+        </div>
+      </div>
+      <div class="swiper" style="width: 100%;">
+        <div id="swiper-wrapper-<%= templateType.id %>" class="swiper-wrapper">
+          <!-- Slides -->
+          <% templateType.templates.forEach((template, idx) => {%>
+          <div class="swiper-slide">
+            <div class="template">
+              <%- include('template', {async: true, template: template}); %>
+              <div class="favorite-wrapper <%= template.isFavorite ? 'liked' : '' %>">
+                <span class="like-icon">
+                  <div class="heart-animation-1"></div>
+                  <div class="heart-animation-2"></div>
+                </span>
+                Favorite
+              </div>
+              <% if (template.name.includes("_free")) { %>
+              <div class="tag fs14 ttuc" style="background-color: #db3965;">Free!</div>
+              <% } %>
+              <div class="download-wrapper">
+                <!--  -->
+                <div class="download-button primary-btn btn-group dropup" style="display: inline-flex;">
+                  <button class="btn btn-med download-button-item" value="jpg" type="button" <% if (!isAllowedDownload(template.name)) { %> style="justify-content: center;" onclick="location.href='/plans';" <% } %>>
+                    <%= isAllowedDownload(template.name) ? 'Download JPG' : 'Upgrade plan' %>
+                  </button>
+                  <% if (isAllowedDownload(template.name)) { %>
+                  <button type="button" class="btn btn-med dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="sr-only">Select download type</span>
+                    <i class="fa-regular fa-chevron-down"></i>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-right">
+                    <button class="dropdown-item download-button-item" value="png">Download PNG</button>
+                    <button class="dropdown-item download-button-item" value="pdf">Download PDF</button>
+                    <button class="dropdown-item download-button-item" value="pdf_flattened">Download PDF Flattened</button>
+                  </div>
+                  <% } %>
+                </div>
+                <!--  -->
+              </div>
+            </div>
+          </div>
+          <%})%>
+          <% if (templateType.totalPages > 1) { %>
+          <div class="swiper-slide load-more-slide" id="load-more-slide-<%= templateType.id %>">
+            <div class="load-more-thumbnail">
+              <button class="load-more" data-category-id="<%= templateType.id %>" data-current-page="1" data-total-pages="<%= templateType.totalPages %>">
+                Load More
+              </button>
+            </div>
+          </div>
+          <% } %>
+        </div>
+        <div class="swiper-button-prev hidden"></div>
+        <div class="swiper-button-next hidden"></div>
+      </div>
+    </div>
+<%})%>

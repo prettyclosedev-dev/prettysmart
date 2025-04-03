@@ -15,10 +15,12 @@ module.exports = {
   getShortSlogan,
 };
 
-async function getIndustryAndWhatWeAre(options) {
+async function getIndustryAndWhatWeAre(options = {}) {
+  return null;
+
   try {
     const gptResponse = await openai.complete({
-      engine: "davinci",
+      engine: "gpt-3.5-turbo",
       prompt: `
             description is a users interpretation of what a brand does.
             industry describes the industry of the described company. for use in a sentence like "we are the best in the music industry".
@@ -81,9 +83,11 @@ async function getIndustryAndWhatWeAre(options) {
 }
 
 async function getSlogan(options) {
+  return null;
+
   try {
     const gptResponse = await openai.complete({
-      engine: "davinci",
+      engine: "gpt-3.5-turbo",
       prompt: `
             creative slogan generator. all slogans are really clever.
             ##
@@ -166,9 +170,11 @@ async function getSlogan(options) {
 }
 
 async function getKeywordsA(options) {
+  return null;
+
   try {
     const gptResponse = await openai.complete({
-      engine: "davinci-instruct-beta",
+      engine: "gpt-3.5-turbo-instruct-beta",
       prompt: `
             create 3 examples for each of the following, based on a description of a company, and the related industry.
             employee: generate 3 creative sample for someone who might work for this industry 
@@ -284,9 +290,11 @@ async function getKeywordsA(options) {
 }
 
 async function getKeywordsB(options) {
+  return null;
+
   try {
     const gptResponse = await openai.complete({
-      engine: "davinci-instruct-beta",
+      engine: "gpt-3.5-turbo-instruct-beta",
       prompt: `
             create 3 examples for each of the following, based on a description of a company, and the related industry.
             adjective: generate 3 positive adjectives, for use with deliverable.
@@ -391,9 +399,11 @@ async function getKeywordsB(options) {
 }
 
 async function getPlurals(options) {
+  return null;
+
   try {
     const gptResponse = await openai.complete({
-      engine: "davinci-instruct-beta",
+      engine: "gpt-3.5-turbo-instruct-beta",
       prompt: `
             convert the input terms to plural.
             #
@@ -424,9 +434,11 @@ async function getPlurals(options) {
 }
 
 async function getSuperlatives(options) {
+  return null;
+
   try {
     const gptResponse = await openai.complete({
-      engine: "davinci-instruct-beta",
+      engine: "gpt-3.5-turbo-instruct-beta",
       prompt: `convert the following adjectives to superlatives. if there are no correct superlatives for that word, add "most" before it. don't add any modifiers or grammatical articles.
 
             adjective: creative, fresh, many
@@ -466,9 +478,15 @@ async function getSuperlatives(options) {
 }
 
 async function getTagline(description) {
+  return null;
+
   let industry_whatWeAre = await getIndustryAndWhatWeAre({
     description: description,
   });
+  if (!industry_whatWeAre)  {
+    return
+  }
+
   let slogan = await getSlogan({
     description: description,
     industry: industry_whatWeAre.industry,
@@ -483,14 +501,24 @@ async function getTagline(description) {
 }
 
 async function getAIFields(description) {
+  return null;
+
   if (!description) {
+    console.log("Description is missing.");
     return;
   }
 
   try {
-    let industry_whatWeAre = await getIndustryAndWhatWeAre({
-      description: description,
-    });
+    let industry_whatWeAre = await getIndustryAndWhatWeAre({ description });
+
+    // Debugging: Log the response from getIndustryAndWhatWeAre
+    console.log("Industry and What We Are:", industry_whatWeAre);
+
+    if (!industry_whatWeAre || !industry_whatWeAre.industry) {
+      console.log("Industry or 'What We Are' is missing.");
+      return;
+    }
+
     let keywordsA = await getKeywordsA({
       description: description,
       industry: industry_whatWeAre.industry,
@@ -601,109 +629,18 @@ async function getAIFields(description) {
       benefit_1: keywords.benefit ? trim(keywords.benefit.split(",")[0]) : "",
       benefit_2: keywords.benefit ? trim(keywords.benefit.split(",")[1]) : "",
       benefit_3: keywords.benefit ? trim(keywords.benefit.split(",")[2]) : "",
-
-      // employee : {
-      //     1 : {
-      //         keyword : trim(keywords.employee.split(',')[0]),
-      //         plural: trim(plurals.plurals[0])
-      //     },
-      //     2 : {
-      //         keyword : trim(keywords.employee.split(',')[1]),
-      //         plural: trim(plurals.plurals[1])
-      //     },
-      //     3 : {
-      //         keyword : trim(keywords.employee.split(',')[2]),
-      //         plural: trim(plurals.plurals[2])
-      //     }
-      // },
-      // verb : {
-      //     1 : {
-      //         keyword : trim(keywords['current verb'].split(',')[0])
-      //     },
-      //     2 : {
-      //         keyword : trim(keywords['current verb'].split(',')[1])
-      //     },
-      //     3 : {
-      //         keyword : trim(keywords['current verb'].split(',')[2])
-      //     }
-      // },
-      // need : {
-      //     1 : {
-      //         keyword : trim(keywords['you need it for your'].split(',')[0]),
-      //         plural: trim(plurals.plurals[3])
-      //     },
-      //     2 : {
-      //         keyword : trim(keywords['you need it for your'].split(',')[1]),
-      //         plural: trim(plurals.plurals[4])
-      //     },
-      //     3 : {
-      //         keyword : trim(keywords['you need it for your'].split(',')[2]),
-      //         plural: trim(plurals.plurals[5])
-      //     }
-      // },
-      // solution : {
-      //     1 : {
-      //         keyword : trim(keywords['a solution'].split(',')[0]),
-      //         plural: trim(plurals.plurals[6])
-      //     },
-      //     2 : {
-      //         keyword : trim(keywords['a solution'].split(',')[1]),
-      //         plural: trim(plurals.plurals[7])
-      //     },
-      //     3 : {
-      //         keyword : trim(keywords['a solution'].split(',')[2]),
-      //         plural: trim(plurals.plurals[8])
-      //     }
-      // },
-      // adjective : {
-      //     1 : {
-      //         keyword : trim(keywords.adjective.split(',')[0]),
-      //         superlative: trim(superlatives.superlatives[0])
-      //     },
-      //     2 : {
-      //         keyword : trim(keywords.adjective.split(',')[1]),
-      //         superlative: trim(superlatives.superlatives[1])
-      //     },
-      //     3 : {
-      //         keyword : trim(keywords.adjective.split(',')[2]),
-      //         superlative: trim(superlatives.superlatives[2])
-      //     }
-      // },
-      // deliverable : {
-      //     1 : {
-      //         keyword : trim(keywords.deliverable.split(',')[0]),
-      //         plural: trim(plurals.plurals[9])
-      //     },
-      //     2 : {
-      //         keyword : trim(keywords.deliverable.split(',')[1]),
-      //         plural: trim(plurals.plurals[10])
-      //     },
-      //     3 : {
-      //         keyword : trim(keywords.deliverable.split(',')[2]),
-      //         plural: trim(plurals.plurals[11])
-      //     }
-      // },
-      // benefit : {
-      //     1 : {
-      //         keyword : trim(keywords.benefit.split(',')[0])
-      //     },
-      //     2 : {
-      //         keyword : trim(keywords.benefit.split(',')[1])
-      //     },
-      //     3 : {
-      //         keyword : trim(keywords.benefit.split(',')[2])
-      //     }
-      // },
     };
   } catch (error) {
-    console.log(error);
+    console.log("Error in getAIFields:", error);
   }
 }
 
 async function getShortSlogan(options) {
+  return null;
+  
   try {
     const gptResponse = await openai.complete({
-      engine: options.settings ? options.settings.engine : "davinci",
+      engine: options.settings ? options.settings.engine : "gpt-3.5-turbo",
       prompt: `${options.description}`,
       temperature: options.settings ? options.settings.temperature : 0.73,
       max_tokens: options.settings ? options.settings.max_tokens : 32,

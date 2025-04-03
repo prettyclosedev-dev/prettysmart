@@ -7,7 +7,7 @@
         <div class="setup-page">
             <div class="page-content-wrapper">
                 <div class="page-title-container">
-                    <a href="/setup"><img id="logo-img" src="/site_static/images/logo.svg" alt="Prettysmart"/></a>
+                    <a href="/setup"><img id="logo-img" src="/site_static/images/logo.svg" alt="Prettyclose"/></a>
                 </div>
                 <div class="instructions-tooltip"><img style="height: 300px; object-fit: contain;" /></div>
                 <div class="inner-content-wrapper help <%= !upgrading ? 'd-none' : '' %>" data-content="ask-help-sec">
@@ -418,7 +418,6 @@
     <%- include('partials/mini-help-setup', {async: true, plan_name}); %>
     
     <script>
-        var TOKEN = '<%=locals.user ? locals.user.token.access_token : ''%>';
         var draft_brand = <%- JSON.stringify(brand) %>;
      </script>
 

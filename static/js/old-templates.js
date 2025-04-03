@@ -289,7 +289,7 @@ function closeExportModal() {
 }
 
 function openEditor(project_id) {
-  window.location = "/editor/" + project_id;
+  window.location = "/polotno/" + project_id;
 }
 
 function exportProject(project_id, params) {

@@ -64,10 +64,6 @@ let userSchema = new Schema(
     token: Object,
     created_at: Number,
     updated_at: Number,
-    issueWithHuddleAccount: {
-      type: Boolean,
-      default: false,
-    },
   },
   {
     timestamps: {

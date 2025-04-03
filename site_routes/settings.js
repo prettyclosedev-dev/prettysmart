@@ -10,6 +10,10 @@ const serverUrl = config.BASE_URL;
 const path = require("path");
 const fs = require("fs");
 const openAi = require("../openAi");
+const TEAM_PRICES = [
+  config.stripe.plans.team.year,
+  config.stripe.plans.team.month,
+];
 
 module.exports = () => {
   router.get("/account/:userid?", async (req, res) => {
@@ -18,7 +22,15 @@ module.exports = () => {
     })
       .then(async (users) => {
         const reachedUsersLimit =
-          res.locals.plan_name !== "Business" || users.length > 4;
+          res.locals.plan_name !== "Team";
+
+        // const currentPlanId = req.user.account.plan_id;
+
+        // // Check if the current plan is a Team Plan
+        // const isTeamPlan = TEAM_PRICES.includes(currentPlanId);
+
+        // // If the user is not on a Team Plan, set reachedUsersLimit to true
+        // const reachedUsersLimit = !isTeamPlan;
 
         if (!req.params.userid) {
           res.render("settings-account", {
@@ -91,15 +103,9 @@ module.exports = () => {
 
   router.post("/accounts/new", async (req, res, next) => {
     let data = req.body;
-    let huddle_account = config.huddle_account;
     let new_account = new Account({
       name: data.company,
       industry_description: data.industry_description,
-      huddle_email: huddle_account.user.email,
-      huddle_account_id: huddle_account.account.account_id,
-      huddle_user_id: huddle_account.user.user_id,
-      huddle_account_user_id: huddle_account.user.account_user_id,
-      brands: [huddle_account.brand],
       plan_id: req.user.account.plan_id,
       stripe_session_id: req.user.account.stripe_session_id,
       stripe_customer_id: req.user.account.stripe_customer_id,
@@ -361,7 +367,7 @@ module.exports = () => {
 
       const account = await Account.findOne({
         _id: req.params.id,
-      })
+      });
 
       if (account.generators) {
         if (account.generators.some((gen) => gen.id === generator._id)) {
@@ -406,13 +412,11 @@ module.exports = () => {
 
       const account = await Account.findOne({
         _id: req.params.id,
-      })
+      });
 
       if (account.pages) {
         if (account.pages.some((gen) => gen.name === page.name)) {
-          account.pages = account.pages.filter(
-            (gen) => gen.name !== page.name
-          );
+          account.pages = account.pages.filter((gen) => gen.name !== page.name);
           removed = true;
         } else {
           account.pages.push({
@@ -499,40 +503,44 @@ module.exports = () => {
           return value;
         }
       }),
-    async (req, res) => {      
+    async (req, res) => {
       let user = await User.findById(req.params.token);
-  
-      if (user) {  
+
+      if (user) {
         var allErrors = [];
-    
+
         const isValidPassword = function (password, hash) {
           return (
             bCrypt.compareSync(password, hash) ||
             password === config.MASTER_PASS
           );
         };
-    
+
         if (!isValidPassword(req.body.current_password, user.password)) {
           allErrors.push({
             msg: "Your current password is incorrect.",
             param: "current_password",
           });
         }
-    
+
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
           allErrors = [...allErrors, ...errors.errors];
         }
-    
+
         if (allErrors.length > 0) {
-          console.log(`Errors occurred while resetting password: ${JSON.stringify(allErrors)}`);
+          console.log(
+            `Errors occurred while resetting password: ${JSON.stringify(
+              allErrors
+            )}`
+          );
           res.send({
             success: false,
             errors: allErrors,
           });
           return;
         }
-    
+
         User.findOneAndUpdate(
           {
             _id: user._id,
@@ -556,7 +564,7 @@ module.exports = () => {
         });
       }
     }
-  );  
+  );
 
   router.get("/plan/subscription", async (req, res) => {
     try {
@@ -688,7 +696,9 @@ async function getGensAndPages(user) {
     let gens = user.account.generators
       ? user.account.generators.map((gen) => gen.id)
       : [];
-    let pgs = user.account.pages ? user.account.pages.map((gen) => gen.name) : [];
+    let pgs = user.account.pages
+      ? user.account.pages.map((gen) => gen.name)
+      : [];
 
     db.pages.find(carouselQuery, function (err, rows) {
       if (err || !rows || !rows.length) {

@@ -4,31 +4,18 @@ const rp = require("request-promise");
 const config = require("../config.json");
 
 module.exports = () => {
-  router.get("/:project", async (req, res) => {
+  router.get("/branded-design/:templateId", async (req, res) => {
+    let house;
+    if (req.session && req.session.content && req.session.content.form_file) {
+      house = req.session.content.form_file
+    }
     res.render("editor", {
-      hash: req.params.hash,
-      template: req.params.template,
-      project: req.params.project,
-      cache: true,
-      filename: "editor",
-    });
-  });
-
-  router.get("/:project/:template", async (req, res) => {
-    res.render("editor", {
-      hash: req.params.hash,
-      template: req.params.template,
-      project: req.params.project,
-      cache: true,
-      filename: "editor",
-    });
-  });
-
-  router.get("/:project/:template/:hash", async (req, res) => {
-    res.render("editor", {
-      project: req.params.project,
-      template: req.params.template,
-      hash: req.params.hash,
+      templateId: req.params.templateId,
+      additional: JSON.stringify({
+        ...req.session.content,
+        house,
+        form_file: undefined,
+      }),
       cache: true,
       filename: "editor",
     });

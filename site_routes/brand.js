@@ -1,29 +1,20 @@
 const express = require("express");
-const Huddle = require("../huddle");
 const router = express.Router();
+const Huddle = require("../huddle");
 const User = require("../schemas/user");
 const Account = require("../schemas/account");
 const fs = require("fs");
 const rp = require("request-promise");
 const config = require("../config.json");
 const serverUrl = config.BASE_URL;
-const HuddleAdmin = require("../admin_huddle");
 const TextToSVG = require("text-to-svg");
 const vectorExpress = require("@smidyo/vectorexpress-nodejs");
 const path = require("path");
 const openAi = require("../openAi");
 const _ = require("lodash");
-const sgMail = require("@sendgrid/mail");
-const {
-  searchContactByEmail,
-  getContactById,
-  updateBrandColor,
-  updateBrandLogo,
-  updateBrandFont,
-} = require("../hubspot");
+const { handleBrandChange } = require("../clyps_brand_update");
 const stripe = require("stripe")(config.stripe.prod.secret);
-
-sgMail.setApiKey(config.sendgrid.token);
+const mailchimp = require("@mailchimp/mailchimp_transactional")(config.mandrill.apiKey);
 
 var attributes = {
   fill: "#1A428A",
@@ -262,38 +253,6 @@ async function setDefaultFonts(req, user_path) {
 
     fontFamily = fontFamily.charAt(0).toUpperCase() + fontFamily.slice(1);
 
-    // Already in huddle
-    let brand_id = req.user.account.brands[0].brand_id;
-
-    await uploadFontToHuddle({
-      name: "Regular",
-      brand_id,
-      upload_path: font_path + regName + type,
-      font_family_name: fontFamily,
-      font_file_name: regName + type,
-    });
-    await uploadFontToHuddle({
-      name: "Italic",
-      brand_id,
-      upload_path: font_path + italicName + type,
-      font_family_name: fontFamily,
-      font_file_name: italicName + type,
-    });
-    await uploadFontToHuddle({
-      name: "Bold",
-      brand_id,
-      upload_path: font_path + boldName + type,
-      font_family_name: fontFamily,
-      font_file_name: boldName + type,
-    });
-    await uploadFontToHuddle({
-      name: "BoldItalic",
-      brand_id,
-      upload_path: font_path + boldItalicName + type,
-      font_family_name: fontFamily,
-      font_file_name: boldItalicName + type,
-    });
-
     await syncFontsWithAccount(req, ["poppins"]);
   }
 
@@ -338,15 +297,7 @@ async function uploadFontToHuddle({
   brand_id,
   font_family_name,
   font_file_name,
-}) {
-  await HuddleAdmin.uploadFont({
-    name,
-    upload_path,
-    brand_id,
-    font_family_name,
-    font_file_name,
-  }).catch(console.log);
-}
+}) {}
 
 async function syncFontsWithAccount(req, fontFamilies) {
   let user_path = path.join(__dirname, "../files/" + req.user.account._id);
@@ -385,6 +336,12 @@ module.exports = () => {
   router.get("/", async (req, res) => {
     await setupDefaults(req);
 
+    try {
+      await handleBrandChange(req.user);
+    } catch (e) {
+      console.log(e);
+    }
+
     let paymentMethods = [];
     let paymentMethodsList = {};
 
@@ -393,28 +350,24 @@ module.exports = () => {
         const checkoutsession = await stripe.checkout.sessions.retrieve(
           req.user.account.stripe_session_id
         );
-  
+
         const customer = await stripe.customers.retrieve(
           checkoutsession.customer
         );
-  
+
         paymentMethodsList = await stripe.paymentMethods.list({
           customer: checkoutsession.customer,
           type: "card",
         });
-      } catch(e) {
-        console.log(e)
+      } catch (e) {
+        console.log(e);
       }
 
       paymentMethods = paymentMethodsList.data || [];
     }
-    let templates = await Huddle.getTemplates({
-      category: 44,
-      user: req.user,
-    });
 
     res.render("brand", {
-      templates: templates.data.items,
+      templates: [],
       brand: await Huddle.getBrandObject(req.user.account).catch(console.log),
       paymentMethods,
       stripe_pub_key: config.stripe.prod.pub,
@@ -580,14 +533,14 @@ module.exports = () => {
         let publicUrl =
           serverUrl + "/files/" + req.user.account._id + "/logos/" + fileName;
 
-        try {
-          const contactID = await searchContactByEmail(req.user.email);
-          if (contactID) {
-            await updateBrandLogo(contactID, publicUrl);
-          }
-        } catch(e) {
-          console.log(e)
-        }
+        // try {
+        //   const contactID = await searchContactByEmail(req.user.email);
+        //   if (contactID) {
+        //     await updateBrandLogo(contactID, publicUrl);
+        //   }
+        // } catch(e) {
+        //   console.log(e)
+        // }
 
         return res.send({
           success: true,
@@ -644,14 +597,14 @@ module.exports = () => {
         req.user.account.brand.colors[req.body.name] = req.body.color;
         account.brand.colors[req.body.name] = req.body.color;
 
-        const contactID = await searchContactByEmail(req.user.email);
-        if (contactID) {
-          await updateBrandColor(
-            contactID,
-            account.brand.colors.primary,
-            account.brand.colors.secondary
-          );
-        }
+        // const contactID = await searchContactByEmail(req.user.email);
+        // if (contactID) {
+        //   await updateBrandColor(
+        //     contactID,
+        //     account.brand.colors.primary,
+        //     account.brand.colors.secondary
+        //   );
+        // }
 
         res.send({
           success: true,
@@ -675,189 +628,176 @@ module.exports = () => {
   });
 
   router.post("/font", async (req, res) => {
-    if (req.user.account.brands && req.user.account.brands.length) {
-      try {
-        let family;
-        let name = req.body.name;
-        let brand_id = req.user.account.brands[0].brand_id;
-        let familyFolder;
-        let fontFileName;
-        let font_path;
-        let folder;
-        let value;
-        let isGoogle;
+    try {
+      let family;
+      let name = req.body.name;
+      let familyFolder;
+      let fontFileName;
+      let font_path;
+      let folder;
+      let value;
+      let isGoogle;
 
-        if (req.files && req.files[name]) {
-          let fileName = req.files[name].name;
-          let fileExt = fileName.split(".").pop();
-          fontFileName = fileName;
-          font_path = path.join(__dirname, "../files/" + req.user.account._id);
-          family = fileName.split(".")[0];
-          familyFolder = family;
+      if (req.files && req.files[name]) {
+        let fileName = req.files[name].name;
+        let fileExt = fileName.split(".").pop();
+        fontFileName = fileName;
+        font_path = path.join(__dirname, "../files/" + req.user.account._id);
+        family = fileName.split(".")[0];
+        familyFolder = family;
 
-          if (fileExt !== "ttf") {
-            return res.send({
-              message: "Invalid font file use ttf",
-              success: false,
-            });
-          }
-
-          if (!fs.existsSync(font_path)) {
-            fs.mkdirSync(font_path);
-          }
-
-          font_path += "/fonts";
-
-          if (!fs.existsSync(font_path)) {
-            fs.mkdirSync(font_path);
-          }
-
-          font_path += "/" + family;
-
-          if (!fs.existsSync(font_path)) {
-            fs.mkdirSync(font_path);
-          }
-
-          let upload_path = font_path + "/" + fileName;
-          folder = await new Promise((resolve, reject) => {
-            req.files[name].mv(upload_path, () => {
-              resolve(upload_path);
-            });
+        if (fileExt !== "ttf") {
+          return res.send({
+            message: "Invalid font file use ttf",
+            success: false,
           });
-        } else {
-          family = req.body.family.replace(/ /g, "");
-          familyFolder = family.replace(/ /g, "").toLowerCase();
-          fontFileName = family + "-" + name + ".ttf";
-          font_path = "./google-fonts/" + familyFolder;
-          value = req.body.value;
-          isGoogle = true;
+        }
 
-          let folderExsist = fs.existsSync(font_path);
-          if (folderExsist) {
-            let fileExsist = fs.existsSync(font_path + "/" + fontFileName);
+        if (!fs.existsSync(font_path)) {
+          fs.mkdirSync(font_path);
+        }
+
+        font_path += "/fonts";
+
+        if (!fs.existsSync(font_path)) {
+          fs.mkdirSync(font_path);
+        }
+
+        font_path += "/" + family;
+
+        if (!fs.existsSync(font_path)) {
+          fs.mkdirSync(font_path);
+        }
+
+        let upload_path = font_path + "/" + fileName;
+        folder = await new Promise((resolve, reject) => {
+          req.files[name].mv(upload_path, () => {
+            resolve(upload_path);
+          });
+        });
+      } else {
+        family = req.body.family.replace(/ /g, "");
+        familyFolder = family.replace(/ /g, "").toLowerCase();
+        fontFileName = family + "-" + name + ".ttf";
+        font_path = "./google-fonts/" + familyFolder;
+        value = req.body.value;
+        isGoogle = true;
+
+        let folderExsist = fs.existsSync(font_path);
+        if (folderExsist) {
+          let fileExsist = fs.existsSync(font_path + "/" + fontFileName);
+          if (fileExsist) {
+            folder = fs.readdirSync(font_path);
+          } else {
+            let fontFiles = fs.readdirSync(font_path);
+            fontFiles = fontFiles.filter((file) => file.endsWith(".ttf"));
+            fontFileName = fontFiles.find((file) => {
+              if (req.body.fontStyle === "italic") {
+                return file.includes(family) && file.includes("Italic");
+              } else {
+                return file.includes(family) && !file.includes("Italic");
+              }
+            });
+
+            if (fontFileName) {
+              // console.log(fontFileName);
+            } else {
+              //fontFileName = family + '-Regular.ttf';
+              fontFileName = fontFiles[0];
+            }
+
+            fileExsist = fs.existsSync(font_path + "/" + fontFileName);
             if (fileExsist) {
               folder = fs.readdirSync(font_path);
-            } else {
-              let fontFiles = fs.readdirSync(font_path);
-              fontFiles = fontFiles.filter((file) => file.endsWith(".ttf"));
-              fontFileName = fontFiles.find((file) => {
-                if (req.body.fontStyle === "italic") {
-                  return file.includes(family) && file.includes("Italic");
-                } else {
-                  return file.includes(family) && !file.includes("Italic");
-                }
-              });
-
-              if (fontFileName) {
-                // console.log(fontFileName);
-              } else {
-                //fontFileName = family + '-Regular.ttf';
-                fontFileName = fontFiles[0];
-              }
-
-              fileExsist = fs.existsSync(font_path + "/" + fontFileName);
-              if (fileExsist) {
-                folder = fs.readdirSync(font_path);
-              }
             }
           }
         }
+      }
 
-        if (folder) {
-          try {
-            let upload = await HuddleAdmin.uploadFont({
-              name: name,
-              upload_path: font_path + "/" + fontFileName,
-              brand_id: brand_id,
-              font_family_name: family,
-              font_file_name: fontFileName,
+      if (folder) {
+        try {
+          // need to upload custom fonts to clyps
+
+          // console.log(upload);
+
+          if (req.query.draft) {
+            let account = req.user.account;
+            account.brand.fonts[`${req.body.name}`] = {
+              name: family,
+              value: value,
+              path: familyFolder + "/" + fontFileName,
+              google: isGoogle,
+            };
+
+            return res.send({
+              success: true,
+              brand: await Huddle.getBrandObject(account).catch(console.log),
             });
+          } else {
+            let updateObj = {};
+            updateObj[`brand.fonts.${req.body.name}`] = {
+              name: family,
+              value: value,
+              path: familyFolder + "/" + fontFileName,
+              google: isGoogle,
+            };
+            Account.findOneAndUpdate(
+              {
+                _id: req.user.account._id,
+              },
+              {
+                $set: updateObj,
+              },
+              {
+                new: true,
+              }
+            ).then(async (account) => {
+              let publicUrl;
 
-            // console.log(upload);
+              if (isGoogle) {
+                publicUrl = value;
+              } else {
+                publicUrl =
+                  serverUrl +
+                  "/files/" +
+                  req.user.account._id +
+                  "/fonts/" +
+                  familyFolder +
+                  "/" +
+                  fontFileName;
+              }
 
-            if (req.query.draft) {
-              let account = req.user.account;
-              account.brand.fonts[`${req.body.name}`] = {
-                name: family,
-                value: value,
-                path: familyFolder + "/" + fontFileName,
-                google: isGoogle,
-              };
+              // const contactID = await searchContactByEmail(req.user.email);
+              // if (contactID) {
+              //   await updateBrandFont(contactID, publicUrl);
+              // }
 
-              return res.send({
+              res.send({
                 success: true,
                 brand: await Huddle.getBrandObject(account).catch(console.log),
               });
-            } else {
-              let updateObj = {};
-              updateObj[`brand.fonts.${req.body.name}`] = {
-                name: family,
-                value: value,
-                path: familyFolder + "/" + fontFileName,
-                google: isGoogle,
-              };
-              Account.findOneAndUpdate(
-                {
-                  _id: req.user.account._id,
-                },
-                {
-                  $set: updateObj,
-                },
-                {
-                  new: true,
-                }
-              ).then(async (account) => {
-                let publicUrl;
-
-                if (isGoogle) {
-                  publicUrl = value;
-                } else {
-                  publicUrl =
-                    serverUrl +
-                    "/files/" +
-                    req.user.account._id +
-                    "/fonts/" +
-                    familyFolder +
-                    "/" +
-                    fontFileName;
-                }
-
-                // const contactID = await searchContactByEmail(req.user.email);
-                // if (contactID) {
-                //   await updateBrandFont(contactID, publicUrl);
-                // }
-
-                res.send({
-                  success: true,
-                  brand: await Huddle.getBrandObject(account).catch(
-                    console.log
-                  ),
-                });
-              });
-            }
-          } catch (error) {
-            console.log(error);
-            res.send({
-              success: false,
-              error,
             });
           }
-        } else {
-          console.log("Google font not found on server!")
-          // download from git
+        } catch (error) {
+          console.log(error);
           res.send({
             success: false,
-            error: "Google font not found on server!",
+            error,
           });
         }
-      } catch (error) {
-        console.log(error);
+      } else {
+        console.log("Google font not found on server!");
+        // download from git
         res.send({
-          error: error.error ? error.error : error,
+          success: false,
+          error: "Google font not found on server!",
         });
       }
-    } else {
-      res.send("Error no brands found on account!");
+    } catch (error) {
+      console.log(error);
+      res.send({
+        error: error.error ? error.error : error,
+      });
     }
   });
 
@@ -890,39 +830,47 @@ module.exports = () => {
 
   function sendBrandAssets(data) {
     try {
-      let attachments = [];
-      Object.keys(data.files).forEach((key) => {
-        attachments.push({
-          content: data.files[key].data.toString("base64"),
-          filename: data.files[key].name,
-          type: data.files[key].mimetype,
-          disposition: "attachment",
-        });
-      });
+      // Prepare attachments
+      const attachments = Object.keys(data.files).map((key) => ({
+        type: data.files[key].mimetype,
+        name: data.files[key].name,
+        content: data.files[key].data.toString("base64"),
+      }));
 
-      const msg = {
-        to: "brandhelp@clyps.io",
-        from: "hi@clyps.io",
+      // Mailchimp message
+      const message = {
+        from_email: "hi@prettyclose.co", // Your verified sender
+        to: [
+          {
+            email: "brandhelp@prettyclose.co", // Recipient email
+            type: "to",
+          },
+        ],
         subject: `Brand assets for ${data.user.name},`,
         html: `<div>Please see attached the brand assets for <p>${data.user.name}, email: ${data.user.email}</p></div>`,
-        dynamic_template_data: {
-          TOKEN: "user._id",
-        },
+        global_merge_vars: [
+          {
+            name: "TOKEN", // Matches *|TOKEN|* in your Mailchimp template
+            content: data.user._id, // Dynamic value
+          },
+        ],
         attachments: attachments,
       };
-      sgMail
-        .send(msg)
-        .then(() => {
-          console.log("Email sent");
+
+      // Send via Mailchimp Transactional
+      mailchimp.messages
+        .send({ message })
+        .then((response) => {
+          console.log("Email sent via Mailchimp:", response);
           return "done";
         })
         .catch((error) => {
-          console.log("KOKOK");
-          console.error(error.response.body.errors[0]);
+          console.error("Error sending email via Mailchimp:", error);
           return new Error("error");
         });
-    } catch (e) {
-      return Error(e);
+    } catch (error) {
+      console.error("Unexpected error in sendBrandAssets:", error);
+      return new Error(error.message);
     }
   }
 
@@ -993,14 +941,9 @@ module.exports = () => {
 
         req.user.account = account;
 
-        let templates = await Huddle.getTemplates({
-          category: 44,
-          user: req.user,
-        });
-
         res.send({
           success: true,
-          templates: templates.data.items,
+          templates: [],
           brand: await Huddle.getBrandObject(account).catch(console.log),
         });
       })
@@ -1011,3 +954,5 @@ module.exports = () => {
 
   return router;
 };
+
+module.exports.setupDefaults = setupDefaults;

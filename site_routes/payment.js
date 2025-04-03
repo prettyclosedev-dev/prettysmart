@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Account = require("../schemas/account");
+const User = require("../schemas/user");
 const config = require("../config");
 const {
   getHardcodedCurrentPlan,
@@ -9,118 +10,35 @@ const {
 } = require("./utils");
 const stripe = require("stripe")(config.stripe.prod.secret);
 const { searchContactByEmail, updateContact } = require("../hubspot");
-const {
-  unarchiveUser,
-  signup,
-  searchUser,
-  createBrand,
-  getToken,
-  getBrand,
-} = require("../admin_huddle");
+const TEAM_PRICES = [
+  config.stripe.plans.team.year,
+  config.stripe.plans.team.month,
+];
 
 module.exports = () => {
   router.get("/update/:plan_id", async (req, res) => {
-    //   if (req.user.account.stripe_session_id) {
-    //     try {
-    //       const checkoutsession = await stripe.checkout.sessions.retrieve(
-    //         req.user.account.stripe_session_id
-    //       );
-    //       const portalsession = await stripe.billingPortal.sessions.create({
-    //         customer: checkoutsession.customer,
-    //         return_url: config.BASE_URL + "/plans",
-    //       });
+    try {
+      const account = await Account.findOne({ _id: req.user.account._id });
 
-    //       return res.redirect(portalsession.url);
-    //     } catch (error) {
-    //       console.log(error);
-    //       //return res.redirect('/plans');
-    //     }
-    //   }
+      if (!account) {
+        return res.status(404).json({ error: "Account not found" });
+      }
 
-    Account.findOne({
-      _id: req.user.account._id,
-    }).then(async (account) => {
-      try {
-        if (req.user.account.stripe_session_id) {
-          const session = await stripe.checkout.sessions.retrieve(
-            req.user.account.stripe_session_id
-          );
+      // Check how many users the account currently has
+      const accountUsers = await User.find({ account: account._id });
+      const userCount = Math.max(accountUsers.length, 2); // Ensure minimum of 2 users for Teams plan
 
-          const subscription = await stripe.subscriptions.retrieve(
-            session.subscription
-          );
+      if (req.user.account.stripe_session_id) {
+        const session = await stripe.checkout.sessions.retrieve(
+          req.user.account.stripe_session_id
+        );
+        const subscription = await stripe.subscriptions.retrieve(
+          session.subscription
+        );
 
-          if (subscription.status !== "active") {
-            const session = await stripe.checkout.sessions.create({
-              mode: "subscription",
-              subscription_data: {
-                trial_period_days: 7,
-              },
-              payment_method_types: ["card"],
-              customer_email: req.user.email,
-              line_items: [
-                {
-                  price: req.params.plan_id,
-                  // For metered billing, do not pass quantity
-                  quantity: 1,
-                },
-              ],
-              allow_promotion_codes: true,
-              // {CHECKOUT_SESSION_ID} is a string literal; do not change it!
-              // the actual Session ID is returned in the query parameter when your customer
-              // is redirected to the success page.
-              success_url:
-                config.BASE_URL +
-                "/payment/success?session_id={CHECKOUT_SESSION_ID}",
-              cancel_url: config.BASE_URL + "/payment/canceled",
-            });
-
-            res.render("payment", {
-              sessionId: session.id,
-              stripe_pub_key: config.stripe.prod.pub,
-              plan_name: getHardcodedCurrentPlan(req.params.plan_id),
-              filename: "payment",
-            });
-
-            return;
-          }
-
-          const updateSubscription = await stripe.subscriptions.update(
-            session.subscription,
-            {
-              items: [
-                {
-                  id: subscription.items.data[0].id,
-                  price: req.params.plan_id,
-                },
-              ],
-            }
-          );
-          // const session = await stripe.checkout.sessions.update(
-          //   req.user.account.stripe_session_id,
-          //   {
-          //     line_items: [
-          //       {
-          //         price: req.params.plan_id,
-          //         // For metered billing, do not pass quantity
-          //         quantity: 1,
-          //       },
-          //     ],
-          //     allow_promotion_codes: true,
-          //     success_url:
-          //       config.BASE_URL +
-          //       "/payment/success?session_id={CHECKOUT_SESSION_ID}",
-          //     cancel_url: config.BASE_URL + "/payment/canceled",
-          //   }
-          // );
-
-          res.redirect(
-            config.BASE_URL +
-              "/payment/success?session_id=" +
-              req.user.account.stripe_session_id
-          );
-        } else {
-          const session = await stripe.checkout.sessions.create({
+        // If the subscription is not active, create a new session
+        if (subscription.status !== "active") {
+          const newSession = await stripe.checkout.sessions.create({
             mode: "subscription",
             subscription_data: {
               trial_period_days: 7,
@@ -130,37 +48,92 @@ module.exports = () => {
             line_items: [
               {
                 price: req.params.plan_id,
-                // For metered billing, do not pass quantity
-                quantity: 1,
+                quantity: TEAM_PRICES.includes(req.params.plan_id)
+                  ? userCount
+                  : 1, // Set quantity based on plan type
               },
             ],
             allow_promotion_codes: true,
-            // {CHECKOUT_SESSION_ID} is a string literal; do not change it!
-            // the actual Session ID is returned in the query parameter when your customer
-            // is redirected to the success page.
-            success_url:
-              config.BASE_URL +
-              "/payment/success?session_id={CHECKOUT_SESSION_ID}",
-            cancel_url: config.BASE_URL + "/payment/canceled",
+            success_url: `${config.BASE_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${config.BASE_URL}/payment/canceled`,
           });
 
-          res.render("payment", {
-            sessionId: session.id,
+          const priceObject = await stripe.prices.retrieve(req.params.plan_id);
+          const plan_price = priceObject.unit_amount / 100; // Convert from cents
+          const plan_interval = priceObject.recurring ? priceObject.recurring.interval : "one-time";
+          const plan_type = TEAM_PRICES.includes(req.params.plan_id) ? "team" : "individual";
+
+          return res.render("payment", {
+            sessionId: newSession.id,
             stripe_pub_key: config.stripe.prod.pub,
             plan_name: getHardcodedCurrentPlan(req.params.plan_id),
+            plan_price: plan_price,
+            plan_interval: plan_interval,
+            plan_type: plan_type,
             filename: "payment",
           });
         }
-      } catch (error) {
-        res.status(400);
-        return res.send({
-          error: {
-            message: error.message,
+
+        // Update the subscription with new plan and quantity
+        await stripe.subscriptions.update(session.subscription, {
+          items: [
+            {
+              id: subscription.items.data[0].id,
+              price: req.params.plan_id,
+              quantity: TEAM_PRICES.includes(req.params.plan_id)
+                ? userCount
+                : 1, // Adjust quantity based on plan type
+            },
+          ],
+        });
+
+        return res.redirect(
+          `${config.BASE_URL}/payment/success?session_id=${req.user.account.stripe_session_id}`
+        );
+      } else {
+        // If no session exists, create a new session
+        const session = await stripe.checkout.sessions.create({
+          mode: "subscription",
+          subscription_data: {
+            trial_period_days: 7,
           },
+          payment_method_types: ["card"],
+          customer_email: req.user.email,
+          line_items: [
+            {
+              price: req.params.plan_id,
+              quantity: TEAM_PRICES.includes(req.params.plan_id)
+                ? userCount
+                : 1, // Set quantity based on plan type
+            },
+          ],
+          allow_promotion_codes: true,
+          success_url: `${config.BASE_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${config.BASE_URL}/payment/canceled`,
+        });
+
+        const priceObject = await stripe.prices.retrieve(req.params.plan_id);
+        const plan_price = priceObject.unit_amount / 100; // Convert from cents
+        const plan_interval = priceObject.recurring ? priceObject.recurring.interval : "one-time";
+        const plan_type = TEAM_PRICES.includes(req.params.plan_id) ? "team" : "individual";
+
+        res.render("payment", {
+          sessionId: session.id,
+          stripe_pub_key: config.stripe.prod.pub,
+          plan_name: getHardcodedCurrentPlan(req.params.plan_id),
+          plan_price: plan_price,
+          plan_interval: plan_interval,
+          plan_type: plan_type,
+          filename: "payment",
         });
       }
-    });
+    } catch (error) {
+      console.error("Error updating plan:", error);
+      return res.status(400).json({ error: error.message });
+    }
   });
+
+  module.exports = router;
 
   router.get("/success", async (req, res) => {
     if (req.query.session_id) {
@@ -207,86 +180,11 @@ module.exports = () => {
         req.user.account.stripe_customer_id = account.stripe_customer_id;
 
         try {
-          let huddleUserResponse = await searchUser(req.user);
-          console.log("huddleUserResponse", huddleUserResponse);
-          if (huddleUserResponse.success && huddleUserResponse.data.total > 0) {
-            // User with the given email already exists
-            let huddleUser = huddleUserResponse.data.items[0];
-
-            // Handle this existing user (e.g., update details, unarchive, etc.)
-            let updatedAccountDetails = {
-              huddle_email: req.user.email,
-              huddle_user_id: huddleUser.user_id,
-              huddle_account_id: huddleUser.account.account_id,
-              huddle_account_user_id: huddleUser.account_user_id,
-            };
-
-            // This is where you'd handle updating the existing user's data
-            await Account.findOneAndUpdate(
-              { _id: req.user.account._id },
-              updatedAccountDetails,
-              { new: true }
-            );
-          } else {
-            // No user found with the given email, so proceed with signup
-            let huddle_account = await signup(req.user, true);
-            let accountDetailsForNewUser = {
-              huddle_email: req.user.email,
-              huddle_user_id: huddle_account.user.user_id,
-              brands: [huddle_account.brand],
-              huddle_account_id: huddle_account.account.account_id,
-              huddle_account_user_id: huddle_account.user.account_user_id,
-              unarchive_huddle_user: true
-            };
-
-            await Account.findOneAndUpdate(
-              { _id: req.user.account._id },
-              accountDetailsForNewUser,
-              { new: true }
-            );
-          }
-
-          req.session.issueWithHuddleAccount = false;
           req.user.account = account;
           await req.user.save();
           return res.redirect("/templates?ob=1");
         } catch (error) {
-          // console.log("should be trying to signup again");
-          if (
-            error.name === "StatusCodeError" &&
-            error.statusCode === 409 /*&&
-            error.error &&
-            error.error.message ===
-              "The specified Email Address is already in use."*/
-          ) {
-            try {
-              let huddle_account = await signup(req.user);
-              let accountDetailsForNewUser = {
-                huddle_email: req.user.email,
-                huddle_user_id: huddle_account.user.user_id,
-                brands: [huddle_account.brand],
-                huddle_account_id: huddle_account.account.account_id,
-                huddle_account_user_id: huddle_account.user.account_user_id,
-                unarchive_huddle_user: true
-              };
-
-              await Account.findOneAndUpdate(
-                { _id: req.user.account._id },
-                accountDetailsForNewUser,
-                { new: true }
-              );
-
-              req.session.issueWithHuddleAccount = false;
-              req.user.account = account;
-              await req.user.save();
-              return res.redirect("/templates?ob=1");
-            } catch (e) {
-              console.log("failed again to signup", e);
-              return await goToSubscribe(req, res, e);
-            }
-          } else {
-            return await goToSubscribe(req, res, error);
-          }
+          return await goToSubscribe(req, res, error);
         }
       });
     } else {
@@ -378,13 +276,9 @@ async function goToSubscribe(req, res, error) {
     }
 
     const plans = await getPlans(); // req.session.affiliate
-    console.log("plans", plans)
+    console.log("plans", plans);
     if (plans && plans.data && plans.data.length) {
-      var currentInterval = getCurrentInterval(
-        plans,
-        subscription,
-        req
-      );
+      var currentInterval = getCurrentInterval(plans, subscription, req);
 
       return res.render("subscribe", {
         products: plans,
@@ -407,16 +301,17 @@ async function goToSubscribe(req, res, error) {
       });
     }
   } catch (err) {
-    console.log(err)
+    console.log(err);
     res.redirect("/login");
   }
 }
 
-async function getPlans() { // affiliate
+async function getPlans() {
+  // affiliate
   try {
     const plans = await stripe.plans.list({ active: true, limit: 20 });
     const products = await stripe.products.list({ active: true });
-console.log(plans, products)
+    console.log(plans, products);
     const indexOfBasic = products.data
       .map((prod) => prod.name)
       .indexOf("Basic");
@@ -458,6 +353,6 @@ console.log(plans, products)
       return products;
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 }

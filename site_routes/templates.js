@@ -6,296 +6,600 @@ const config = require("../config.json");
 const serverUrl = config.BASE_URL;
 const path = require("path");
 const User = require("../schemas/user");
+const {
+  getBrandedDesigns,
+  getDesignsCount,
+  getBrandedDesign,
+  getDesigns,
+  getCategories,
+} = require("../clyps_api");
+const {
+  getUserFavorites,
+  addFavorite,
+  removeFavorite,
+} = require("../clyps_brand_update");
+const fetchSizesMiddleware = require("./sizes-middleware");
 
 module.exports = () => {
+  router.use(fetchSizesMiddleware);
+
   router.get("/", async (req, res) => {
     try {
-      let token = await Huddle.getToken(req.user);
+      const sizes = req.session.sizes || [];
 
-      await User.findOneAndUpdate(
-        {
-          _id: req.user._id,
-        },
-        {
-          $set: {
-            login_date: Date.now(),
-            token: token,
+      return res.render("templates", {
+        sizes,
+        templates: [],
+        loading: true,
+        row: { templates: [] },
+        cache: true,
+        filename: "templates",
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("Error loading templates");
+    }
+  });
+
+  router.get("/get-templates", async (req, res) => {
+    const sizes = req.session.sizes;
+
+    let categorizedDesigns = [];
+    const userEmail = req.user.email;
+    const pageSize = 10; // Number of designs to fetch per category per page
+
+    try {
+      // Fetch content categories available on the "Templates" page
+      const categories = await getCategories({
+        where: {
+          availableOnPages: {
+            has: "Templates",
           },
         },
-        {
-          new: true,
-        }
+        orderBy: [{ priority: { sort: "asc" } }],
+      });
+
+      const favoritesData = await getUserFavorites(userEmail);
+      const favoriteIds = favoritesData
+        ? favoritesData.map((fav) => fav.id)
+        : [];
+
+      // Loop through each category to fetch its designs
+      categorizedDesigns = await Promise.all(
+        categories.map(async (category) => {
+          let categorizedCategory = {
+            id: category.id,
+            name: category.name,
+            creatorId: category.creatorId,
+            public: category.public,
+            tags: category.tags,
+            templates: [],
+            sizes: [],
+            default_size: category.size || 40,
+            currentPage: 1,
+            totalPages: 1,
+          };
+
+          // Fetch designs and total design count concurrently
+          const [designsData, totalDesigns] = await Promise.all([
+            getDesigns({
+              take: pageSize,
+              skip: 0,
+              where: {
+                AND: [
+                  {
+                    categories: { some: { id: { equals: category.id } } },
+                  },
+                  {
+                    categories: {
+                      some: {
+                        name: { contains: "square", mode: "insensitive" },
+                      },
+                    },
+                  },
+                ],
+              },
+            }),
+            getDesignsCount({
+              where: {
+                AND: [
+                  { categories: { some: { id: { equals: category.id } } } },
+                  {
+                    categories: {
+                      some: {
+                        name: { contains: "square", mode: "insensitive" },
+                      },
+                    },
+                  },
+                ],
+              },
+            }),
+          ]);
+
+          if (designsData?.designs) {
+            categorizedCategory.templates = designsData.designs.map(
+              (design) => ({
+                ...design,
+                isFavorite: favoriteIds.includes(design.id),
+              })
+            );
+            categorizedCategory.totalPages = Math.ceil(
+              totalDesigns.designsCount / pageSize
+            );
+
+            if (totalDesigns.designsCount > 0) {
+              const squareSize = sizes.find(
+                (size) => size.name.toLowerCase() === "square"
+              );
+              if (squareSize) categorizedCategory.sizes.push(squareSize);
+            }
+          }
+
+          // Populate sizes with Promise.all for concurrent size checks
+          const sizesWithCounts = await Promise.all(
+            sizes.map(async (size) => {
+              if (size.name.toLowerCase() === "square") {
+                categorizedCategory.default_size = size.id;
+                return size; // Return square size to keep it in sizes array
+              }
+
+              const designsCountData = await getDesignsCount({
+                where: {
+                  AND: [
+                    { categories: { some: { id: { equals: category.id } } } },
+                    {
+                      categories: {
+                        some: {
+                          name: { contains: size.name, mode: "insensitive" },
+                        },
+                      },
+                    },
+                  ],
+                },
+              });
+
+              if (designsCountData.designsCount > 0) {
+                return size;
+              }
+
+              return null;
+            })
+          );
+
+          // Filter out null sizes and set default size if not already set
+          categorizedCategory.sizes = sizesWithCounts.filter(Boolean);
+          if (
+            !categorizedCategory.default_size &&
+            categorizedCategory.sizes.length > 0
+          ) {
+            categorizedCategory.default_size = categorizedCategory.sizes[0].id;
+          }
+
+          return categorizedCategory;
+        })
       );
     } catch (error) {
       console.log(error);
-      return res.redirect("/login");
     }
 
-    db.pages.find(
-      {
-        type: "size",
-      },
-      function (err, sizes) {
-        sizes = _.orderBy(sizes, "order");
-        let carouselQuery = getCarouselQuery(req);
-
-        db.pages.find(carouselQuery, async function (err, rows) {
-          await Promise.all(
-            rows.map(async (row) => {
-              let rowQuery = getQuery(req, row, sizes);
-              let rowTemplates = await Huddle.getTemplates(rowQuery);
-              let templateItems = rowTemplates.data.items;
-              row.templates = templateItems;
-            })
-          );
-
-          return res.render("templates", {
-            sizes: sizes,
-            templates: _.orderBy(rows, "position"),
-            row: { templates: [] },
-            cache: true,
-            filename: "templates",
-          });
-        });
-      }
-    );
+    return res.render("partials/templates-content", {
+      sizes,
+      templates: categorizedDesigns,
+      row: { templates: [] },
+      cache: true,
+      filename: "templates",
+      loading: false,
+    });
   });
 
-  router.get("/category/:templatesId", (req, res) => {
-    db.pages.find(
-      {
-        type: "size",
+  // Route to load more designs for a specific category
+  router.get("/load-more/:categoryId", async (req, res) => {
+    const { categoryId } = req.params;
+    const { page = 1, sizeName = "square" } = req.query; // Default to 'square' if sizeName is not provided
+    const pageSize = 10; // Number of designs to fetch per page
+    const offset = (page - 1) * pageSize;
+
+    try {
+      // Fetch the designs for the given category, page, and size
+      const designsData = await getDesigns({
+        take: pageSize,
+        skip: offset,
+        where: {
+          AND: [
+            {
+              categories: {
+                some: {
+                  id: {
+                    equals: parseInt(categoryId),
+                  },
+                },
+              },
+            },
+            {
+              categories: {
+                some: {
+                  name: {
+                    contains: sizeName, // Filter by the selected size
+                    mode: "insensitive",
+                  },
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      if (designsData && designsData.designs) {
+        return res.status(200).json(designsData.designs);
+      } else {
+        return res.status(500).json({ error: "No designs found." });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Failed to load more designs." });
+    }
+  });
+
+  router.get("/preview/:id", async (req, res) => {
+    const variables = {
+      user: req.user,
+      where: {
+        id: parseInt(req.params.id),
       },
-      function (err, sizes) {
-        sizes = _.orderBy(sizes, "order");
-        let carouselQuery = getCarouselQuery(req, req.params.templatesId);
+      brandWhere: {
+        prettySmartId: req.user.account._id.toString(),
+      },
+      previewOptions: {
+        pixelRatio: 1,
+      }
+    };
 
-        db.pages.find(carouselQuery, async function (err, rows) {
-          await Promise.all(
-            rows.map(async (row) => {
-              let rowQuery = getQuery(req, row, sizes, req.params.templatesId);
+    if (req.session.content) {
+      variables.additional = {
+        ...req.session.content,
+        house: req.session.content.form_file,
+      };
+      delete variables.form_file; // should we pass form_file instead of house?
+    }
 
-              let rowTemplates = await Huddle.getTemplates(rowQuery);
-              let templateItems = rowTemplates.data.items;
-              row.templates = templateItems;
-            })
-          );
+    try {
+      let brandedDesignData = await getBrandedDesign(variables);
+      if (
+        brandedDesignData &&
+        brandedDesignData.brandedDesign &&
+        brandedDesignData.brandedDesign.preview
+      ) {
+        return res.status(200).send(brandedDesignData.brandedDesign.preview);
+      }
 
-          res.render("templates", {
-            sizes: sizes,
-            templates: _.orderBy(rows, "position"),
-            row: { templates: [] },
-            cache: true,
-            filename: "templates",
-            ai_input: req.query.input,
-            ai_placeholder: req.query.placeholder,
-            ai_engine: req.query.engine
+      return res.status(404).send("Preview not found.");
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(500)
+        .send("An error occurred while fetching the preview.");
+    }
+  });
+
+  router.get("/export/:templateId", async function (req, res) {
+    const { templateId } = req.params;
+    const { file_type, file_name } = req.query;
+
+    try {
+      // Prepare variables for export
+      const variables = {
+        user: req.user,
+        where: { id: parseInt(templateId) },
+        previewOptions: {
+          mimeType:
+            file_type === "pdf" ? "application/pdf" : `image/${file_type}`,
+          pixelRatio: 2, // TODO: - allow user to choose quality?
+        },
+        brandWhere: {
+          prettySmartId: req.user.account._id.toString(),
+        },
+      };
+
+      // Generate the branded design (image or PDF)
+      const brandedDesignData = await getBrandedDesign(variables);
+
+      if (
+        brandedDesignData &&
+        brandedDesignData.brandedDesign &&
+        brandedDesignData.brandedDesign.preview
+      ) {
+        // Send the file directly
+        const fileBuffer = Buffer.from(
+          brandedDesignData.brandedDesign.preview,
+          "base64"
+        );
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename="${file_name}.${file_type}"`
+        );
+        res.setHeader("Content-Type", variables.previewOptions.mimeType);
+        return res.send(fileBuffer);
+      }
+
+      return res.status(404).send("Export failed, preview not found.");
+    } catch (error) {
+      console.error("Error exporting:", error);
+      return res.status(500).send("Error during export process.");
+    }
+  });
+
+  router.get("/category/:categoryId", async (req, res) => {
+    const sizes = req.session.sizes;
+    const sizeNames = sizes.map((size) => size.name);
+    const categoryId = req.params.categoryId;
+    let categorizedDesigns = [];
+    const userEmail = req.user.email;
+
+    const favoritesData = await getUserFavorites(userEmail);
+    const favoriteIds = favoritesData.map((fav) => fav.id);
+
+    try {
+      const designsData = await getDesigns({
+        where: {
+          AND: [
+            {
+              categories: {
+                some: {
+                  id: {
+                    equals: parseInt(categoryId),
+                  },
+                },
+              },
+            },
+            {
+              categories: {
+                some: {
+                  name: {
+                    contains: "square", // or vertical, square, horizontal based on your logic
+                    mode: "insensitive",
+                  },
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      if (designsData && designsData.designs) {
+        designsData.designs.forEach((design) => {
+          design.isFavorite = favoriteIds.includes(design.id);
+          design.categories.forEach((category) => {
+            if (!sizeNames.includes(category.name)) {
+              let categoryIndex = categorizedDesigns.findIndex(
+                (cat) => cat.name === category.name
+              );
+
+              if (categoryIndex === -1) {
+                // Category does not exist, so create it
+                categorizedDesigns.push({
+                  id: category.id,
+                  name: category.name,
+                  creatorId: category.creatorId,
+                  public: category.public,
+                  tags: category.tags,
+                  templates: [design],
+                  sizes: [],
+                  default_size: category.size || 40,
+                });
+              } else {
+                // Category exists, so push the design into it
+                categorizedDesigns[categoryIndex].templates.push(design);
+              }
+            }
           });
         });
       }
+    } catch (error) {
+      console.log(error);
+    }
+
+    // Now, to iterate over categorizedDesigns to populate sizes
+    await Promise.all(
+      categorizedDesigns.map(async (category) => {
+        const sizePromises = sizes.map(async (size) => {
+          try {
+            const designsCountData = await getDesignsCount({
+              where: {
+                AND: [
+                  {
+                    categories: {
+                      some: {
+                        name: { contains: category.name, mode: "insensitive" },
+                      },
+                    },
+                  },
+                  {
+                    categories: {
+                      some: {
+                        name: { contains: size.name, mode: "insensitive" },
+                      },
+                    },
+                  },
+                  // Uncomment this if needed
+                  // {
+                  //   categories: {
+                  //     some: {
+                  //       availableOnPages: { has: "Templates" },
+                  //     },
+                  //   },
+                  // },
+                ],
+              },
+            });
+
+            if (designsCountData.designsCount > 0) {
+              return size; // Return the size if designs are found
+            }
+          } catch (error) {
+            console.log(error);
+            return null; // Return null in case of error
+          }
+          return null; // Return null if no designs are found
+        });
+
+        // Wait for all size checks to complete and filter valid sizes
+        const validSizes = (await Promise.all(sizePromises)).filter(Boolean);
+        category.sizes.push(...validSizes); // Add valid sizes to category
+      })
     );
+
+    return res.render("templates", {
+      sizes, // This could be a separate query if needed
+      templates: categorizedDesigns,
+      row: { templates: [] },
+      cache: true,
+      filename: "templates",
+      loading: false,
+    });
   });
 
   router.get("/resize?", async (req, res) => {
-    await handleResize(req, res)
+    await handleResize(req, res);
   });
 
   router.get("/category/:templatesId/resize?", async (req, res) => {
-    await handleResize(req, res)
+    await handleResize(req, res);
   });
 
-  router.get("/export/:project", async function (req, res) {
-    let project_export_job = await Huddle.newExportJob({
-      user: req.user,
-      project: req.params.project,
-      format: req.query.file_type,
-      filename: req.query.file_name,
-      cropmarks: req.query.file_crop,
-    });
-
-    res.redirect(
-      `/templates/export/${req.params.project}/${project_export_job.data.job_id}`
-    );
+  router.post("/addFavorite", async (req, res) => {
+    const { designId } = req.body;
+    const userEmail = req.user.email;
+    try {
+      const response = await addFavorite(userEmail, designId);
+      res.status(200).json(response);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   });
 
-  router.get("/export/:project/:job", async function (req, res) {
-    let project_export_job = await Huddle.getExportJob({
-      user: req.user,
-      project: req.params.project,
-      job: req.params.job,
-    });
-
-    res.send({
-      data: Object.assign(
-        {
-          link: "/templates" + req.path,
-        },
-        project_export_job.data
-      ),
-    });
+  router.post("/removeFavorite", async (req, res) => {
+    const { designId } = req.body;
+    const userEmail = req.user.email;
+    try {
+      const response = await removeFavorite(userEmail, designId);
+      res.status(200).json(response);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   });
 
   return router;
 };
 
 async function handleResize(req, res) {
-  db.pages.findOne(
-    {
-      _id: req.query.row,
-      type: "carousel",
-    },
-    function (err, row) {
-      if (err) {
-        res.status(400).send(err);
-        return;
-      }
+  const sizes = req.session.sizes;
+  const { row, size } = req.query; // 'row' is the category ID, 'size' is the desired size ID
+  let newRow = {};
 
-      db.pages.find(
-        {
-          type: "size",
-        },
-        async function (err, sizes) {
-          if (err) {
-            res.status(400).send(err);
-            return;
-          }
-
-          if (row.sizes && row.sizes.length) {
-            row.sizes = row.sizes.map((size) => {
-              return sizes.find((s) => s._id === size);
-            });
-          }
-
-          let rowQuery = {
-            user: req.user,
-            category: row.templates_category
-          };
-
-          if (req.query.size && row.sizes && row.sizes.length) {
-            let default_size = row.sizes.find((size) => {
-              return size._id === req.query.size;
-            });
-
-            if (default_size) {
-              rowQuery.size = {
-                width: default_size.width,
-                height: default_size.height,
-              };
-              // row.default_size = default_size;
-            } else {
-              rowQuery.size = {
-                width: row.sizes[0].width,
-                height: row.sizes[0].height,
-              };
-            }
-          }
-
-          if (row.default_tag) {
-            rowQuery.search = row.default_tag;
-          }
-
-          let templates = await Huddle.getTemplates(rowQuery);
-          let templateItems = templates.data.items;
-          row.templates = templateItems;
-
-          res.render("templates", {
-            row: row,
-            templates: [],
-            cache: true,
-            filename: "templates",
-          });
-        }
-      );
-    }
-  );
-}
-
-function getQuery(req, row, sizes, templatesId) {
-  if (row.sizes && row.sizes.length) {
-    row.sizes = row.sizes.map((size) => {
-      return sizes.find((s) => s._id === size);
-    });
-  }
-
-  let rowQuery = {
-    user: req.user,
-    category: row.templates_category,
-  };
-
-  if (templatesId && req.session.content && req.session.content.form_file) {
-    rowQuery.form_file = req.session.content.form_file;
-  }
-
-  if (row.sizes && row.sizes.length) {
-    if (!row.default_size) {
-      row.default_size = row.sizes[0]._id;
+  try {
+    // First, find the name of the size the user wants to switch to
+    const newSize = sizes.find((s) => s.id.toString() === size)?.name;
+    if (!newSize) {
+      return res.status(400).send("Invalid size specified.");
     }
 
-    let default_size = row.sizes.find((size) => {
-      return size._id === row.default_size;
+    // Fetch designs in the specified category and for the new size
+    const designsData = await getDesigns({
+      where: {
+        AND: [
+          {
+            categories: {
+              some: {
+                id: {
+                  equals: parseInt(row),
+                },
+              },
+            },
+          },
+          {
+            categories: {
+              some: {
+                name: { contains: newSize, mode: "insensitive" },
+              },
+            },
+          },
+          // {
+          //   categories: {
+          //     some: {
+          //       availableOnPages: {
+          //         has: "Templates",
+          //       },
+          //     }
+          //   },
+          // },
+        ],
+      },
     });
 
-    if (default_size) {
-      rowQuery.size = {
-        width: default_size.width,
-        height: default_size.height,
-      };
-    } else {
-      rowQuery.size = {
-        width: row.sizes[0].width,
-        height: row.sizes[0].height,
-      };
-    }
-  }
+    // Assuming 'getBrandedDesigns' returns an array of designs
+    const designsInNewSize = designsData.designs;
 
-  if (row.default_tag) {
-    rowQuery.search = row.default_tag;
-  }
-
-  return rowQuery;
-}
-
-function getCarouselQuery(req, templatesId) {
-  let today = new Date();
-
-  let carouselQuery = {
-    type: "carousel",
-    templates_category: parseInt(templatesId) || 39,
-    $or: [
-      {
-        start_date: null,
-        end_date: null,
-      },
-      {
-        start_date: {
-          $lte: today,
-        },
-        end_date: {
-          $gte: today,
-        },
-      },
-      {
-        start_date: {
-          $lte: today,
-        },
-        end_date: null,
-      },
-      {
-        start_date: null,
-        end_date: {
-          $gte: today,
-        },
-      },
-    ],
-  };
-
-  let special_access = req.user.account.special_access
-
-  if (!global.isDev && (!special_access || !templatesId)) {
-    carouselQuery.isDev = {
-      $ne: true,
+    newRow = {
+      templates: designsInNewSize,
+      sizes: [], // needs to be fetched again for category
     };
+
+    // Prepare newRow with the fetched designs and initialize sizeOptions
+    const sizesWithCounts = await Promise.all(
+      sizes.map(async (size) => {
+        try {
+          const designsCountData = await getDesignsCount({
+            where: {
+              AND: [
+                {
+                  categories: {
+                    some: {
+                      id: { equals: parseInt(row) },
+                    },
+                  },
+                },
+                {
+                  categories: {
+                    some: {
+                      name: { contains: size.name, mode: "insensitive" },
+                    },
+                  },
+                },
+                {
+                  categories: {
+                    some: {
+                      availableOnPages: { has: "Templates" },
+                    },
+                  },
+                },
+              ],
+            },
+          });
+
+          if (designsCountData.designsCount > 0) {
+            return size; // Return the size if there's a match
+          }
+        } catch (error) {
+          console.log(error);
+          return null; // Return null in case of error
+        }
+        return null; // Return null if no designs are found
+      })
+    );
+
+    // Filter out null values and populate newRow.sizes
+    newRow.sizes = sizesWithCounts.filter(Boolean);
+  } catch (error) {
+    console.error("Error fetching designs for new size:", error);
+    return res.status(500).send("An error occurred while resizing.");
   }
 
-  return carouselQuery;
+  res.render("templates", {
+    sizes, // Pass the size array for the frontend to use
+    row: newRow, // Pass the newRow object containing designs in the new size and size options
+    templates: [],
+    cache: true,
+    filename: "templates",
+    loading: false,
+  });
 }

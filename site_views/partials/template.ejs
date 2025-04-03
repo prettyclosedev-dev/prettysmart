@@ -1,12 +1,12 @@
 <div
-  data-template="<%=template.template_id%>"
+  data-template="<%=template.id%>"
   data-export
   class="template d-block rounded"
-  original_title="<%= template.template_title %>"
-  title="<%=template.template_title.replace('_free','');%>"
+  original_title="<%= template.name %>"
+  title="<%=template.name ? template.name.replace('_free','') : '';%>"
 >
   <img
-    src="<%=template.thumbnail_url%>"
+    src="<%=template.preview%>"
     alt=""
     class="rounded LoNotSensitive"
   />

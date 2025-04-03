@@ -179,13 +179,13 @@
                 contentType: false,
                 processData: false,
                 success: function (res) {
-                    console.log("SUCCESS");
+                    console.log("SUCCESS", res);
                     if (!res.success) {
                         alert(res.error || "Failed to upload avatar!")
                     }
                 },
                 error: function (err) {
-                    console.log("ERROR");
+                    console.log("ERROR", err);
                     alert(JSON.stringify(err));
                 },
             });
@@ -196,28 +196,44 @@
         var $form = $(this),
             data = $form.serializeArray();
 
-            $form.find('.form-loader').addClass('d-flex');
-        $.post($form.attr('action'), $.param(data), function(res){
-            if (res && res.success) {
-                window.location.href = "/settings/account"//"/settings/account";
-            } else {
-                alert(JSON.stringify(res))
-            }
-            $form.find('.form-loader').removeClass('d-flex');
-        }).fail(function(res){
-            console.log(res)
-            if(res.responseJSON && res.responseJSON.errors){
-                res.responseJSON.errors.forEach(function(error){
-                    $('[data-field="'+ error.param +'"]').text(error.msg);
-                })
-            }else if(res.responseJSON && res.responseJSON.error){
-                $('[data-field="signup"]').text(res.responseJSON.error.message);
-            }else{                
-                $('[data-field="signup"]').text(res.responseText);
-            }
-            $form.find('.form-loader').removeClass('d-flex');
-        })
+        // Show the loader
+        $form.find('.form-loader').addClass('d-flex');
 
-        return false;
-    })
+        // Clear any previous error messages
+        $('[data-field]').text('');
+
+        $.post($form.attr('action'), $.param(data), function(res) {
+            console.log("Response: ", res);
+            if (res && res.success) {
+                window.location.href = "/settings/account"; // Redirect on success
+            } else {
+                // Display any errors returned by the server
+                if (res.errors && Array.isArray(res.errors)) {
+                    res.errors.forEach(function(error) {
+                        $('[data-field="'+ error.param +'"]').text(error.msg);
+                    });
+                } else if (res.error) {
+                    alert(res.error.message || "An unexpected error occurred.");
+                }
+            }
+        }).fail(function(res) {
+            console.log(res);
+            // Handle server-side validation errors or other issues
+            if (res.responseJSON && res.responseJSON.errors) {
+                res.responseJSON.errors.forEach(function(error) {
+                    $('[data-field="'+ error.param +'"]').text(error.msg);
+                });
+            } else if (res.responseJSON && res.responseJSON.error) {
+                $('[data-field="signup"]').text(res.responseJSON.error.message);
+            } else {                
+                $('[data-field="signup"]').text("An unexpected error occurred.");
+            }
+        }).always(function() {
+            // Always remove the loader, regardless of success or failure
+            $form.find('.form-loader').removeClass('d-flex');
+        });
+
+        return false; // Prevent form submission from reloading the page
+    });
+
 </script>

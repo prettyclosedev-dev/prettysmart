@@ -18,8 +18,8 @@
     .cards-wrapper {
       display: grid;
       grid-template-columns: 33fr 33fr 33fr;
-      column-gap: 22px;
-      row-gap: 22px;
+      column-gap: 52px;
+      row-gap: 52px;
       width: 100%;
 
       .my-card {
@@ -63,27 +63,26 @@
         }
 
         .svg-wrapper {
-          height: calc(100% - 70px);
+          height: calc(100% - 90px);
           width: 100%;
           position: absolute;
           -webkit-transform: translateY(-20%);
           transform: translateY(-20%);
-          top: 0px;
           left: 50%;
           transform: translate(-50%, -1.3vw);
 
           img,
           svg {
-            max-width: 100%;
-            max-height: 100%;
+            max-width: 80%;
+            max-height: 80%;
             position: relative;
             transition: all 0.3s;
           }
         }
 
         .title {
-          font-weight: 500;
-          line-height: 26px;
+          font-weight: 700;
+          line-height: 32px;
           user-select: none;
         }
 

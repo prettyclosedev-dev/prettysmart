@@ -15,9 +15,9 @@
 .new-dashboard-page .line .cards-wrapper {
   display: grid;
   grid-template-columns: 33fr 33fr 33fr;
-  -moz-column-gap: 22px;
-       column-gap: 22px;
-  row-gap: 22px;
+  -moz-column-gap: 52px;
+       column-gap: 52px;
+  row-gap: 52px;
   width: 100%;
 }
 .new-dashboard-page .line .cards-wrapper .my-card {
@@ -53,24 +53,23 @@
   z-index: 1;
 }
 .new-dashboard-page .line .cards-wrapper .my-card .svg-wrapper {
-  height: calc(100% - 70px);
+  height: calc(100% - 90px);
   width: 100%;
   position: absolute;
   transform: translateY(-20%);
-  top: 0px;
   left: 50%;
   transform: translate(-50%, -1.3vw);
 }
 .new-dashboard-page .line .cards-wrapper .my-card .svg-wrapper img,
 .new-dashboard-page .line .cards-wrapper .my-card .svg-wrapper svg {
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 80%;
+  max-height: 80%;
   position: relative;
   transition: all 0.3s;
 }
 .new-dashboard-page .line .cards-wrapper .my-card .title {
-  font-weight: 500;
-  line-height: 26px;
+  font-weight: 700;
+  line-height: 32px;
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;

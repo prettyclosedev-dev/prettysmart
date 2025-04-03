@@ -15,7 +15,7 @@
                 <% if(user.master){ %>
 
                     <div class="mb-2 d-none">
-                        <a href="/onboarding/transfer" class="btn btn-primary btn-sm px-4 badge-pill">Transfer from design huddle to prettysmart</a>
+                        <a href="/onboarding/transfer" class="btn btn-primary btn-sm px-4 badge-pill">Transfer from design huddle to prettyclose</a>
                     </div>
 
                 <% } %>
@@ -40,7 +40,7 @@
                     </div>
                     <div class="upload-primary-wrapper">
                         <div class="onboarding-section-subtitle mt-1">
-                        Upload your logos. The more the merrier 😎
+                        Upload your logo, brand assets & avatar. The more the merrier 😎
                         </div>
                         <label for="upload-assets" class="df acc upload-wrapper">
                             <i class="fa-light fa-upload"></i>
@@ -287,31 +287,6 @@
                     <button class="btn btn-primary badge-pill px-4" data-save-brand>Submit Brand</button>
                 </div>
             </div>
-            <div class="col-12 col-lg-5 position-relative pl-xl-5 d-none">
-                <div class="onboarding-templates-preview">
-
-                 
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-4">
-                                <%- include('partials/template', {async: true,onboarding:true, template:templates[5]}); %>
-                            </div>
-                            <%- include('partials/template', {async: true,onboarding:true, template:templates[2]}); %>
-                        </div>
-                        <div class="col-6 mb-4">
-                            <div class="mb-4">
-                                <%- include('partials/template', {async: true,onboarding:true, template:templates[1]}); %>
-                            </div>
-                            <%- include('partials/template', {async: true,onboarding:true, template:templates[3]}); %>
-                        </div>
-                    </div>
-                      <div class="text-center">
-                        <button class="btn btn-primary badge-pill px-4" data-save-brand>Update Brand</button>
-                      </div>
-                </div>
-
-                
-            </div>
         </div>
     </div>
 </div>
@@ -319,7 +294,7 @@
 <%- include('partials/footer', {async: true}); %>
 
 <script>
-    var TOKEN = '<%=user.token.access_token%>';
+    
     var draft_brand = <%- JSON.stringify(brand) %>;
 
     function getFiles(e) {

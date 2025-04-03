@@ -932,6 +932,50 @@ header .header-account:hover .account-menu {
   font-weight: 600;
 }
 
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.load-more.loading-anim {
+  pointer-events: none;
+}
+.load-more.loading-anim .spinner {
+  display: inline-block;
+  margin-left: 10px;
+  animation: fadeInOut 1s infinite;
+}
+
+.load-more-slide {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+}
+.load-more-slide .load-more-thumbnail {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.load-more-slide .load-more-thumbnail button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.load-more-slide .load-more-thumbnail button:hover {
+  background-color: #0056b3;
+}
+
 .template {
   border: 1px solid #f2f2f2;
   background-color: #f8f8f8;
@@ -1125,7 +1169,7 @@ header .header-account:hover .account-menu {
 }
 
 #editor {
-  height: calc(100vh - 96px);
+  width: inherit;
 }
 
 .dashboard-page {

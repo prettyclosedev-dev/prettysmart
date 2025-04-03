@@ -7,6 +7,7 @@ const config = require("../config");
 const openAi = require("../openAi");
 const stripe = require("stripe")(config.stripe.prod.secret);
 const { body, validationResult } = require("express-validator");
+const TEAM_PRICES = [config.stripe.plans.team.year, config.stripe.plans.team.month];
 
 // for(let i = 0;i<4000;i++){
 //     setTimeout(() => {
@@ -257,7 +258,7 @@ module.exports = () => {
       );
       const portalsession = await stripe.billingPortal.sessions.create({
         customer: checkoutsession.customer,
-        return_url: "https://prettysmart.co/account",
+        return_url: "https://prettyclose.co/account",
       });
       res.redirect(portalsession.url);
     } catch (error) {
@@ -341,12 +342,49 @@ module.exports = () => {
         delete user.role;
       }
 
+      const currentPlanId = req.user.account.plan_id;
+
+      // Check if the current plan is part of the TEAM_PRICES
+      if (!TEAM_PRICES.includes(currentPlanId)) {
+        // Disable adding users and redirect with a message
+        return res.status(403).json({
+          success: false,
+          message: "You need to upgrade to the Teams plan to add users.",
+        });
+      }
+
       user.account = req.user.account;
       let newUser = new User(user);
+
       newUser
         .save()
         .then(async (user) => {
-          res.send({success: true});
+          // Update the subscription quantity based on the number of users in the account
+          const accountUsers = await User.find({
+            account: req.user.account._id,
+          });
+          const userCount = Math.max(accountUsers.length, 2); // Ensure minimum of 2 users
+
+          if (req.user.account.stripe_session_id) {
+            const session = await stripe.checkout.sessions.retrieve(
+              req.user.account.stripe_session_id
+            );
+            const subscription = await stripe.subscriptions.retrieve(
+              session.subscription
+            );
+
+            // Update the subscription quantity for the Team plan
+            await stripe.subscriptions.update(subscription.id, {
+              items: [
+                {
+                  id: subscription.items.data[0].id,
+                  quantity: userCount,
+                },
+              ],
+            });
+          }
+
+          res.send({ success: true });
         })
         .catch((err) => {
           console.log(err);
@@ -358,26 +396,35 @@ module.exports = () => {
   router.post("/users/:id", async (req, res, next) => {
     let user = req.body;
 
+    // If the current user is not an owner, don't allow role updates
     if (req.user.role !== "owner") {
       delete user.role;
     }
 
+    // Avoid updating sensitive fields like email or avatar directly from the form
     delete user.email;
     delete user.avatar;
 
-    let updateUser = await User.findOneAndUpdate(
-      {
-        _id: req.params.id,
-      },
-      {
-        $set: user,
-      },
-      {
-        new: true,
-      }
-    );
+    try {
+      let updatedUser = await User.findOneAndUpdate(
+        {
+          _id: req.params.id,
+        },
+        {
+          $set: user,
+        },
+        {
+          new: true,
+        }
+      );
 
-    res.redirect("/settings/account");
+      // Respond with JSON indicating success
+      res.json({ success: true, user: updatedUser });
+    } catch (error) {
+      // Handle any errors and return a JSON error response
+      console.error("Error updating user:", error);
+      res.status(500).json({ success: false, error: "Failed to update user" });
+    }
   });
 
   router.get("/users/:id/delete", async (req, res, next) => {

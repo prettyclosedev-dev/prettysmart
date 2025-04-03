@@ -1,314 +1,294 @@
 <%- include('partials/header', {async: true}); %>
-    <link rel="stylesheet" href="/static/css/jquery-ui.min.css">
-    <link rel="stylesheet" href="/static/css/templates-page.css?<%=Date.now()%>">
-    <script src="/static/js/jquery-ui.min.js"></script>
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>
-    <style>
-    .ui-autocomplete-loading {
-        background: white url("/static/images/ui-anim_basic_16x16.gif") right center no-repeat;
-    }
-    </style>
-    <div class="df page-wrapper df ffp">
-        <%- include('partials/nav', {async: true}); %>
-        <div class="page-content">
-            <div class="templates-page"><div class="page-content-wrapper">
-                <div style="<%= typeof pageTitle !== "undefined" && pageTitle == "Chanukah" ? 'display: flex; justify-content: space-between; flex-direction: row; align-items: center;' : ''%>">
-                    <div>
-                        <h2 class="ffp page-title"><%= typeof pageTitle !== "undefined" ? pageTitle : "Templates" %><span class="text-primary">.</span></h2>
-                        <p style="padding-bottom: 32px" class="page-title-sub <%= (typeof pageTitle !== 'undefined' && pageTitle.includes('reviews')) ? '' : 'd-none' %>">Enter your company name to get some google reviews predesigned.</p>
-                        <% if (typeof ai_input != "undefined" && typeof ai_placeholder != "undefined" && ai_input.length && ai_placeholder.length) { %>
-                        <div class="orientation-selection-wrapper" style="margin-bottom: 32px; flex-direction: row; display: flex;">
-                            <input style="margin-right: 20px; text-align:center;" type="text" class="ui-widget ai_field" placeholder="<%=  ai_placeholder %>" name="<%= ai_input %>" />
-                            <a href="#" class="refresh-link px-lg-3 badge-pill text-white" onclick="regenerateTemplates()">
-                                <span class="">
-                                    Regenerate
-                                </span>                                                
-                            </a>
-                        </div>
-                        <% } %>
-                    </div>
-                    <% if (typeof pageTitle !== "undefined" && pageTitle == "Chanukah") { %>
-                     <a href="#" class="refresh-link px-lg-3 badge-pill text-white" onclick="regenerateChanukah()">
-                        <span class="">
-                            Regenerate
-                        </span>                                                
-                    </a> 
-                    <% } %>
-                </div>
-                <%
-                    function isAllowedDownload(file_name) {
-                        return (
-                            (plan_name && plan_name !== "Free" && !payment_failed) ||
-                            file_name.includes("_free")
-                        );
-                    }
-                %>
-                <div class="list-wrapper <%= (typeof ai_input != 'undefined' && typeof ai_placeholder != 'undefined' && ai_input.length && ai_placeholder.length && ai_input !== 'marketing' && ai_input !== 'facts') ? 'd-none' : '' %>">
-                    <div id="templates_container">
-                    <% templates.forEach((templateType, index) => { %>
-                        <div id="<%= templateType._id %>" class="item-wrapper">
-                            <div class="df aic item-header">
-                                <p><%-templateType.name%></p>
-                                <div class="mla">
-                                    <%  if (templateType.name === "Newsroom" || templateType.name.includes("Reviews") || templateType.name.includes("Q&A")) { %>
-                                    <div class="orientation-selection-wrapper" style="margin-left: 20px;">
-                                        <% if(templateType.ai_field){ %>
-                                            <% if (templateType.name === 'Q&A') {  %>
-                                                <textarea style="margin-right: 20px; text-align:center;" type="text" class="ui-widget ai_field" placeholder="<%= templateType.ai_field_placeholder || templateType.name === 'Newsroom' ? 'Enter search term or full url' : templateType.name.includes('Reviews') ? 'Search for a place name or ID' : templateType.name === 'Q&A' ? 'Enter a url or text of article, text in a Q&A format or search for a topic' : '' %>" name="<%= templateType.ai_field %>"></textarea>
-                                            <% } else {  %>
-                                                <input style="margin-right: 20px; text-align:center;" type="text" class="ui-widget ai_field" placeholder="<%= templateType.ai_field_placeholder || templateType.name === 'Newsroom' ? 'Enter search term or full url' : templateType.name.includes('Reviews') ? 'Search for a place name or ID' : templateType.name === 'Q&A' ? 'Enter a url or text of article, text in a Q&A format or search for a topic' : '' %>" name="<%= templateType.ai_field %>"/>
-                                            <% }  %>
-                                            <a href="#" class="refresh-link px-lg-3 badge-pill text-white" onclick="generate(<%= JSON.stringify(templateType) %>)">
-                                                <span class="">
-                                                    Generate
-                                                </span>                                                
-                                            </a>
-                                        <% } %>
-                                    </div>
-                                    <% } else { %>    
-                                    <div class="orientation-selection-wrapper">
-                                        <% 
-                                            function sizeOptions(selectedRow) {
-                                                return selectedRow.sizes.map(function (size, index) {
-                                                    return {value: size.name, id: size._id, selected: size._id === selectedRow.default_size, row: selectedRow, size};
-                                                }) 
-                                            }
-                                        %>
-                                        <% if (templateType.sizes) { %>
-                                            <%- include('partials/segment-control', {async: true, options: sizeOptions(templateType), inverted: false, segmentID: index + "-seg"}); %>
-                                        <% } %>
-                                    </div>
-                                    <% } %>
-                                </div>
-                            </div>
-                            
-                            <div class="swiper" style="width: 100%;">
-                                <div class="swiper-wrapper">
-                                  <!-- Slides -->
-                                    <% templateType.templates.forEach((template,idx) => {%>
-                                        <div class="swiper-slide">
-                                            <div class="template">
-                                            <%- include('partials/template', {async: true, template:template}); %>
-                                            <div class="favorite-wrapper">
-                                                <span class="like-icon">
-                                                    <div class="heart-animation-1"></div>
-                                                    <div class="heart-animation-2"></div>
-                                                </span>
-                                                Favorite
-                                            </div>
-                                            <% if (template.template_title.includes("_free")) { %>
-                                                <div class="tag fs14 ttuc" style="background-color: #db3965;">Free!</div>
-                                            <% } %>
-
-                                            <div class="download-wrapper">
-
-                                                <!--  -->
-                                                <div class="download-button primary-btn btn-group dropup" style="display: inline-flex;">
-                                                    <button class="btn btn-med download-button-item" value="jpg" type="button" <% if (!isAllowedDownload(template.template_title)) { %> style="justify-content: center;" onclick="location.href='/plans';" <% } %>>
-                                                      <%= isAllowedDownload(template.template_title) ? 'Download JPG' : 'Upgrade plan' %>
-                                                    </button>
-                                                    <% if (isAllowedDownload(template.template_title)) { %>
-                                                        <button type="button" class="btn btn-med  dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            <span class="sr-only">Select download type</span>
-                                                            <i class="fa-regular fa-chevron-down"></i>
-                                                        </button>
-                                                        <div class="dropdown-menu dropdown-menu-right">
-                                                        <button class="dropdown-item download-button-item" value="png">Download PNG</button>
-                                                        <button class="dropdown-item download-button-item" value="pdf">Download PDF</button>
-                                                        <button class="dropdown-item download-button-item" value="pdf_flattened">Download PDF Flattened</button>
-                                                        </div>
-                                                    <% } %>
-                                                  </div>
-                                                  <!--  -->
-                                            </div>
-                                            </div>
-                                        </div>
-                                    <%})%>
-                                </div>
-                                <div class="swiper-button-prev hidden"></div>
-                                <div class="swiper-button-next hidden"></div>
-                            </div>
-                        </div>
-                    <%})%>
-                    </div>
-                        <div class="single-swiper-wrapper swiper-wrapper">
-                            <!-- Slides -->
-                            <% row.templates.forEach((template,idx) => {%>
-                                <div class="swiper-slide">
-                                    <div class="template">
-                                    <%- include('partials/template', {async: true, template:template}); %>
-                                    <div class="favorite-wrapper">
-                                        <span class="like-icon">
-                                            <div class="heart-animation-1"></div>
-                                            <div class="heart-animation-2"></div>
-                                        </span>
-                                        Favorite
-                                    </div>
-                                    <% if (template.template_title.includes("_free")) { %>
-                                        <div class="tag fs14 ttuc" style="background-color: #db3965;">Free!</div>
-                                    <% } %>
-
-                                    <div class="download-wrapper">
-                                        <!--  -->
-                                        <div class="download-button primary-btn btn-group dropup" style="display: inline-flex;">
-                                            <button class="btn btn-med download-button-item" value="jpg" type="button" <% if (!isAllowedDownload(template.template_title)) { %> style="justify-content: center;" onclick="location.href='/plans';" <% } %>>
-                                                <%= isAllowedDownload(template.template_title) ? 'Download JPG' : 'Upgrade plan' %>
-                                            </button>
-                                            <% if (isAllowedDownload(template.template_title)) { %>
-                                                <button type="button" class="btn btn-med  dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    <span class="sr-only">Select download type</span>
-                                                    <i class="fa-regular fa-chevron-down"></i>
-                                                </button>
-                                                <div class="dropdown-menu dropdown-menu-right">
-                                                <button class="dropdown-item download-button-item" value="png">Download PNG</button>
-                                                <button class="dropdown-item download-button-item" value="pdf">Download PDF</button>
-                                                <button class="dropdown-item download-button-item" value="pdf_flattened">Download PDF Flattened</button>
-                                                </div>
-                                            <% } %>
-                                        </div>
-                                        <!--  -->
-                                    </div>
-                                    </div>
-                                </div>
-                            <%})%>
-                        </div>
-                </div>
+<link rel="stylesheet" href="/static/css/jquery-ui.min.css">
+<link rel="stylesheet" href="/static/css/templates-page.css?<%=Date.now()%>">
+<script src="/static/js/jquery-ui.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<style>
+.ui-autocomplete-loading {
+    background: white url("/static/images/ui-anim_basic_16x16.gif") right center no-repeat;
+}
+</style>
+<div class="df page-wrapper df ffp">
+  <%- include('partials/nav', {async: true}); %>
+  <div class="page-content">
+    <div class="templates-page">
+      <div class="page-content-wrapper">
+        <div style="<%= typeof pageTitle !== "undefined" && pageTitle == "Chanukah" ? 'display: flex; justify-content: space-between; flex-direction: row; align-items: center;' : ''%>">
+          <div>
+            <h2 class="ffp page-title"><%= typeof pageTitle !== "undefined" ? pageTitle : "Templates" %><span class="text-primary">.</span></h2>
+            <p style="padding-bottom: 32px" class="page-title-sub <%= (typeof pageTitle !== 'undefined' && pageTitle.includes('reviews')) ? '' : 'd-none' %>">Enter your company name to get some google reviews predesigned.</p>
+            <% if (typeof ai_input != "undefined" && typeof ai_placeholder != "undefined" && ai_input.length && ai_placeholder.length) { %>
+            <div class="orientation-selection-wrapper" style="margin-bottom: 32px; flex-direction: row; display: flex;">
+              <input style="margin-right: 20px; text-align:center;" type="text" class="ui-widget ai_field" placeholder="<%=  ai_placeholder %>" name="<%= ai_input %>" />
+              <a href="#" class="refresh-link px-lg-3 badge-pill text-white" onclick="regenerateTemplates()">
+                <span class="">
+                  Regenerate
+                </span>
+              </a>
             </div>
+            <% } %>
+          </div>
+          <% if (typeof pageTitle !== "undefined" && pageTitle == "Chanukah") { %>
+          <a href="#" class="refresh-link px-lg-3 badge-pill text-white" onclick="regenerateChanukah()">
+            <span class="">
+              Regenerate
+            </span>
+          </a>
+          <% } %>
         </div>
+        <%
+          function isAllowedDownload(file_name) {
+            return (
+              (plan_name && plan_name !== "Free" && !payment_failed) ||
+              file_name.includes("_free")
+            );
+          }
+        %>
+        <% if (typeof loading !== 'undefined' && loading) { %>
+          <div id="loading-state">
+            <p>Loading templates, please wait... (Can take up to 30 seconds)</p>
+          </div>
+        <% } %>
+          <div class="list-wrapper <%= (typeof ai_input != 'undefined' && typeof ai_placeholder != 'undefined' && ai_input.length && ai_placeholder.length && ai_input !== 'marketing' && ai_input !== 'facts') ? 'd-none' : '' %>">
+            <div id="templates_container">
+              <%- include('partials/templates-content', { templates: templates, sizes: sizes }) %>
+            </div>
+            <div class="single-swiper-wrapper swiper-wrapper">
+              <!-- Slides -->
+              <% row.templates.forEach((template, idx) => {%>
+              <div class="swiper-slide">
+                <div class="template">
+                  <%- include('partials/template', {async: true, template:template}); %>
+                  <div class="favorite-wrapper <%= template.isFavorite ? 'liked' : '' %>">
+                    <span class="like-icon">
+                      <div class="heart-animation-1"></div>
+                      <div class="heart-animation-2"></div>
+                    </span>
+                    Favorite
+                  </div>
+                  <% if (template.name.includes("_free")) { %>
+                  <div class="tag fs14 ttuc" style="background-color: #db3965;">Free!</div>
+                  <% } %>
+                  <div class="download-wrapper">
+                    <!--  -->
+                    <div class="download-button primary-btn btn-group dropup" style="display: inline-flex;">
+                      <button class="btn btn-med download-button-item" value="jpg" type="button" <% if (!isAllowedDownload(template.name)) { %> style="justify-content: center;" onclick="location.href='/plans';" <% } %>>
+                        <%= isAllowedDownload(template.name) ? 'Download JPG' : 'Upgrade plan' %>
+                      </button>
+                      <% if (isAllowedDownload(template.name)) { %>
+                      <button type="button" class="btn btn-med dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="sr-only">Select download type</span>
+                        <i class="fa-regular fa-chevron-down"></i>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-right">
+                        <button class="dropdown-item download-button-item" value="png">Download PNG</button>
+                        <button class="dropdown-item download-button-item" value="pdf">Download PDF</button>
+                        <button class="dropdown-item download-button-item" value="pdf_flattened">Download PDF Flattened</button>
+                      </div>
+                      <% } %>
+                    </div>
+                    <!--  -->
+                  </div>
+                </div>
+              </div>
+              <%})%>
+            </div>
+          </div>
+      </div>
     </div>
+  </div>
+  <%- include('partials/export-template', {async: true}); %>
+</div>
 
-        <%- include('partials/export-template', {async: true}); %>
-    </div>
+<script>
+  $(document).ready(function () {
+    // Check if loading state is present, then fetch the templates
+    if (window.location.pathname === '/templates' && $('#loading-state').length) {
+      fetchTemplates();
+    }
+  });
+
+  function fetchTemplates() {
+    topbar.config({
+      barThickness: 4,
+      barColors: {
+        '0': '#db3965',
+        '1.0': '#db3965'
+      }
+    });
+    topbar.show();
+
+    $.ajax({
+      url: '/templates/get-templates',
+      method: 'GET',
+      success: function (html) {
+        // Remove the loading state
+        topbar.hide();
+        $('#loading-state').remove();
+
+        // Inject the fetched HTML into the templates container
+        $('#templates_container').html(html);
+
+        // Reinitialize Swiper after new content is loaded
+        swiper = new Swiper('.swiper', {
+          slidesPerView: 'auto',
+          spaceBetween: 14,
+          mousewheel: true,
+          observer: true,
+          observeParents: true,
+          rebuildOnUpdate: true,
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+
+        getCustomization({});
+      },
+      error: function (err) {
+        topbar.hide();
+        console.error('Error fetching templates:', err);
+
+        // Replace the loading state with an error message and retry button
+        $('#loading-state').html(`
+          <p>Error loading templates. Please try again.</p>
+          <button id="retry-button" class="btn btn-primary">Retry</button>
+        `);
+
+        // Add click handler for the retry button
+        $('#retry-button').on('click', function () {
+          $('#loading-state').html('<p>Loading templates, please wait... (Can take up to 30 seconds)</p>');
+          fetchTemplates();  // Retry fetching the templates
+        });
+      }
+    });
+  }
+</script>
+
+<script>
+  var swiper = new Swiper('.swiper', {
+    slidesPerView: 'auto',
+    spaceBetween: 14,
+    mousewheel: true,
+    observer: true, 
+    observeParents: true,
+    rebuildOnUpdate: true,
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+  });
+
+  $(".item-wrapper").hover(function() {
+    $(".swiper-button-prev").removeClass("hidden");
+    $(".swiper-button-next").removeClass("hidden");
+  }, function() {
+    $(".swiper-button-prev").addClass("hidden");
+    $(".swiper-button-next").addClass("hidden");
+  });
+
+  $(document).on('mouseenter', '.item-wrapper', function() {
+    $(".swiper-button-prev").removeClass("hidden");
+    $(".swiper-button-next").removeClass("hidden");
+  });
+
+  $(document).on('mouseleave', '.item-wrapper', function() {
+      $(".swiper-button-prev").addClass("hidden");
+      $(".swiper-button-next").addClass("hidden");
+  });
+
+  $(document).on('click', '.favorite-wrapper', function(e) {
+    if (!user.account.plan_id) {
+      alert("You need a paid account to save your favorite templates.");
+    } else {
+      $(this).toggleClass('liked');
+      if ($(this).hasClass("liked")) {
+        onAddFavorite($(this));
+      } else {
+        onRemoveFavorite($(this));
+      }
+    }
+  });
 
 
-    <script>
-        var swiper = new Swiper('.swiper', {
-            slidesPerView: 'auto',
+  function isAllowedDownload(file_name) {
+    var plan_name = <%- JSON.stringify(plan_name) %>;
+    var payment_failed = <%- JSON.stringify(payment_failed) %>;
+
+    return (plan_name && plan_name !== "Free" && !payment_failed) || file_name.includes("_free");
+  }
+
+  function regenerateChanukah() {
+    $('.list-wrapper').load('/chanukah' +  ' #templates_container', function() {
+      $(".list-wrapper").removeClass("d-none")
+      getCustomization({ runAI: true, row_class_name: 'Chanukah' }, null, function(opts) {
+        if (opts.success) {
+          swiper = new Swiper(".swiper", {
+            slidesPerView: "auto",
             spaceBetween: 14,
-            // slidesPerView: 3,
             mousewheel: true,
-            observer: true, 
+            observer: true,
             observeParents: true,
             rebuildOnUpdate: true,
             navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
+              nextEl: ".swiper-button-next",
+              prevEl: ".swiper-button-prev",
             },
-        });
+          });
 
-        $( ".item-wrapper" ).hover(function() {
-            $( ".swiper-button-prev" ).removeClass( "hidden" );
-            $( ".swiper-button-next" ).removeClass( "hidden" );
-            }, function() {
-            $( ".swiper-button-prev" ).addClass( "hidden" );
-            $( ".swiper-button-next" ).addClass( "hidden" );
-        });
-    </script>
-
-    <script>
-        $('.favorite-wrapper').on('click', function(e) {
-            if (!user.account.plan_id) {
-                alert("You need a paid account to save your favorite templates.")
-            } else {
-                $(this).toggleClass('liked');
-                if ($(this).hasClass("liked")) {
-                    onAddFavorite($(this))
-                } else {
-                     onRemoveFavorite($(this))
-                }
-            }
-            
-            // setTimeout(() => {
-            //   $(e.target).removeClass('liked')
-            // }, 1000)
-        });
-
-        function isAllowedDownload(file_name) {
-            var plan_name = <%- JSON.stringify(plan_name) %>
-            var payment_failed = <%- JSON.stringify(payment_failed) %>
-
-            return (plan_name && plan_name !== "Free" && !payment_failed) || file_name.includes("_free");
+          $(".item-wrapper").hover(function() {
+            $(".swiper-button-prev").removeClass("hidden");
+            $(".swiper-button-next").removeClass("hidden");
+          }, function() {
+            $(".swiper-button-prev").addClass("hidden");
+            $(".swiper-button-next").addClass("hidden");
+          });
         }
+      });
+    });
+  }
 
-    </script>
+  const ai_engine = <%- typeof ai_engine != "undefined" ? decodeURI(JSON.stringify(ai_engine)) : JSON.stringify("") %>;
 
-    <script>
-        function regenerateChanukah() {
-            $('.list-wrapper').load('/chanukah' +  ' #templates_container', function() {
-                $(".list-wrapper").removeClass("d-none")
-                getCustomization({ runAI: true, row_class_name: 'Chanukah' }, null, function(opts) {
-                    if (opts.success) {
-                        // $(".list-wrapper").removeClass("d-none")
-                        // swiper.update()
-                        swiper = new Swiper(".swiper", {
-                            slidesPerView: "auto",
-                            spaceBetween: 14,
-                            mousewheel: true,
-                            observer: true,
-                            observeParents: true,
-                            rebuildOnUpdate: true,
-                            navigation: {
-                                nextEl: ".swiper-button-next",
-                                prevEl: ".swiper-button-prev",
-                            },
-                        });
+  function regenerateTemplates() {
+    $('.list-wrapper').load(location.pathname + location.search +  ' #templates_container', function() {
+      $(".list-wrapper").removeClass("d-none");
+      getCustomization({runAI: true, row_class_name: ai_engine}, null, function(opts) {
+        if (opts.success) {
+          swiper = new Swiper(".swiper", {
+            slidesPerView: "auto",
+            spaceBetween: 14,
+            mousewheel: true,
+            observer: true,
+            observeParents: true,
+            rebuildOnUpdate: true,
+            navigation: {
+              nextEl: ".swiper-button-next",
+              prevEl: ".swiper-button-prev",
+            },
+          });
 
-                        $( ".item-wrapper" ).hover(function() {
-                            $( ".swiper-button-prev" ).removeClass( "hidden" );
-                            $( ".swiper-button-next" ).removeClass( "hidden" );
-                            }, function() {
-                            $( ".swiper-button-prev" ).addClass( "hidden" );
-                            $( ".swiper-button-next" ).addClass( "hidden" );
-                        });
-                    }
-                });
-            });
+          $(".item-wrapper").hover(function() {
+            $(".swiper-button-prev").removeClass("hidden");
+            $(".swiper-button-next").removeClass("hidden");
+          }, function() {
+            $(".swiper-button-prev").addClass("hidden");
+            $(".swiper-button-next").addClass("hidden");
+          });
         }
+      });
+    });
+  }
+</script>
 
-        const ai_engine = <%- typeof ai_engine != "undefined" ? decodeURI(JSON.stringify(ai_engine)) : JSON.stringify("") %>
-
-        function regenerateTemplates() {
-            $('.list-wrapper').load(location.pathname + location.search +  ' #templates_container', function() {
-                $(".list-wrapper").removeClass("d-none")
-                getCustomization({runAI: true, row_class_name: ai_engine}, null, function(opts) {
-                    if (opts.success) {
-                        // $(".list-wrapper").removeClass("d-none")
-                        // swiper.update()
-                        swiper = new Swiper(".swiper", {
-                            slidesPerView: "auto",
-                            spaceBetween: 14,
-                            mousewheel: true,
-                            observer: true,
-                            observeParents: true,
-                            rebuildOnUpdate: true,
-                            navigation: {
-                                nextEl: ".swiper-button-next",
-                                prevEl: ".swiper-button-prev",
-                            },
-                        });
-
-                        $( ".item-wrapper" ).hover(function() {
-                            $( ".swiper-button-prev" ).removeClass( "hidden" );
-                            $( ".swiper-button-next" ).removeClass( "hidden" );
-                            }, function() {
-                            $( ".swiper-button-prev" ).addClass( "hidden" );
-                            $( ".swiper-button-next" ).addClass( "hidden" );
-                        });
-                    }
-                });
-            });
-        }
-    </script>
-
-    <script>
-        var TOKEN = '<%=user.token.access_token%>';
-        var user = <%- JSON.stringify(user) %>;
-        var articles = <%- JSON.stringify(typeof articles !== "undefined" ? articles : "") %> // used for mortgage news
-        var rates = <%- JSON.stringify(typeof rates !== "undefined" ? rates : "") %> // used for mortgage rates
-    </script>
-    <script src="/static/js/templates.js?<%=Date.now()%>"></script>
-    <script src="/static/js/loader.js"></script>
-
-    </body>
+<script>
+  
+  var user = <%- JSON.stringify(user) %>;
+  var articles = <%- JSON.stringify(typeof articles !== "undefined" ? articles : "") %>; // used for mortgage news
+  var rates = <%- JSON.stringify(typeof rates !== "undefined" ? rates : "") %>; // used for mortgage rates
+</script>
+<script src="/static/js/templates.js?<%=Date.now()%>"></script>
+<script src="/static/js/loader.js"></script>
+</body>
 </html>

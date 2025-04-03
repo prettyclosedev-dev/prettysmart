@@ -1,7 +1,7 @@
 window.UPDATE_COUNTER = 0;
 
 if (window.location.pathname.includes("brand")) {
-  TextType.start();
+  // TextType.start();
 }
 
 $(".google_font")
@@ -455,7 +455,7 @@ function updateGoogleFont($this, draft) {
     window.UPDATE_COUNTER++;
 
     $(".template-loader-new").show();
-    TextType.start();
+    // TextType.start();
 
     $this.closest(".onboarding-font-row").loading();
     $.post("/brand/font" + (draft ? "?draft=1" : ""), {
@@ -549,7 +549,7 @@ function updateInfo(draft) {
   }
 
   $(".template-loader-new").show();
-  TextType.start();
+  // TextType.start();
 
   $('[data-tab-content="info"]').loading();
 
@@ -590,7 +590,7 @@ function updateInfo(draft) {
 function displayBrand(brand, runAI) {
   if (!window.location.pathname.includes("setup")) {
     $(".template-loader-new").show();
-    TextType.start();
+    // TextType.start();
 
     getCustomization(
       {

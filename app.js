@@ -75,6 +75,7 @@ app.use((req, res, next) => {
     "landing?affiliate=true",
     "landing?ref=producthunt",
     "?ref=producthunt",
+    "clyps",
   ];
 
   res.locals.light = false;
@@ -94,16 +95,14 @@ app.use((req, res, next) => {
 
   if (req.isAuthenticated()) {
     const needsToLogin = () => {
-      let secondsSinceLastLogin = (Date.now() - req.user.login_date) / 1000;
+      // let secondsSinceLastLogin = (Date.now() - req.user.login_date) / 1000;
 
       return (
-        !req.user.account ||
-        !req.user.token ||
-        (req.user.token && req.user.token.expires_in <= secondsSinceLastLogin)
+        !req.user.account
       );
     };
 
-    if (needsToLogin() && !isOpen() && !req.session.issueWithHuddleAccount) {
+    if (needsToLogin() && !isOpen()) {
       return res.redirect("/login");
     }
 
@@ -123,16 +122,6 @@ app.use((req, res, next) => {
     calculateCreditsLeft(req, res, function (credits) {
       res.locals.credits_left = credits;
     });
-
-    if (req.session.issueWithHuddleAccount) {
-      res.locals.infobox = {
-        text: "There was an issue with your Huddle account please resolve.",
-        button: {
-          text: "Resolve here",
-          link: "/subscribe",
-        },
-      };
-    }
 
     res.locals.payment_failed = req.user.account.payment_failed;
     if (req.user.account.payment_failed) {
@@ -173,7 +162,7 @@ app.use((req, res, next) => {
     res.locals.affiliate = req.session.affiliate;
 
     const needsPayment = () => {
-      return !req.user.account.plan_id;// || req.session.issueWithHuddleAccount; //!req.user.account.stripe_session_id;// && req.session.affiliate;
+      return !req.user.account.plan_id;
     };
 
     if (
@@ -269,8 +258,10 @@ app.use(function (error, req, res, next) {
 // });
 
 app.use("/", require("./site_routes/index")());
+app.use("/landing", require("./site_routes/index")());
 app.use("/app", require("./site_routes/app")());
 app.use("/login", require("./site_routes/login")());
+app.use("/clyps", require("./site_routes/clyps")());
 app.use("/forgot", require("./site_routes/forgot")());
 app.use("/reset", require("./site_routes/reset")());
 app.use("/logout", require("./site_routes/logout")());

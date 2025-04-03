@@ -1,22 +1,41 @@
-<%- include('partials/header', {async: true,fixed_header:true}); %>
+<%- include('partials/header', {async: true, fixed_header: true}); %>
 <script src="https://js.stripe.com/v3/"></script>
 
 <script>
-  var stripe = Stripe('<%=stripe_pub_key%>');
+  var stripe = Stripe('<%= stripe_pub_key %>');
 
   stripe.redirectToCheckout({
-      sessionId: '<%=sessionId%>'
-  }).then(function(res){
-      console.log(res)
-      fbq('track', 'InitiateCheckout', {plan: "<%= plan_name %>"})
+      sessionId: '<%= sessionId %>'
+  }).then(function(res) {
+      console.log(res);
+
+      if (res.error) {
+          console.error("Stripe checkout error:", res.error.message);
+      } else {
+          // Facebook Pixel Tracking for Checkout
+          fbq('track', 'InitiateCheckout', { plan: "<%= plan_name %>" });
+
+          if (typeof tap !== 'undefined' && typeof tap.push === 'function') {
+          // Tapfiliate conversion tracking for successful payments
+            tap.push(["conversion", {
+                conversion_type: "purchase",
+                amount: <%= plan_price %>,  // Ensure this is included in res.render()
+                plan_name: "<%= plan_name %>",
+                plan_interval: "<%= plan_interval %>",
+                plan_type: "<%= plan_type %>",
+                external_id: "<%= sessionId %>"
+            }]);
+          }
+      }
   });
 </script>
 
 <div class="payment-page d-flex align-items-center justify-content-center">
   <div>
     <div class="login-title">
-      <h1 class="text-center"></h1>
+      <h1 class="text-center">Processing Payment...</h1>
     </div>
   </div>
 </div>
+
 <%- include('partials/footer', {async: true}); %>
