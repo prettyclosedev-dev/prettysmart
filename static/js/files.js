@@ -158,9 +158,18 @@ function uploadFile(formData){
             $('[name="form_file"]').val(data.path);
             $('.form-file-upload').addClass('d-none');
             $('.form-file-uploaded').removeClass('d-none').find('.file-preview').css('background-image','url('+ data.path +')');
+            $('#upload-image-preview').attr('src', data.path);
+            $('#upload-image-preview').attr('hidden', false);
+            $('#upload-image-placeholder').attr('hidden', true);
             closeFileModal();
             $('.file-loader').addClass('d-none');
+            $('[data-insert]').attr('disabled', false)
         },
+        error: function(data) {
+            console.error(data);
+            closeFileModal();
+            $('.file-loader').addClass('d-none');
+        }
      });
 }
 

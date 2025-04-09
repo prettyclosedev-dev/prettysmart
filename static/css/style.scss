@@ -829,6 +829,14 @@ header {
   // }
 }
 
+#upload-image-preview {
+  height: 100px;
+  border-radius: .3rem;
+  margin-top: 20px;
+  background-size: cover;
+  background-position: center;
+}
+
 .unsplash {
   margin-top: 60px;
   .unsplash-search {
