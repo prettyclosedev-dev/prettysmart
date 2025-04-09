@@ -147,7 +147,10 @@ $(document)
   .on("click", "[data-editor]", function () {
     var $form = $(this).closest("form"),
       template_id = $form.data("template");
-    window.location.href = "/editor/branded-design/" + template_id;
+
+    const imgSrc = $(this).closest("form").find("img").attr("src");
+
+    if (imgSrc) window.location.href = "/editor/branded-design/" + template_id;
 
     return false;
   })
@@ -770,7 +773,7 @@ function exportTemplate(template_id, export_params) {
       link.href = window.URL.createObjectURL(blob);
       link.download = getParameterByName("file_name", url) || "downloaded_file";
       link.click();
-      
+
       setTimeout(closeExportModal, 1000);
     },
     error: function () {
