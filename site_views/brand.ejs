@@ -238,292 +238,294 @@
                 </div>
                 <div class="df inner-content-wrapper reg" data-content="self-help">
 
-                    <div class="left-sec w-100">
-                        <div class="df aic tabs-wrapper">
-                            <div id="logo-tab" class="df acc tab ffp selected" data-tab="logo">Logo</div>
-                            <div id="colors-tab" class="df acc tab ffp" data-tab="colors">Colors</div>
-                            <div id="fonts-tab" class="df acc tab ffp d-none" data-tab="fonts">Fonts</div>
-                            <div id="info-tab" class="df acc tab ffp" data-tab="info">Info</div>
-                        </div>
+                    <div class="left-sec w-100 d-flex justify-content-center">
+                        <div class="left-sec w-50">
+                            <div class="df aic tabs-wrapper">
+                                <div id="logo-tab" class="df acc tab ffp selected" data-tab="logo">Logo</div>
+                                <div id="colors-tab" class="df acc tab ffp" data-tab="colors">Colors</div>
+                                <div id="fonts-tab" class="df acc tab ffp d-none" data-tab="fonts">Fonts</div>
+                                <div id="info-tab" class="df acc tab ffp" data-tab="info">Info</div>
+                            </div>
 
-                        <%
-                            function addViewBox(svg) {
-                                if (!svg) {
-                                    return;
+                            <%
+                                function addViewBox(svg) {
+                                    if (!svg) {
+                                        return;
+                                    }
+
+                                    if (!svg.includes("viewBox")) {
+                                        var width, height;
+
+                                        var wArr = svg.match(/width="(.*?)"/i)
+                                        if (wArr && wArr.length) {
+                                            width = wArr[1];
+                                        }
+                                        
+                                        var hArr = svg.match(/height="(.*?)"/i);
+                                        if (hArr && hArr.length) {
+                                            height = hArr[1]
+                                        }
+
+                                        if (width && height) {
+                                            svg = svg.replace("height=", `height="${height}" viewBox="0 0 ${width} ${height}"`);
+                                        }
+                                    }
+
+                                    return svg;
                                 }
-
-                                if (!svg.includes("viewBox")) {
-                                    var width, height;
-
-                                    var wArr = svg.match(/width="(.*?)"/i)
-                                    if (wArr && wArr.length) {
-                                        width = wArr[1];
-                                    }
-                                    
-                                    var hArr = svg.match(/height="(.*?)"/i);
-                                    if (hArr && hArr.length) {
-                                        height = hArr[1]
-                                    }
-
-                                    if (width && height) {
-                                        svg = svg.replace("height=", `height="${height}" viewBox="0 0 ${width} ${height}"`);
-                                    }
-                                }
-
-                                return svg;
-                            }
-                        %>
-                        <div class="tabs-content-wrapper">
-                            <div class="tab-content logo" data-tab-content="logo">  
-                                <div class="df aic ffp fs12 need-help"><p>Don't have your logo files as an .ai, open .pdf or .svg?</p><button class="mla" onclick="openMiniHelp();">Ask for help </button></div>
-                                <div class="df line">
-                                    <div class="sec" id="logo">
-                                        <div class="onboarding-label mt-1 mb-20  fs12">LOGO</div>
-                                        <label class="onboarding-logo-inner">
-                                            <p></p>
-                                            <span class="onboarding-logo-preview" id="logo-preview">
-                                                <% if(brand && brand.logos && brand.logos.logo){ %>
-                                                    <%- brand.logos.logo %>
-                                                    <div class="df aic logo-select-wrapper floating">
-                                                        <div class="df aic">
-                                                            <i class="fa-light fa-upload"></i>
-                                                            <div class="text-wrapper">
-                                                                <p class="text fs12 mb-0">Drop here to upload Logo</p>
-                                                                <p class="text fs10 mb-0 text-underline">Or click to browse</p>
-                                                            </div>
-                                                        </div>
-                                                        <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'logo')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
-                                                    </div>
-                                                <% } else { %>
-                                                    <div class="df aic logo-select-wrapper">
-                                                        <div class="df aic">
-                                                            <i class="fa-light fa-upload"></i>
-                                                            <div class="text-wrapper">
-                                                                <p class="text fs12 mb-0">Drop here to upload Logo</p>
-                                                                <p class="text fs10 mb-0 text-underline">Or click to browse</p>
-                                                            </div>
-                                                        </div>
-                                                        <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'logo')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
-                                                    </div>
-                                                <% }  %>
-                                            </span>
-                                            <input type="file" name="logo" hidden data-file-type="logo" accept="image/svg+xml,application/pdf,.ai">
-                                        </label>
-                                    </div>
-                                </div>
-
+                            %>
+                            <div class="tabs-content-wrapper">
+                                <div class="tab-content logo" data-tab-content="logo">  
+                                    <div class="df aic ffp fs12 need-help"><p>Don't have your logo files as an .ai, open .pdf or .svg?</p><button class="mla" onclick="openMiniHelp();">Ask for help </button></div>
                                     <div class="df line">
-                                    <div class="sec icon">
-                                        <div class="onboarding-label mt-1 fs12">ICON</div>
-                                        <label class="onboarding-logo-inner">
-                                            <span class="onboarding-logo-preview" id="icon-preview">
-                                                <% if(brand && brand.logos && brand.logos.icon){ %>
-                                                    <%- addViewBox(brand.logos.icon) %>
-                                                    <div class="df aic logo-select-wrapper floating">
-                                                        <div class="df aic">
-                                                            <i class="fa-light fa-upload"></i>
-                                                            <div class="text-wrapper">
-                                                                <p class="text fs12 mb-0">Drop here to upload Icon</p>
-                                                                <p class="text fs10 mb-0 text-underline">Or click to browse</p>
-                                                            </div>
-                                                        </div>
-                                                        <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'icon')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
-                                                    </div>
-                                                <% } else { %>
-                                                    <div class="df aic logo-select-wrapper">
-                                                        <div class="df aic">
-                                                            <i class="fa-light fa-upload"></i>
-                                                            <div class="text-wrapper">
-                                                                <p class="text fs12 mb-0">Drop here to upload Icon</p>
-                                                                <p class="text fs10 mb-0 text-underline">Or click to browse</p>
-                                                            </div>
-                                                        </div>
-                                                        <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'icon')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
-                                                    </div>
-                                                <% }  %>
-                                            </span>
-                                            <input type="file" name="icon" hidden data-file-type="logo" accept="image/svg+xml,application/pdf,.ai">
-                                        </label>
-                                    </div>
-                                    
-                                
-                                </div>
-                                <div class="df line">
-                                    <div class="sec wordmark">
-                                        <div class="onboarding-label mt-1  fs12">WORDMARK</div>
+                                        <div class="sec" id="logo">
+                                            <div class="onboarding-label mt-1 mb-20  fs12">LOGO</div>
                                             <label class="onboarding-logo-inner">
-                                                <p>
-                                            </p>
-                                                <span class="onboarding-logo-preview" id="wordmark-preview">
-                                                    <% if(brand && brand.logos && brand.logos.watermark){ %>
-                                                        <%- addViewBox(brand.logos.watermark) %>
+                                                <p></p>
+                                                <span class="onboarding-logo-preview" id="logo-preview">
+                                                    <% if(brand && brand.logos && brand.logos.logo){ %>
+                                                        <%- brand.logos.logo %>
                                                         <div class="df aic logo-select-wrapper floating">
                                                             <div class="df aic">
                                                                 <i class="fa-light fa-upload"></i>
                                                                 <div class="text-wrapper">
-                                                                    <p class="text fs12 mb-0">Drop here to upload Wordmark</p>
+                                                                    <p class="text fs12 mb-0">Drop here to upload Logo</p>
                                                                     <p class="text fs10 mb-0 text-underline">Or click to browse</p>
                                                                 </div>
                                                             </div>
-                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'wordmark')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'logo')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
                                                         </div>
                                                     <% } else { %>
                                                         <div class="df aic logo-select-wrapper">
                                                             <div class="df aic">
                                                                 <i class="fa-light fa-upload"></i>
                                                                 <div class="text-wrapper">
-                                                                    <p class="text fs12 mb-0">Drop here to upload Wordmark</p>
+                                                                    <p class="text fs12 mb-0">Drop here to upload Logo</p>
                                                                     <p class="text fs10 mb-0 text-underline">Or click to browse</p>
                                                                 </div>
                                                             </div>
-                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'wordmark')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'logo')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
                                                         </div>
                                                     <% }  %>
                                                 </span>
-                                                <input type="file" name="watermark" hidden data-file-type="logo" accept="image/svg+xml,application/pdf,.ai">
+                                                <input type="file" name="logo" hidden data-file-type="logo" accept="image/svg+xml,application/pdf,.ai">
                                             </label>
+                                        </div>
+                                    </div>
+
+                                        <div class="df line">
+                                        <div class="sec icon">
+                                            <div class="onboarding-label mt-1 fs12">ICON</div>
+                                            <label class="onboarding-logo-inner">
+                                                <span class="onboarding-logo-preview" id="icon-preview">
+                                                    <% if(brand && brand.logos && brand.logos.icon){ %>
+                                                        <%- addViewBox(brand.logos.icon) %>
+                                                        <div class="df aic logo-select-wrapper floating">
+                                                            <div class="df aic">
+                                                                <i class="fa-light fa-upload"></i>
+                                                                <div class="text-wrapper">
+                                                                    <p class="text fs12 mb-0">Drop here to upload Icon</p>
+                                                                    <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'icon')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                        </div>
+                                                    <% } else { %>
+                                                        <div class="df aic logo-select-wrapper">
+                                                            <div class="df aic">
+                                                                <i class="fa-light fa-upload"></i>
+                                                                <div class="text-wrapper">
+                                                                    <p class="text fs12 mb-0">Drop here to upload Icon</p>
+                                                                    <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'icon')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                        </div>
+                                                    <% }  %>
+                                                </span>
+                                                <input type="file" name="icon" hidden data-file-type="logo" accept="image/svg+xml,application/pdf,.ai">
+                                            </label>
+                                        </div>
                                         
                                     
                                     </div>
-                                </div>
-                            </div>
-
-                            <div class="tab-content fonts d-none" data-tab-content="fonts">
-                            
-                                <div class="onboarding-font-row font-line" data-font-form="Regular">
-                                    <p class="brand-label title">REGULAR FONT <%if(brand && brand.fonts && brand.fonts.Regular && brand.fonts.Regular.name){%> • <span class="font-name"><%-brand.fonts.Regular.name%></span><%}%></p>
-                                    <%if(brand && brand.fonts && brand.fonts.Regular && brand.fonts.Regular.name){%> 
-                                        <div class="font-preview userRegularFont">This is your font</div>
-                                    <%}%> 
-                                        <div class="<% if(brand && brand.fonts && brand.fonts.Regular && brand.fonts.Regular.name){ %>hovering<% } %> df font-upload-sec">
-                                            <label for="reg-input" class="df aic left-sec"><div class="icon"></div><div class="text"><p class="fs10 label">Drop here to upload font</p><p class="fs8"><u>Or click to browse</u></p></div></label>
-                                            <input id="reg-input" type="file" data-file-type="font" accept=".ttf" name="Regular" hidden>
-                                            <div class="df acc right-sec"> 
-                                                <input name="Regular" class="google_font" value="<%= brand && brand.fonts && brand.fonts.Regular ? brand.fonts.Regular.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
-                                            </div>
+                                    <div class="df line">
+                                        <div class="sec wordmark">
+                                            <div class="onboarding-label mt-1  fs12">WORDMARK</div>
+                                                <label class="onboarding-logo-inner">
+                                                    <p>
+                                                </p>
+                                                    <span class="onboarding-logo-preview" id="wordmark-preview">
+                                                        <% if(brand && brand.logos && brand.logos.watermark){ %>
+                                                            <%- addViewBox(brand.logos.watermark) %>
+                                                            <div class="df aic logo-select-wrapper floating">
+                                                                <div class="df aic">
+                                                                    <i class="fa-light fa-upload"></i>
+                                                                    <div class="text-wrapper">
+                                                                        <p class="text fs12 mb-0">Drop here to upload Wordmark</p>
+                                                                        <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'wordmark')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                            </div>
+                                                        <% } else { %>
+                                                            <div class="df aic logo-select-wrapper">
+                                                                <div class="df aic">
+                                                                    <i class="fa-light fa-upload"></i>
+                                                                    <div class="text-wrapper">
+                                                                        <p class="text fs12 mb-0">Drop here to upload Wordmark</p>
+                                                                        <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'wordmark')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                            </div>
+                                                        <% }  %>
+                                                    </span>
+                                                    <input type="file" name="watermark" hidden data-file-type="logo" accept="image/svg+xml,application/pdf,.ai">
+                                                </label>
+                                            
+                                        
                                         </div>
-                                </div> 
-                                <div class="onboarding-font-row font-line" data-font-form="Italic">
-                                    <p class="brand-label  title">ITALIC FONT <%if(brand && brand.fonts && brand.fonts.Italic && brand.fonts.Italic.name){%> • <span class="font-name"><%-brand.fonts.Italic.name%></span><%}%></p>
-                                    <%if(brand && brand.fonts && brand.fonts.Italic && brand.fonts.Italic.name){%> 
-                                        <div class="font-preview userItalicFont">This is your font</div>
-                                        <%}%> 
-                                        <div class="<% if(brand && brand.fonts && brand.fonts.Italic && brand.fonts.Italic.name){ %>hovering<% } %> df font-upload-sec">
-                                            <label for="ital-input" class="df aic left-sec"><div class="icon"></div><div class="text"><p class="fs10 label">Drop here to upload font</p><p class="fs8"><u>Or click to browse</u></p></div></label>
-                                            <input id="ital-input" type="file" data-file-type="font" accept=".ttf" name="Italic" hidden>
-                                            <div class="df acc right-sec"> 
-                                                <input name="Italic" class="google_font" value="<%= brand && brand.fonts && brand.fonts.Italic ? brand.fonts.Italic.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
-                                            </div>
-                                        </div>
-                                </div>
-                                <div class="onboarding-font-row font-line" data-font-form="Bold">
-                                    <p class="brand-label  title">BOLD FONT <%if(brand && brand.fonts && brand.fonts.Bold && brand.fonts.Bold.name){%> • <span class="font-name"><%-brand.fonts.Bold.name%></span><%}%></p>
-                                    <%if(brand && brand.fonts && brand.fonts.Bold && brand.fonts.Bold.name){%> 
-                                        <div class="font-preview userBoldFont">This is your font</div>
-                                        <%}%> 
-                                        <div class="<% if(brand && brand.fonts && brand.fonts.Bold && brand.fonts.Bold.name){ %>hovering<% } %> df font-upload-sec">
-                                            <label for="bold-input" class="df aic left-sec"><div class="icon"></div><div class="text"><p class="fs10 label">Drop here to upload font</p><p class="fs8"><u>Or click to browse</u></p></div></label>
-                                            <input id="bold-input" type="file" data-file-type="font" accept=".ttf" name="Bold" hidden>
-                                            <div class="df acc right-sec"> 
-                                                <input name="Bold" class="google_font" value="<%= brand && brand.fonts && brand.fonts.Bold ? brand.fonts.Bold.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
-                                            </div>
-                                        </div>
-                                </div>
-                                <div class="onboarding-font-row font-line" data-font-form="BoldItalic">
-                                    <p class="brand-label  title">BOLD ITALIC FONT <%if(brand && brand.fonts && brand.fonts.BoldItalic && brand.fonts.BoldItalic.name){%> • <span class="font-name"><%-brand.fonts.BoldItalic.name%></span><%}%></p>
-                                    <%if(brand && brand.fonts && brand.fonts.BoldItalic && brand.fonts.BoldItalic.name){%> 
-                                        <div class="font-preview userBoldItalicFont">This is your font</div>
-                                        <%}%> 
-                                        <div class="<% if(brand && brand.fonts && brand.fonts.BoldItalic && brand.fonts.BoldItalic.name){ %>hovering<% } %> df font-upload-sec">
-                                            <label for="boldital-input" class="df aic left-sec"><div class="icon"></div><div class="text"><p class="fs10 label">Drop here to upload font</p><p class="fs8"><u>Or click to browse</u></p></div></label>
-                                            <input id="boldital-input" type="file" data-file-type="font" accept=".ttf" name="BoldItalic" hidden>
-                                            <div class="df acc right-sec"> 
-                                                <input name="BoldItalic" class="google_font" value="<%= brand && brand.fonts && brand.fonts.BoldItalic ? brand.fonts.BoldItalic.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
-                                            </div>
-                                        </div>
-                                </div>
-                            </div>
-
-                            <div class="tab-content colors d-none" data-tab-content="colors">
-                                <div>
-                                <div class="df colors-wrapper p-4">
-                                    <div class="color-wrapper">
-                                        <div class="label ffp brand-label ">PRIMARY COLOR</div>
-                                        <input 
-                                            style="background-color: <%= user.account.brand.colors.primary || '#D5BA8C' %>"
-                                            type="color" 
-                                            id="primary"
-                                            class="color " 
-                                            value="<%= user.account.brand.colors.primary || '#1A428A' %>"   
-                                            name="primary"  
-                                            data-primary-color="<%= user.account.brand_primary || '#1A428A' %>"
-                                        />
                                     </div>
+                                </div>
+
+                                <div class="tab-content fonts d-none" data-tab-content="fonts">
                                 
-                                    <div class="color-wrapper">
-                                        <div class="label ffp brand-label ">SECONDARY COLOR</div>
-                                        <input
-                                            style="background-color: <%= user.account.brand.colors.secondary || '#D5BA8C' %>"
-                                            class="color" 
-                                            type="color"
-                                            name="secondary"
-                                            id="secondary"
-                                            value="<%= user.account.brand.colors.secondary || '#D5BA8C' %>"
-                                            data-secondary-color="<%= user.account.brand_secondary || '#D5BA8C' %>"
-                                        />
+                                    <div class="onboarding-font-row font-line" data-font-form="Regular">
+                                        <p class="brand-label title">REGULAR FONT <%if(brand && brand.fonts && brand.fonts.Regular && brand.fonts.Regular.name){%> • <span class="font-name"><%-brand.fonts.Regular.name%></span><%}%></p>
+                                        <%if(brand && brand.fonts && brand.fonts.Regular && brand.fonts.Regular.name){%> 
+                                            <div class="font-preview userRegularFont">This is your font</div>
+                                        <%}%> 
+                                            <div class="<% if(brand && brand.fonts && brand.fonts.Regular && brand.fonts.Regular.name){ %>hovering<% } %> df font-upload-sec">
+                                                <label for="reg-input" class="df aic left-sec"><div class="icon"></div><div class="text"><p class="fs10 label">Drop here to upload font</p><p class="fs8"><u>Or click to browse</u></p></div></label>
+                                                <input id="reg-input" type="file" data-file-type="font" accept=".ttf" name="Regular" hidden>
+                                                <div class="df acc right-sec"> 
+                                                    <input name="Regular" class="google_font" value="<%= brand && brand.fonts && brand.fonts.Regular ? brand.fonts.Regular.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
+                                                </div>
+                                            </div>
+                                    </div> 
+                                    <div class="onboarding-font-row font-line" data-font-form="Italic">
+                                        <p class="brand-label  title">ITALIC FONT <%if(brand && brand.fonts && brand.fonts.Italic && brand.fonts.Italic.name){%> • <span class="font-name"><%-brand.fonts.Italic.name%></span><%}%></p>
+                                        <%if(brand && brand.fonts && brand.fonts.Italic && brand.fonts.Italic.name){%> 
+                                            <div class="font-preview userItalicFont">This is your font</div>
+                                            <%}%> 
+                                            <div class="<% if(brand && brand.fonts && brand.fonts.Italic && brand.fonts.Italic.name){ %>hovering<% } %> df font-upload-sec">
+                                                <label for="ital-input" class="df aic left-sec"><div class="icon"></div><div class="text"><p class="fs10 label">Drop here to upload font</p><p class="fs8"><u>Or click to browse</u></p></div></label>
+                                                <input id="ital-input" type="file" data-file-type="font" accept=".ttf" name="Italic" hidden>
+                                                <div class="df acc right-sec"> 
+                                                    <input name="Italic" class="google_font" value="<%= brand && brand.fonts && brand.fonts.Italic ? brand.fonts.Italic.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
+                                                </div>
+                                            </div>
+                                    </div>
+                                    <div class="onboarding-font-row font-line" data-font-form="Bold">
+                                        <p class="brand-label  title">BOLD FONT <%if(brand && brand.fonts && brand.fonts.Bold && brand.fonts.Bold.name){%> • <span class="font-name"><%-brand.fonts.Bold.name%></span><%}%></p>
+                                        <%if(brand && brand.fonts && brand.fonts.Bold && brand.fonts.Bold.name){%> 
+                                            <div class="font-preview userBoldFont">This is your font</div>
+                                            <%}%> 
+                                            <div class="<% if(brand && brand.fonts && brand.fonts.Bold && brand.fonts.Bold.name){ %>hovering<% } %> df font-upload-sec">
+                                                <label for="bold-input" class="df aic left-sec"><div class="icon"></div><div class="text"><p class="fs10 label">Drop here to upload font</p><p class="fs8"><u>Or click to browse</u></p></div></label>
+                                                <input id="bold-input" type="file" data-file-type="font" accept=".ttf" name="Bold" hidden>
+                                                <div class="df acc right-sec"> 
+                                                    <input name="Bold" class="google_font" value="<%= brand && brand.fonts && brand.fonts.Bold ? brand.fonts.Bold.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
+                                                </div>
+                                            </div>
+                                    </div>
+                                    <div class="onboarding-font-row font-line" data-font-form="BoldItalic">
+                                        <p class="brand-label  title">BOLD ITALIC FONT <%if(brand && brand.fonts && brand.fonts.BoldItalic && brand.fonts.BoldItalic.name){%> • <span class="font-name"><%-brand.fonts.BoldItalic.name%></span><%}%></p>
+                                        <%if(brand && brand.fonts && brand.fonts.BoldItalic && brand.fonts.BoldItalic.name){%> 
+                                            <div class="font-preview userBoldItalicFont">This is your font</div>
+                                            <%}%> 
+                                            <div class="<% if(brand && brand.fonts && brand.fonts.BoldItalic && brand.fonts.BoldItalic.name){ %>hovering<% } %> df font-upload-sec">
+                                                <label for="boldital-input" class="df aic left-sec"><div class="icon"></div><div class="text"><p class="fs10 label">Drop here to upload font</p><p class="fs8"><u>Or click to browse</u></p></div></label>
+                                                <input id="boldital-input" type="file" data-file-type="font" accept=".ttf" name="BoldItalic" hidden>
+                                                <div class="df acc right-sec"> 
+                                                    <input name="BoldItalic" class="google_font" value="<%= brand && brand.fonts && brand.fonts.BoldItalic ? brand.fonts.BoldItalic.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
+                                                </div>
+                                            </div>
                                     </div>
                                 </div>
-                            </div>
-                            <% if(brand && brand.logos && brand.logos.logo){ %>
-                            <div class="df line mt-4">
-                                <div class="sec" id="logo">
-                                    <div class="onboarding-label mt-1 mb-20  fs12">Choose from Logo</div>
-                                    <label class="onboarding-logo-inner">
-                                        <p></p>
-                                        <span class="onboarding-logo-preview">
-                                            <%- brand.logos.logo %>
-                                        </span>
-                                    </label>
-                                </div>
-                            </div>
-                            <% } %>
-                            </div>
 
-                            <div class="tab-content info d-none" data-tab-content="info">
-                                <form data-hs-cf-bound="true">
-                                    <div class="input-wrapper">
-                                        <label class="label ffp brand-label">BRAND NAME</label>
-                                        <input type="text" name="name" value="<%= user.account.name %>" class="form-control" required>
+                                <div class="tab-content colors d-none" data-tab-content="colors">
+                                    <div>
+                                    <div class="df colors-wrapper  p-4">
+                                        <div class="color-wrapper">
+                                            <div class="label ffp brand-label ">PRIMARY COLOR</div>
+                                            <input 
+                                                style="background-color: <%= user.account.brand.colors.primary || '#D5BA8C' %>"
+                                                type="color" 
+                                                id="primary"
+                                                class="color " 
+                                                value="<%= user.account.brand.colors.primary || '#1A428A' %>"   
+                                                name="primary"  
+                                                data-primary-color="<%= user.account.brand_primary || '#1A428A' %>"
+                                            />
+                                        </div>
+                                    
+                                        <div class="color-wrapper">
+                                            <div class="label ffp brand-label ">SECONDARY COLOR</div>
+                                            <input
+                                                style="background-color: <%= user.account.brand.colors.secondary || '#D5BA8C' %>"
+                                                class="color" 
+                                                type="color"
+                                                name="secondary"
+                                                id="secondary"
+                                                value="<%= user.account.brand.colors.secondary || '#D5BA8C' %>"
+                                                data-secondary-color="<%= user.account.brand_secondary || '#D5BA8C' %>"
+                                            />
+                                        </div>
                                     </div>
-                                        <div class="input-wrapper">
-                                            <label class="label ffp brand-label">BRAND EMAIL</label>
-                                            <input type="text" name="brand_email" value="<%= user.account.brand_email %>" class="form-control" required>
-                                        </div>
-                                        <div class="input-wrapper">
-                                            <label class="label ffp brand-label">BRAND PHONE</label>
-                                            <input type="text" name="brand_phone" value="<%= user.account.brand_phone %>" class="form-control" required>
-                                        </div>
-                                        <div class="input-wrapper">
-                                            <label class="label ffp brand-label">INDUSTRY</label>
-                                            <input type="text" name="industry" value="<%= user.account.industry %>" class="form-control" required>
-                                        </div>
-                                        <div class="input-wrapper">
-                                            <label class="label ffp brand-label">DESCRIPTION</label>
-                                            <input type="text" name="industry_description" value="<%= user.account.industry_description %>" class="form-control" required>
-                                        </div>
-                                        <div class="input-wrapper">
-                                            <label class="label ffp brand-label">TAGLINE</label>
-                                            <input type="text" name="tagline" value="<%= user.account.tagline %>" class="form-control" required>
-                                        </div>
-                                        <div class="input-wrapper">
-                                            <label class="label ffp brand-label">FOOTER</label>
-                                            <textarea type="text" name="brand_footer" value="<%= user.account.brand_footer %>" class="form-control" placeholder="Enter your legals, terms & conditions etc"></textarea>
-                                        </div>
-                                </form>
-                            
                                 </div>
-                            </div>
+                                <% if(brand && brand.logos && brand.logos.logo){ %>
+                                <div class="df line mt-4">
+                                    <div class="sec" id="logo">
+                                        <div class="onboarding-label mt-1 mb-20  fs12">Choose from Logo</div>
+                                        <label class="onboarding-logo-inner">
+                                            <p></p>
+                                            <span class="onboarding-logo-preview">
+                                                <%- brand.logos.logo %>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <% } %>
+                                </div>
+
+                                <div class="tab-content info d-none" data-tab-content="info">
+                                    <form data-hs-cf-bound="true">
+                                        <div class="input-wrapper">
+                                            <label class="label ffp brand-label">BRAND NAME</label>
+                                            <input type="text" name="name" value="<%= user.account.name %>" class="form-control" required>
+                                        </div>
+                                            <div class="input-wrapper">
+                                                <label class="label ffp brand-label">BRAND EMAIL</label>
+                                                <input type="text" name="brand_email" value="<%= user.account.brand_email %>" class="form-control" required>
+                                            </div>
+                                            <div class="input-wrapper">
+                                                <label class="label ffp brand-label">BRAND PHONE</label>
+                                                <input type="text" name="brand_phone" value="<%= user.account.brand_phone %>" class="form-control" required>
+                                            </div>
+                                            <div class="input-wrapper">
+                                                <label class="label ffp brand-label">INDUSTRY</label>
+                                                <input type="text" name="industry" value="<%= user.account.industry %>" class="form-control" required>
+                                            </div>
+                                            <div class="input-wrapper">
+                                                <label class="label ffp brand-label">DESCRIPTION</label>
+                                                <input type="text" name="industry_description" value="<%= user.account.industry_description %>" class="form-control" required>
+                                            </div>
+                                            <div class="input-wrapper">
+                                                <label class="label ffp brand-label">TAGLINE</label>
+                                                <input type="text" name="tagline" value="<%= user.account.tagline %>" class="form-control" required>
+                                            </div>
+                                            <div class="input-wrapper">
+                                                <label class="label ffp brand-label">FOOTER</label>
+                                                <textarea type="text" name="brand_footer" value="<%= user.account.brand_footer %>" class="form-control" placeholder="Enter your legals, terms & conditions etc"></textarea>
+                                            </div>
+                                    </form>
+                                
+                                    </div>
+                                </div>
                         </div>
+                    </div>
                 </div>
                
                 <!-- <%- include('brand-help', {async: true}); %>                   -->
