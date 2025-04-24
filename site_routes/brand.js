@@ -250,6 +250,10 @@ async function setDefaultFonts(req, user_path) {
 
   let fonts = fs.readdirSync(font_path);
 
+  if (!fs.existsSync(path.join(font_path, "/poppins/"))) {
+    fs.mkdirSync(path.join(font_path, "/poppins/"), { recursive: true });
+  }
+
   const defaultFonts = [
     "Poppins-Regular",
     "Poppins-Italic",
@@ -258,10 +262,19 @@ async function setDefaultFonts(req, user_path) {
   ];
 
   defaultFonts.map((font) => {
-    copyFile(
-      path.join(__dirname, "../google-fonts/poppins/" + font + ".ttf"),
-      font_path + "\\poppins\\" + font + ".ttf"
+    const source = path.join(
+      __dirname,
+      "../google-fonts/poppins/" + font + ".ttf"
     );
+    
+    const destination = path.join(font_path, "/poppins/", font + ".ttf");
+
+    console.log({
+      source,
+      destination,
+    });
+
+    copyFile(source, destination);
   });
 
   await syncFontsWithAccount(req, ["poppins"]);
@@ -312,7 +325,9 @@ async function uploadFontToHuddle({
 async function syncFontsWithAccount(req, fontFamilies) {
   let user_path = path.join(__dirname, "../files/" + req.user.account._id);
   let fonts = fs.readdirSync(user_path + "/fonts/" + fontFamilies[0]);
+
   console.log("fonts", fonts);
+
   let fontObj = {};
 
   fonts.map((font) => {
