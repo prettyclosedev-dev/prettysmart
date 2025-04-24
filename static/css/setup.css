@@ -351,6 +351,7 @@
   background-color: inherit;
   opacity: 0.8;
   border-radius: 12px;
+  -webkit-transform: rotate(-3deg);
   transform: rotate(-4deg);
 }
 .page-content .setup-page .inner-content-wrapper.reg > .left-sec .tab-content .colors-wrapper .color::before {
@@ -365,6 +366,7 @@
   background-color: inherit;
   opacity: 0.5;
   border-radius: 12px;
+  -webkit-transform: rotate(-8deg);
   transform: rotate(-8deg);
 }
 .page-content .setup-page .inner-content-wrapper.reg > .left-sec .tab-content .colors-wrapper .color::-webkit-color-swatch-wrapper {
@@ -682,4 +684,6 @@
 }
 #svg-editor-popup .original-container > svg *[data-selected] {
   opacity: 1;
-}/*# sourceMappingURL=setup.css.map */
+}
+
+/*# sourceMappingURL=setup.css.map */

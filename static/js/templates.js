@@ -150,6 +150,8 @@ $(document)
 
     const imgSrc = $(this).closest("form").find("img").attr("src");
 
+    console.log("imgSrc", imgSrc);
+
     if (imgSrc) window.location.href = "/editor/branded-design/" + template_id;
 
     return false;

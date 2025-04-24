@@ -56,6 +56,19 @@ html.hidden-c .wowo.animated {
 .leftor.animated {
   animation-name: leftors;
 }
+
+@-webkit-keyframes leftors {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(-150px, 0, 0);
+    transform: translate3d(-150px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+  }
+}
 @keyframes zoomOut {
   from {
     transform: scale(1.1);
@@ -67,20 +80,24 @@ html.hidden-c .wowo.animated {
 @keyframes leftshow {
   0% {
     opacity: 0;
+    -webkit-transform: translate3d(-900px, 0, 0);
     transform: translate3d(-900px, 0, 0);
   }
   100% {
     opacity: 0.61;
+    -webkit-transform: none;
     transform: none;
   }
 }
 @keyframes leftshowtwo {
   0% {
     opacity: 0;
+    -webkit-transform: translate3d(-900px, 0, 0);
     transform: translate3d(-900px, 0, 0);
   }
   100% {
     opacity: 0.8;
+    -webkit-transform: none;
     transform: none;
   }
 }
@@ -95,9 +112,11 @@ html.hidden-c .wowo.animated {
 @keyframes fadeInUp {
   0% {
     opacity: 0;
+    -webkit-transform: translate3d(0, 30px, 0);
     transform: translate3d(0, 30px, 0);
   }
   to {
+    -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
     opacity: 1;
   }
@@ -105,9 +124,11 @@ html.hidden-c .wowo.animated {
 @keyframes fadeInBigUp {
   0% {
     opacity: 0;
+    -webkit-transform: translate3d(0, 100px, 0);
     transform: translate3d(0, 100px, 0);
   }
   to {
+    -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
     opacity: 1;
   }
@@ -115,9 +136,11 @@ html.hidden-c .wowo.animated {
 @keyframes fadeInDown {
   0% {
     opacity: 0;
+    -webkit-transform: translate3d(0, -30px, 0);
     transform: translate3d(0, -30px, 0);
   }
   to {
+    -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
     opacity: 1;
   }
@@ -188,21 +211,141 @@ html.hidden-c .wowo.animated {
 
 @keyframes myleft {
   50% {
+    -o-transform: translate(8px, 0);
+    -moz-transform: translate(8px, 0);
+    -webkit-transform: translate(8px, 0);
     transform: translate(8px, 0);
   }
   100% {
+    -o-transform: translate(0, 0);
+    -moz-transform: translate(0, 0);
+    -webkit-transform: translate(0, 0);
+    transform: translate(0, 0);
+  }
+}
+@-o-keyframes myleft {
+  50% {
+    -o-transform: translate(8px, 0);
+    -moz-transform: translate(8px, 0);
+    -webkit-transform: translate(8px, 0);
+    transform: translate(8px, 0);
+  }
+  100% {
+    -o-transform: translate(0, 0);
+    -moz-transform: translate(0, 0);
+    -webkit-transform: translate(0, 0);
+    transform: translate(0, 0);
+  }
+}
+@-moz-keyframes myleft {
+  50% {
+    -o-transform: translate(8px, 0);
+    -moz-transform: translate(8px, 0);
+    -webkit-transform: translate(8px, 0);
+    transform: translate(8px, 0);
+  }
+  100% {
+    -o-transform: translate(0, 0);
+    -moz-transform: translate(0, 0);
+    -webkit-transform: translate(0, 0);
+    transform: translate(0, 0);
+  }
+}
+@-webkit-keyframes myleft {
+  50% {
+    -o-transform: translate(8px, 0);
+    -moz-transform: translate(8px, 0);
+    -webkit-transform: translate(8px, 0);
+    transform: translate(8px, 0);
+  }
+  100% {
+    -o-transform: translate(0, 0);
+    -moz-transform: translate(0, 0);
+    -webkit-transform: translate(0, 0);
     transform: translate(0, 0);
   }
 }
 @keyframes myright {
   50% {
+    -o-transform: rotate(180deg) translate(8px, 0);
+    -moz-transform: rotate(180deg) translate(8px, 0);
+    -webkit-transform: rotate(180deg) translate(8px, 0);
     transform: rotate(180deg) translate(8px, 0);
   }
   100% {
+    -o-transform: rotate(180deg) translate(0, 0);
+    -moz-transform: rotate(180deg) translate(0, 0);
+    -webkit-transform: rotate(180deg) translate(0, 0);
+    transform: rotate(180deg) translate(0, 0);
+  }
+}
+@-o-keyframes myright {
+  50% {
+    -o-transform: rotate(180deg) translate(8px, 0);
+    -moz-transform: rotate(180deg) translate(8px, 0);
+    -webkit-transform: rotate(180deg) translate(8px, 0);
+    transform: rotate(180deg) translate(8px, 0);
+  }
+  100% {
+    -o-transform: rotate(180deg) translate(0, 0);
+    -moz-transform: rotate(180deg) translate(0, 0);
+    -webkit-transform: rotate(180deg) translate(0, 0);
+    transform: rotate(180deg) translate(0, 0);
+  }
+}
+@-moz-keyframes myright {
+  50% {
+    -o-transform: rotate(180deg) translate(8px, 0);
+    -moz-transform: rotate(180deg) translate(8px, 0);
+    -webkit-transform: rotate(180deg) translate(8px, 0);
+    transform: rotate(180deg) translate(8px, 0);
+  }
+  100% {
+    -o-transform: rotate(180deg) translate(0, 0);
+    -moz-transform: rotate(180deg) translate(0, 0);
+    -webkit-transform: rotate(180deg) translate(0, 0);
+    transform: rotate(180deg) translate(0, 0);
+  }
+}
+@-webkit-keyframes myright {
+  50% {
+    -o-transform: rotate(180deg) translate(8px, 0);
+    -moz-transform: rotate(180deg) translate(8px, 0);
+    -webkit-transform: rotate(180deg) translate(8px, 0);
+    transform: rotate(180deg) translate(8px, 0);
+  }
+  100% {
+    -o-transform: rotate(180deg) translate(0, 0);
+    -moz-transform: rotate(180deg) translate(0, 0);
+    -webkit-transform: rotate(180deg) translate(0, 0);
     transform: rotate(180deg) translate(0, 0);
   }
 }
 @keyframes bgmyleft {
+  50% {
+    background-position: 60% center;
+  }
+  100% {
+    background-position: center center;
+  }
+}
+@-moz-keyframes bgmyleft {
+  50% {
+    background-position: 60% center;
+  }
+  100% {
+    background-position: center center;
+  }
+}
+@-o-keyframes bgmyleft {
+  50% {
+    background-position: 60% center;
+  }
+  100% {
+    background-position: center center;
+  }
+}
+@-webkit-keyframes bgmyleft {
   50% {
     background-position: 60% center;
   }
@@ -493,8 +636,7 @@ input[type=submit] {
   transition: all 0.3s ease;
   cursor: pointer;
   -webkit-appearance: none;
-  -moz-appearance: none;
-       appearance: none;
+  appearance: none;
 }
 
 button {
@@ -720,6 +862,8 @@ div.wpcf7 .ajax-loader.is-active {
     z-index: 100000;
     opacity: 0;
     visibility: hidden;
+    -webkit-transition: opacity 0.8s cubic-bezier(0.77, 0, 0.175, 1), top 0.8s cubic-bezier(0.77, 0, 0.175, 1), visibility 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+    -o-transition: opacity 0.8s cubic-bezier(0.77, 0, 0.175, 1), top 0.8s cubic-bezier(0.77, 0, 0.175, 1), visibility 0.8s cubic-bezier(0.77, 0, 0.175, 1);
     transition: opacity 0.8s cubic-bezier(0.77, 0, 0.175, 1), top 0.8s cubic-bezier(0.77, 0, 0.175, 1), visibility 0.8s cubic-bezier(0.77, 0, 0.175, 1);
     overflow-y: auto;
     visibility: hidden;
@@ -3642,6 +3786,8 @@ header + div, header + section {
   z-index: 9;
   right: -7px;
   top: -30px;
+  -webkit-transition: All 0.2s ease-in-out;
+  -o-transition: All 0.2s ease-in-out;
   transition: All 0.2s ease-in-out;
 }
 
@@ -3659,10 +3805,13 @@ header + div, header + section {
   width: 20px;
   height: 2px;
   background: #fff;
+  -webkit-transform: rotate(-45deg) translateZ(0);
   transform: rotate(-45deg) translateZ(0);
   position: absolute;
   left: 3px;
   top: 13px;
+  -webkit-transition: All 0.3s ease-in-out;
+  -o-transition: All 0.3s ease-in-out;
   transition: All 0.3s ease-in-out;
 }
 
@@ -3672,6 +3821,7 @@ header + div, header + section {
   width: 20px;
   height: 2px;
   background: #ffffff;
+  -webkit-transform: rotate(45deg) translateZ(0);
   transform: rotate(45deg) translateZ(0);
   position: absolute;
   left: 3px;
@@ -3689,6 +3839,8 @@ header + div, header + section {
   z-index: 2;
   left: 50%;
   top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   padding: 0;
 }
@@ -3718,4 +3870,6 @@ header + div, header + section {
 
 [data-handle=wistiaLogo] {
   display: none !important;
-}/*# sourceMappingURL=style.css.map */
+}
+
+/*# sourceMappingURL=style.css.map */

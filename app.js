@@ -64,6 +64,9 @@ app.use((req, res, next) => {
   let url = req.url.replace("/", "");
   let open_routes = [
     "",
+    "static",
+    "site_static",
+    "files",
     "login",
     "forgot",
     "reset",
@@ -87,6 +90,9 @@ app.use((req, res, next) => {
     return (
       open_routes.includes(url) ||
       url.startsWith("public") ||
+      url.startsWith("static") ||
+      url.startsWith("files") ||
+      url.startsWith("site_static") ||
       url.startsWith("pages") ||
       url.startsWith("reset") ||
       url.startsWith("webhooks")
@@ -97,9 +103,7 @@ app.use((req, res, next) => {
     const needsToLogin = () => {
       // let secondsSinceLastLogin = (Date.now() - req.user.login_date) / 1000;
 
-      return (
-        !req.user.account
-      );
+      return !req.user.account;
     };
 
     if (needsToLogin() && !isOpen()) {
@@ -305,6 +309,9 @@ app.use("/clip-studio", require("./site_routes/clip-studio")());
 app.use("/real-estate", require("./site_routes/real-estate")());
 app.use("/mortgage-news", require("./site_routes/mortgage-news")());
 app.use("/mortgage-rates", require("./site_routes/mortgage-rates")());
+
+app.use("/static", express.static(path.join(__dirname, "static")));
+app.use("/site_static", express.static(path.join(__dirname, "site_static")));
 
 app.use(function (req, res) {
   res.render("404", {

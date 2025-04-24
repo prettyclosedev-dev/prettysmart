@@ -4,8 +4,6 @@
   border-bottom: 0.07rem solid #e0e0e0;
   position: absolute;
   top: 0;
-  width: -webkit-fill-available;
-  width: -moz-available;
   width: fill-available;
   background-color: white;
   align-items: center;
@@ -410,9 +408,6 @@
   resize: none;
   border-bottom: none;
 }
-.clips-form-page .clips-form textarea::-moz-placeholder {
-  font-size: 14px;
-}
 .clips-form-page .clips-form textarea::placeholder {
   font-size: 14px;
 }
@@ -458,4 +453,6 @@
 .studio-footer .regenerate-button {
   background-color: #240c23;
   color: #fff;
-}/*# sourceMappingURL=clip-studio.css.map */
+}
+
+/*# sourceMappingURL=clip-studio.css.map */

@@ -1,8 +1,3 @@
-::-moz-selection {
-  background: #db3965;
-  color: black;
-}
-
 ::selection {
   background: #db3965;
   color: black;
@@ -265,8 +260,8 @@ button {
 .btn-primary:hover,
 .btn-primary.disabled:hover,
 .btn-primary:disabled:hover {
-  background-color: #be234d;
-  border-color: #be234d;
+  background-color: rgb(190.3846153846, 34.6153846154, 76.9230769231);
+  border-color: rgb(190.3846153846, 34.6153846154, 76.9230769231);
 }
 
 .btn-outline-primary,
@@ -292,8 +287,8 @@ button {
 .btn-secondary:hover,
 .btn-secondary.disabled:hover,
 .btn-secondary:disabled:hover {
-  background-color: rgba(190, 35, 77, 0.1);
-  border-color: rgba(190, 35, 77, 0.1);
+  background-color: rgba(190.3846153846, 34.6153846154, 76.9230769231, 0.1);
+  border-color: rgba(190.3846153846, 34.6153846154, 76.9230769231, 0.1);
 }
 
 .ready-size {
@@ -732,9 +727,6 @@ header .header-account:hover .account-menu {
   outline: none;
   box-shadow: none;
 }
-.form-page .form-right form .form-control-container .form-control::-moz-placeholder {
-  color: #a7a7a7;
-}
 .form-page .form-right form .form-control-container .form-control::placeholder {
   color: #a7a7a7;
 }
@@ -802,6 +794,14 @@ header .header-account:hover .account-menu {
   background-color: rgba(247, 23, 106, 0.12);
 }
 
+#upload-image-preview {
+  height: 100px;
+  border-radius: 0.3rem;
+  margin-top: 20px;
+  background-size: cover;
+  background-position: center;
+}
+
 .unsplash {
   margin-top: 60px;
 }
@@ -824,10 +824,8 @@ header .header-account:hover .account-menu {
   overflow: auto;
 }
 .unsplash .unsplash-list {
-  -moz-column-count: 4;
-       column-count: 4;
-  -moz-column-gap: 4px;
-       column-gap: 4px;
+  column-count: 4;
+  column-gap: 4px;
 }
 .unsplash .unsplash-list .unsplash-card {
   cursor: pointer;
@@ -866,8 +864,7 @@ header .header-account:hover .account-menu {
 }
 @media only screen and (max-width: 768px) {
   .unsplash .unsplash-list {
-    -moz-column-count: 2;
-         column-count: 2;
+    column-count: 2;
   }
 }
 
@@ -1001,8 +998,7 @@ header .header-account:hover .account-menu {
 .template .template-loader-new img {
   width: 100%;
   height: 100%;
-  -o-object-fit: contain;
-     object-fit: contain;
+  object-fit: contain;
 }
 .template .template-loader-new h3 {
   position: absolute;
@@ -1876,8 +1872,7 @@ header .header-account:hover .account-menu {
   height: 100%;
   width: 100%;
   z-index: 999;
-  -webkit-backdrop-filter: blur(3px);
-          backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
 }
 
 .my-button {
@@ -2005,4 +2000,6 @@ header .header-account:hover .account-menu {
   .info-box.collapsed {
     width: 100%;
   }
-}/*# sourceMappingURL=style.css.map */
+}
+
+/*# sourceMappingURL=style.css.map */

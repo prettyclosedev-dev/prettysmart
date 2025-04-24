@@ -15,8 +15,7 @@
 .new-dashboard-page .line .cards-wrapper {
   display: grid;
   grid-template-columns: 33fr 33fr 33fr;
-  -moz-column-gap: 52px;
-       column-gap: 52px;
+  column-gap: 52px;
   row-gap: 52px;
   width: 100%;
 }
@@ -56,6 +55,7 @@
   height: calc(100% - 90px);
   width: 100%;
   position: absolute;
+  -webkit-transform: translateY(-20%);
   transform: translateY(-20%);
   left: 50%;
   transform: translate(-50%, -1.3vw);
@@ -70,9 +70,7 @@
 .new-dashboard-page .line .cards-wrapper .my-card .title {
   font-weight: 700;
   line-height: 32px;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-          user-select: none;
+  user-select: none;
 }
 .new-dashboard-page .line .cards-wrapper .my-card .ftr {
   margin-top: auto;
@@ -87,9 +85,7 @@
   filter: brightness(30%);
   margin-bottom: 4px;
   font-weight: 300;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-          user-select: none;
+  user-select: none;
 }
 .new-dashboard-page .line .cards-wrapper .my-card:last-child {
   margin-right: 0px;
@@ -294,4 +290,6 @@
     margin-bottom: 30px;
     max-width: initial;
   }
-}/*# sourceMappingURL=generator.css.map */
+}
+
+/*# sourceMappingURL=generator.css.map */

@@ -6,11 +6,6 @@ html {
   scroll-behavior: smooth;
 }
 
-::-moz-selection {
-  background: #db3965;
-  color: black;
-}
-
 ::selection {
   background: #db3965;
   color: black;
@@ -106,8 +101,7 @@ a.sign-up-inverted:hover {
     top: 0;
     left: 0;
     z-index: 999;
-    -webkit-backdrop-filter: blur(2.5px);
-            backdrop-filter: blur(2.5px);
+    backdrop-filter: blur(2.5px);
     background: rgba(0, 0, 0, 0.15);
     display: none;
   }
@@ -612,16 +606,14 @@ a.sign-up-inverted:hover {
 
 .why-pretty-smart-grid {
   grid-template-columns: 19.75rem 19.75rem 19.75rem;
-  -moz-column-gap: 50px;
-       column-gap: 50px;
+  column-gap: 50px;
   row-gap: 42px;
 }
 
 @media screen and (max-width: 1340px) {
   .why-pretty-smart-grid {
     grid-template-columns: 19.75rem 19.75rem;
-    -moz-column-gap: 40px;
-         column-gap: 40px;
+    column-gap: 40px;
     row-gap: 34px;
   }
 }
@@ -631,8 +623,7 @@ a.sign-up-inverted:hover {
   }
   .why-pretty-smart-grid {
     grid-template-columns: 19.75rem;
-    -moz-column-gap: 30px;
-         column-gap: 30px;
+    column-gap: 30px;
     row-gap: 28px;
   }
   #how-it-works {
@@ -694,4 +685,6 @@ a.sign-up-inverted:hover {
 .anchor {
   position: absolute;
   top: -90px;
-}/*# sourceMappingURL=landing.css.map */
+}
+
+/*# sourceMappingURL=landing.css.map */

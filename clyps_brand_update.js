@@ -374,7 +374,12 @@ async function handleBrandChange(user) {
           // email: { set: user.email }, // causes unique constraint error for same user email
           name: { set: user.name },
           avatar: user.avatar ? { set: config.BASE_URL + user.avatar } : null,
-          role: { set: (user.role === "owner" || user.role === "admin") ? "ADMIN" : "VIEWER" },
+          role: {
+            set:
+              user.role === "owner" || user.role === "admin"
+                ? "ADMIN"
+                : "VIEWER",
+          },
           brands: {
             update: updates,
             create: creates,
@@ -412,7 +417,8 @@ async function handleBrandChange(user) {
           email: user.email,
           name: user.name,
           avatar: user.avatar ? config.BASE_URL + user.avatar : null,
-          role: (user.role === "owner" || user.role === "admin") ? "ADMIN" : "VIEWER",
+          role:
+            user.role === "owner" || user.role === "admin" ? "ADMIN" : "VIEWER",
           brands: {
             create:
               user.multiAccounts && user.multiAccounts.length
@@ -528,10 +534,21 @@ async function graphqlRequest(query, variables) {
 
   return request(options)
     .then((response) => {
-      // console.log(JSON.stringify(response));
+      // console.log("\n\nresponse\n===", JSON.stringify(response), "===\n\n");
+
+      if (response.errors) {
+        console.error("errors:", response.errors);
+        throw new Error("Failed to execute request");
+      }
+
+      console.log("\n\nresponse.data\n===", response.data, "===\n\n");
+
       return response.data;
     })
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      console.error(error);
+      throw new Error("Failed to execute request");
+    });
 }
 
 module.exports = {

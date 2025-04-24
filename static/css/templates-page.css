@@ -68,12 +68,10 @@
   font-size: 16px;
   opacity: 0;
   transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  -webkit-user-select: none;
-     -moz-user-select: none;
-          user-select: none;
+  user-select: none;
   cursor: pointer;
   filter: grayscale(100%);
-  color: #878787;
+  color: rgb(135.25, 135.25, 135.25);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -315,4 +313,6 @@
   .item-header {
     display: block;
   }
-}/*# sourceMappingURL=templates-page.css.map */
+}
+
+/*# sourceMappingURL=templates-page.css.map */

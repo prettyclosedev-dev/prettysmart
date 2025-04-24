@@ -303,8 +303,7 @@
     left: 0;
     width: 100%;
     z-index: 999;
-    -webkit-backdrop-filter: blur(2px);
-            backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
   }
   .mobile-hide.mobile-nav-opener,
   .overlay.mobile-hide {
@@ -425,4 +424,6 @@
 }
 .select-button .more-options {
   position: absolute;
-}/*# sourceMappingURL=nav.css.map */
+}
+
+/*# sourceMappingURL=nav.css.map */

@@ -235,7 +235,7 @@ function uploadFile($this, type, draft, data, name) {
         }
         if (!draft) {
           $this.find('[type="file"]').removeClass("touched");
-          
+
           $(`[data-tab-content="colors"]`)
             .find(".onboarding-logo-preview")
             .children("svg")
@@ -287,11 +287,23 @@ function updateColors(noreload, cb) {
           if (res.success) {
             $this.removeClass("touched");
 
-            $(name === "primary" ? ".color-primary" : ".color-secondary").css("background-color", val);
-            $(name === "primary" ? "#primary" : "#secondary").css("background-color", val);
+            $(name === "primary" ? ".color-primary" : ".color-secondary").css(
+              "background-color",
+              val
+            );
+            $(name === "primary" ? "#primary" : "#secondary").css(
+              "background-color",
+              val
+            );
 
-            $(name === "primary" ? "#primary" : "#secondary").attr("value", val);
-            $(name === "primary" ? "#primary" : "#secondary").attr("data-secondary-color", val);
+            $(name === "primary" ? "#primary" : "#secondary").attr(
+              "value",
+              val
+            );
+            $(name === "primary" ? "#primary" : "#secondary").attr(
+              "data-secondary-color",
+              val
+            );
           }
           window.UPDATE_COUNTER--;
           if (window.UPDATE_COUNTER === 1) {
@@ -509,7 +521,11 @@ function updateFontCSS(ff, res) {
     res.brand.fonts[ff].google
       ? "<link href='https://fonts.googleapis.com/css?family=" +
           res.brand.fonts[ff].name
-          .replace(/([A-Z][a-z0-9]+)/g, '+$1').replace(/\s{2}/g,"").trim().replace(/ /g, "").replace(/^\+/, '') +
+            .replace(/([A-Z][a-z0-9]+)/g, "+$1")
+            .replace(/\s{2}/g, "")
+            .trim()
+            .replace(/ /g, "")
+            .replace(/^\+/, "") +
           "' rel='stylesheet' type='text/css'>"
       : `@font-face {
                     font-family: 'user${ff}Font';
@@ -529,7 +545,14 @@ function updateFontCSS(ff, res) {
                 }`
   );
 
-  $(`.user${ff}Font`).css("font-family", '"' + res.brand.fonts[ff].name .replace(/([a-z])([A-Z])/g, "$1 $2") .replace(/ /g, " ") + '"');
+  $(`.user${ff}Font`).css(
+    "font-family",
+    '"' +
+      res.brand.fonts[ff].name
+        .replace(/([a-z])([A-Z])/g, "$1 $2")
+        .replace(/ /g, " ") +
+      '"'
+  );
 }
 
 function updateInfo(draft) {
