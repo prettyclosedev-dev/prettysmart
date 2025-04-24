@@ -14,7 +14,9 @@ const openAi = require("../openAi");
 const _ = require("lodash");
 const { handleBrandChange } = require("../clyps_brand_update");
 const stripe = require("stripe")(config.stripe.prod.secret);
-const mailchimp = require("@mailchimp/mailchimp_transactional")(config.mandrill.apiKey);
+const mailchimp = require("@mailchimp/mailchimp_transactional")(
+  config.mandrill.apiKey
+);
 
 var attributes = {
   fill: "#1A428A",
@@ -45,9 +47,34 @@ async function setupDefaults(req) {
     fs.mkdirSync(user_path, { recursive: true });
   }
 
+  await setDefaultInformation(req);
   // await setupDefaultColors(req);
   await setDefaultFonts(req, user_path);
   // await setDefaultAssets(req, user_path);
+}
+
+async function setDefaultInformation(req) {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    return;
+  }
+
+  const account = await Account.findById(req.user.account._id);
+
+  if (!account) {
+    return;
+  }
+
+  if (!account.brand_email) {
+    account.brand_email = user.email || "";
+  }
+
+  if (!account.brand_phone) {
+    account.brand_phone = user.phone || "";
+  }
+
+  await account.save();
 }
 
 async function setDefaultAssets(req, user_path) {
@@ -223,38 +250,21 @@ async function setDefaultFonts(req, user_path) {
 
   let fonts = fs.readdirSync(font_path);
 
-  if (!fonts.length) {
-    let fontFamily = "poppins";
+  const defaultFonts = [
+    "Poppins-Regular",
+    "Poppins-Italic",
+    "Poppins-Bold",
+    "Poppins-BoldItalic",
+  ];
 
-    if (!fs.existsSync(font_path + "/" + fontFamily)) {
-      fs.mkdirSync(font_path + "/" + fontFamily, { recursive: true });
-    }
-
-    let type = ".ttf";
-    let regName = "Poppins-Regular";
-    let italicName = "Poppins-Italic";
-    let boldName = "Poppins-Bold";
-    let boldItalicName = "Poppins-BoldItalic";
-
-    font_path += "/" + fontFamily + "/";
-
-    let googleFontPath = path.join(
-      __dirname,
-      "../google-fonts/" + fontFamily + "/"
-    );
-
-    copyFile(googleFontPath + regName + type, font_path + regName + type);
-    copyFile(googleFontPath + italicName + type, font_path + italicName + type);
-    copyFile(googleFontPath + boldName + type, font_path + boldName + type);
+  defaultFonts.map((font) => {
     copyFile(
-      googleFontPath + boldItalicName + type,
-      font_path + boldItalicName + type
+      path.join(__dirname, "../google-fonts/poppins/" + font + ".ttf"),
+      font_path + "\\poppins\\" + font + ".ttf"
     );
+  });
 
-    fontFamily = fontFamily.charAt(0).toUpperCase() + fontFamily.slice(1);
-
-    await syncFontsWithAccount(req, ["poppins"]);
-  }
+  await syncFontsWithAccount(req, ["poppins"]);
 
   let account = req.user.account;
   let hasFonts = Object.keys(account.brand.fonts).filter((key) => {
@@ -302,7 +312,7 @@ async function uploadFontToHuddle({
 async function syncFontsWithAccount(req, fontFamilies) {
   let user_path = path.join(__dirname, "../files/" + req.user.account._id);
   let fonts = fs.readdirSync(user_path + "/fonts/" + fontFamilies[0]);
-
+  console.log("fonts", fonts);
   let fontObj = {};
 
   fonts.map((font) => {
@@ -368,7 +378,10 @@ module.exports = () => {
 
     res.render("brand", {
       templates: [],
-      brand: await Huddle.getBrandObject(req.user.account).catch(console.log),
+      brand: {
+        ...(await Huddle.getBrandObject(req.user.account).catch(console.log)),
+        brand_phone: "1",
+      },
       paymentMethods,
       stripe_pub_key: config.stripe.prod.pub,
       cache: true,
@@ -876,15 +889,7 @@ module.exports = () => {
 
   router.post("/info", async (req, res) => {
     let oldAccountData = await Account.findById(req.user.account._id);
-    let accountNewData = {
-      name: req.body.name || oldAccountData.name,
-      industry: req.body.industry || oldAccountData.industry,
-      brand_email: req.body.brand_email || oldAccountData.brand_email,
-      brand_phone: req.body.brand_phone || oldAccountData.brand_phone,
-      industry_description:
-        req.body.industry_description || oldAccountData.industry_description,
-      tagline: req.body.tagline || oldAccountData.tagline,
-    };
+    let accountNewData = { ...req.body };
 
     if (req.user.master) {
       accountNewData.AI = req.body.AI;
