@@ -238,11 +238,11 @@
                 </div>
                 <div class="df inner-content-wrapper reg" data-content="self-help">
 
-                    <div class="left-sec">
+                    <div class="left-sec w-100">
                         <div class="df aic tabs-wrapper">
                             <div id="logo-tab" class="df acc tab ffp selected" data-tab="logo">Logo</div>
                             <div id="colors-tab" class="df acc tab ffp" data-tab="colors">Colors</div>
-                            <div id="fonts-tab" class="df acc tab ffp" data-tab="fonts">Fonts</div>
+                            <div id="fonts-tab" class="df acc tab ffp d-none" data-tab="fonts">Fonts</div>
                             <div id="info-tab" class="df acc tab ffp" data-tab="info">Info</div>
                         </div>
 
@@ -446,7 +446,7 @@
 
                             <div class="tab-content colors d-none" data-tab-content="colors">
                                 <div>
-                                <div class="df colors-wrapper">
+                                <div class="df colors-wrapper p-4">
                                     <div class="color-wrapper">
                                         <div class="label ffp brand-label ">PRIMARY COLOR</div>
                                         <input 
@@ -475,7 +475,7 @@
                                 </div>
                             </div>
                             <% if(brand && brand.logos && brand.logos.logo){ %>
-                            <div class="df line" style="margin-top: 235px;">
+                            <div class="df line mt-4">
                                 <div class="sec" id="logo">
                                     <div class="onboarding-label mt-1 mb-20  fs12">Choose from Logo</div>
                                     <label class="onboarding-logo-inner">
