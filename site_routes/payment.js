@@ -60,8 +60,12 @@ module.exports = () => {
 
           const priceObject = await stripe.prices.retrieve(req.params.plan_id);
           const plan_price = priceObject.unit_amount / 100; // Convert from cents
-          const plan_interval = priceObject.recurring ? priceObject.recurring.interval : "one-time";
-          const plan_type = TEAM_PRICES.includes(req.params.plan_id) ? "team" : "individual";
+          const plan_interval = priceObject.recurring
+            ? priceObject.recurring.interval
+            : "one-time";
+          const plan_type = TEAM_PRICES.includes(req.params.plan_id)
+            ? "team"
+            : "individual";
 
           return res.render("payment", {
             sessionId: newSession.id,
@@ -114,8 +118,12 @@ module.exports = () => {
 
         const priceObject = await stripe.prices.retrieve(req.params.plan_id);
         const plan_price = priceObject.unit_amount / 100; // Convert from cents
-        const plan_interval = priceObject.recurring ? priceObject.recurring.interval : "one-time";
-        const plan_type = TEAM_PRICES.includes(req.params.plan_id) ? "team" : "individual";
+        const plan_interval = priceObject.recurring
+          ? priceObject.recurring.interval
+          : "one-time";
+        const plan_type = TEAM_PRICES.includes(req.params.plan_id)
+          ? "team"
+          : "individual";
 
         res.render("payment", {
           sessionId: session.id,
@@ -181,8 +189,10 @@ module.exports = () => {
 
         try {
           req.user.account = account;
+          
           await req.user.save();
-          return res.redirect("/templates?ob=1");
+
+          return res.redirect("/brand/build?url=/templates?ob=1");
         } catch (error) {
           return await goToSubscribe(req, res, error);
         }
