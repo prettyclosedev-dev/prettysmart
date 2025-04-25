@@ -6,6 +6,10 @@
   //   font-weight: 600;
   // }
 
+  .page-content-wrapper {
+    max-width: 600px !important;
+  }
+
   .page-title-container {
     display: flex;
     flex-direction: row;
