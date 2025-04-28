@@ -406,20 +406,16 @@ module.exports = () => {
 
   router.get("/build", async (req, res) => {
     console.log("building brand...");
-
-    console.log(req.query.url);
-    console.log("user", req.user);
-
-    await setupDefaults(req);
-
     try {
+      await setupDefaults(req);
       await handleBrandChange(req.user);
     } catch (e) {
       console.log(e);
     }
-
-    let url = req.query.url;
-    res.redirect(url || "/templates");
+    finally {
+      let url = req.query.url;
+      res.redirect(url || "/templates");
+    }
   });
 
   router.post("/mix-colors", async function (req, res) {
