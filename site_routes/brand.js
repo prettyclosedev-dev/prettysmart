@@ -530,13 +530,14 @@ module.exports = () => {
             file: file,
             save: true,
             path: newPath,
-            //transformers : ['auto']
+            transformers : ['auto']
           });
 
           fileName = fileName.replace("." + fileExt, ".svg");
           fileExt = "svg";
         } catch (e) {
-          console.log(e);
+          console.log("convert failed");
+          // console.log(e);
           res.send({ error: e, success: false });
           return;
         }

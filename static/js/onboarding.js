@@ -36,8 +36,14 @@ $(document)
 
     return;
   })
+  .on("change", "#upload-logo", function () {
+    uploadLogoNew();
+  })
   .on("change", "#upload-assets", function () {
     uploadAssets();
+  })
+  .on("change", "#upload-avatar", function () {
+    uploadAvatar();
   })
   .on("input", '[type="color"]', function () {
     var $this = $(this),
@@ -60,8 +66,10 @@ $(document)
       .next()
       .addClass("d-none");
   })
-  .on("click", "[data-save-brand]", function () {
+  .on("click", "[data-save-brand]", function (e) {
     console.log("UPDATING ");
+
+    updateInfo();
 
     // var logoDfd = $.Deferred();
     // updateLogos(function (res) {
@@ -438,6 +446,16 @@ function updateGoogleFont($this, draft, cb) {
   }
 }
 
+function updateInfo() {
+  $.post("/onboarding/brand-info", {
+    brand_phone: $("#onboarding-info-form #phone").val(),
+    location_city: $("#onboarding-info-form #location-city").val(),
+    location_country: $("#onboarding-info-form #location-country").val(),
+  }).then(function (res) {
+    console.log(res.success === true ? "Brand info updated" : "Brand info not updated");
+  });
+}
+
 function displayBrand(brand) {
   $(".template-loader").show();
 
@@ -480,6 +498,44 @@ function addTabState(type, state) {
   }
 }
 
+function uploadLogoNew() {
+  console.log("uploading logo...")
+  const $file = $("#upload-logo");
+
+  const file = $file[0].files[0]
+
+  if (!file) {
+    return;
+  }
+
+  $("#logo-preview").attr("src", URL.createObjectURL(file));  
+  $("#select-prompt").addClass("d-none");
+  $(".logo-container").removeAttr("hidden");
+
+  const data = new FormData();
+
+  data.append(file.name, file);
+  data.append("name", file.name);
+
+  $.ajax({
+    url: "/brand/logo",
+    data: data,
+    type: "POST",
+    contentType: false,
+    processData: false,
+    success: function (res) {
+      if (res.success) {
+        console.log("SUCCESS", res);
+      }
+    },
+    error: function (err) {
+      $this.stopLoading();
+      addTabState("logo", "failed");
+      console.log(err);
+    },
+  });
+}
+
 function uploadAssets() {
   var $file = $("#upload-assets");
 
@@ -518,5 +574,46 @@ function uploadAssets() {
         '<span class="fa-stack"><i style="color:#EB2121;" class="fas fa-circle fa-stack-2x"></i><i class="fas fa-times fa-xs fa-stack-1x fa-inverse"></i></span>'
       );
     },
+  });
+}
+
+function uploadAvatar() {
+  console.log("uploading avatar...")
+  const $file = $("#upload-avatar");
+
+  const file = $file[0].files[0]
+
+  if (!file) {
+    return;
+  }
+
+  $("#avatar-img").attr("src", URL.createObjectURL(file));
+  $("#avatar-upload-icon").addClass("d-none");
+  $("#avatar-img").removeClass("d-none");
+
+  const data = new FormData();
+
+  data.append(file.name, file);
+  data.append("name", file.name);
+
+  const userId = $("#user-id").val()
+  console.log(data, userId)
+
+  $.ajax({
+      url: "/settings/account/upload-avatar/" + userId,
+      data: data,
+      type: "POST",
+      contentType: false,
+      processData: false,
+      success: function (res) {
+          console.log("SUCCESS", res);
+          if (!res.success) {
+              alert(res.error || "Failed to upload avatar!")
+          }
+      },
+      error: function (err) {
+          console.log("ERROR", err);
+          alert(JSON.stringify(err));
+      },
   });
 }

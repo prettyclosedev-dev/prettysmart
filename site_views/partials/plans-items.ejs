@@ -6,7 +6,7 @@
   @import url("https://fonts.googleapis.com/css?family=Poppins:400,500,600");
 </style>
 
-<% const renderPriceItem = (id, primeColor, secondColor, title, button, children, darkText, price, canceled) => { %>
+<% const renderPriceItem = (id, primeColor, secondColor, title, button1, button2, children, darkText, price, canceled) => { %>
 <div class="price-item" style="background-color: <%= primeColor %>; color: <%= darkText || secondColor %>;">
   <div style="margin-bottom: 1.5rem;">
     <p class="price-item-title" style="color: <%= darkText || secondColor %>;"><%= title %><% if (canceled) { %> <span style="margin-left: 10px; color: 'gray'; font-size: 9px;">Canceled</span> <% } %></p>
@@ -25,7 +25,7 @@
         if (typeof tap !== 'undefined' && typeof tap.push === 'function') {
             tap.push(['conversion', { 
                 conversion_type: 'subscription', 
-                plan_id: '<%= id %>', 
+                plan_id: '<%= id %>',   
                 plan_name: '<%= title %>', 
                 price: <%= price || 0 %>, 
                 currency: 'USD' 
@@ -33,7 +33,10 @@
         }
         location.href='<%= price ? `/payment/update/` + id : `/payment/free` %>';"  
     id="plan-button" class="price-button tiny-text" style="background-color: <%= secondColor %>;">
-        <p style="color: <%= darkText || primeColor %>;"><%= button %></p>
+    <div class=" d-flex flex-column py-2" style="gap:10px;">
+        <p style="color: <%= darkText || primeColor %>; font-size:20px;"><%= button1 %></p>
+        <p style="color: <%= darkText || primeColor %>; font-size:30px; font-weight:600;" ><%= button2 %></p>
+    </div>
   </button>
 </div>
 <% } %>
@@ -123,7 +126,7 @@
                         });
 
                         if (product.prices[interval] && product.prices[interval].id) {
-                            renderPriceItem(product.prices[interval].id, getFirstColor(index), getSecondColor(index), "PrettyClose " + name, getPreText(product) + " • " + (price ? "$" + price + "/" + getIntervalAbbrev() : "Free Forever" ), icons, index === 0 ? "black" : undefined, price, getCanceledStatus(product))
+                            renderPriceItem(product.prices[interval].id, getFirstColor(index), getSecondColor(index), "PrettyClose " + name, getPreText(product), (price ? "$" + price + "/" + getIntervalAbbrev() : "Free Forever" ), icons, index === 0 ? "black" : undefined, price, getCanceledStatus(product))
                         }
                     }
                 }

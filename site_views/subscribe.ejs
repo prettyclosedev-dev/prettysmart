@@ -5,15 +5,18 @@
 
     <div class="plans-page go-pro-page" style="padding: 32px;">
       <div class="page-content-wrapper">
-        <div class="page-title-container">
-          <a href='<%= affiliate ? "/landing?affiliate=true" : "/landing" %>'><img id="logo-img" src="/site_static/images/logo.svg" alt="Prettyclose" /></a>
+        <div class="page-title-container d-flex justify-content-center mb-5">
+          <a href='<%= affiliate ? "/landing?affiliate=true" : "/landing" %>'>
+            <img id="logo-img" src="/site_static/images/logo.svg" alt="Prettyclose" class="object-contain" style="object-fit: cover; width: 20vw;" />
+          </a>
         </div>
-        <div style="display: flex; align-items: center; flex-direction:row; justify-content: center;">
+        <!-- TODO: CLEAN THIS UP LATER -->
+        <!-- <div style="display: flex; align-items: center; flex-direction:row; justify-content: center;">
           <div>
             <h2 class="page-title">Get access...</h2>
             <p style="padding-bottom: 32px">Get access for unlimited templates with many credits.</p>
           </div>
-        </div>
+        </div> -->
         <div class="df inner-content-wrapper">
           <div class="plans-wrapper">
             <script>
@@ -22,6 +25,15 @@
               });
             </script>
             <script>
+              $(document).ready(function(e) {
+                // default to yearly
+                // $("#plans-seg-year").attr("checked", true);
+                // $.post(`/subscribe/interval/${"year"}`, function(data) {
+                //   $('.price-items').html($(data).find('.price-items').html());
+                // });
+
+                console.log("interval", "<%= interval %>");
+              });
               $(document).on('change', '[type="radio"]', function(e) {
                 var new_interval = $(this).attr("id").includes("month") ? 'month' : 'year'
                 $.post(`/subscribe/interval/${new_interval}`, function(data) {
