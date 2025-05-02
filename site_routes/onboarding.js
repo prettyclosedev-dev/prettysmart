@@ -9,6 +9,7 @@ const stripe = require("stripe")(config.stripe.prod.secret);
 const mailchimp = require("@mailchimp/mailchimp_transactional")(
   config.mandrill.apiKey
 );
+const User = require("../schemas/user");
 
 const attributes = {
   fill: "#1A428A",
@@ -169,6 +170,27 @@ module.exports = () => {
     // }
   });
 
+  router.post("/brand-info", async (req, res) => {
+    const body = req.body;
+    
+    const account = await Account.findById(req.user.account._id);
+
+    if (!account) {
+      return;
+    }
+
+    console.log("updating brand info for ", req.user.account._id, body);
+
+    account.brand_phone = body.brand_phone || req.user.phone || "";
+
+    account.location_city = body.location_city || "";
+  
+    account.location_country = body.location_country || "";
+
+    await account.save();
+    res.send({ success: true });
+  });
+
   router.post("/brand-assets-payment", async (req, res) => {
     console.log("TRYING T PROCESS PAYMENT #43gD");
 
@@ -187,7 +209,7 @@ module.exports = () => {
         console.log("PAYMENT PROCESSED A*b7");
       }
 
-      await sendBrandAssets({ files: req.files, user: req.user });
+      // await sendBrandAssets({ files: req.files, user: req.user });
 
       Account.findOneAndUpdate(
         {

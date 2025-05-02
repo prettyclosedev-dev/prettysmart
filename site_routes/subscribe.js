@@ -26,10 +26,11 @@ module.exports = () => {
       if (plans && plans.data && plans.data.length) {
         let currentInterval = getCurrentInterval(plans, subscription, req);
 
+
         res.render("subscribe", {
           products: plans,
           subscription,
-          interval: currentInterval,
+          interval: "year",
           cache: true,
           filename: "subscribe",
         });
@@ -37,7 +38,7 @@ module.exports = () => {
         res.render("subscribe", {
           products: {},
           subscription: {},
-          interval: "month",
+          interval: "year",
           error: {
             message: "Failed to get plans.",
           },
@@ -49,7 +50,7 @@ module.exports = () => {
       res.render("subscribe", {
         products: {},
         subscription: {},
-        interval: "month",
+        interval: "year",
         error,
         cache: true,
         filename: "subscribe",

@@ -1,3 +1,6 @@
+.new-brand-page .page-content-wrapper {
+  max-width: 600px !important;
+}
 .new-brand-page .page-title-container {
   display: flex;
   flex-direction: row;

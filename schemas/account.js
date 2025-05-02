@@ -16,6 +16,8 @@ let accountSchema = new Schema(
     brand_primary: String,
     brand_secondary: String,
     brand_footer: String,
+    location_city:String,
+    location_country:String,
     status: String,
     special_access: {
       type: Boolean,

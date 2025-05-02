@@ -64,9 +64,13 @@ app.use((req, res, next) => {
   let url = req.url.replace("/", "");
   let open_routes = [
     "",
+
+    /** STATIC FILES - DO NOT DEPLOY TO SERVER **/
     "static",
     "site_static",
     "files",
+    /** STATIC FILES - DO NOT DEPLOY TO SERVER **/
+    
     "login",
     "forgot",
     "reset",
@@ -90,9 +94,13 @@ app.use((req, res, next) => {
     return (
       open_routes.includes(url) ||
       url.startsWith("public") ||
+
+      /** STATIC FILES - DO NOT DEPLOY TO SERVER **/
       url.startsWith("static") ||
       url.startsWith("files") ||
       url.startsWith("site_static") ||
+      /** STATIC FILES - DO NOT DEPLOY TO SERVER **/
+
       url.startsWith("pages") ||
       url.startsWith("reset") ||
       url.startsWith("webhooks")
@@ -310,8 +318,11 @@ app.use("/real-estate", require("./site_routes/real-estate")());
 app.use("/mortgage-news", require("./site_routes/mortgage-news")());
 app.use("/mortgage-rates", require("./site_routes/mortgage-rates")());
 
+/** STATIC FILES - DO NOT DEPLOY TO SERVER **/
 app.use("/static", express.static(path.join(__dirname, "static")));
 app.use("/site_static", express.static(path.join(__dirname, "site_static")));
+app.use("/files", express.static(path.join(__dirname, "files")));
+/** STATIC FILES - DO NOT DEPLOY TO SERVER **/
 
 app.use(function (req, res) {
   res.render("404", {

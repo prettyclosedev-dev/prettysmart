@@ -20,6 +20,8 @@
 
                 <% } %>
 
+                <input id="user-id" class="d-none" value="<%= user._id %>"/>
+
                 <div class="onboarding-section onboarding-logos">
                     <div class="d-flex justify-content-between">
                         <div class="onboarding-section-title">
@@ -38,9 +40,53 @@
                         </div>
                         
                     </div>
+
                     <div class="upload-primary-wrapper">
                         <div class="onboarding-section-subtitle mt-1">
-                        Upload your logo, brand assets & avatar. The more the merrier 😎
+                        Upload your logo
+                        </div>
+
+                        <label id="upload-logo-label" for="upload-logo" class="df acc upload-wrapper">
+                            <div class="df acc jcc logo-container" hidden>
+                                <img id="logo-preview" src="files/67d0fc130daa396a1077d697/logos/logo.svg">
+                            </div>
+                            <div id="select-prompt" class="df acc">
+                                <i class="fa-light fa-upload"></i>
+                                <div>
+                                    <p class="fs14">Drop here to upload</p>
+                                    <p class="fs10 mb-0 text-underline">Or click to browse</p>
+                                </div>
+                            </div>
+                        </label>
+                        <input hidden type="file" id="upload-logo" multiple/>
+                        <!-- <div class="file-list"><div id="selected-files-list"></div></div> -->
+                    </div>
+                    <div class="upload-btn-wrapper d-none">
+                        <button onclick="uploadLogo()" style="margin-top: 1rem;" class="btn btn-primary px-4 upload-logo-btn"><i class="fas fa-arrow-right"></i>Upload your logos</button>
+                    </div>
+                </div>
+
+                <div class="onboarding-section onboarding-logos">
+                    <div class="d-flex justify-content-between">
+                        <div class="onboarding-section-title">
+                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 18.7 18.7" xml:space="preserve">
+                                <g id="LOGO_7_">
+                                  <path class="st0" d="M14 13.5H6.7c-.1 0-.2-.1-.2-.2V12c0-.1.1-.2.2-.2H14c1.4 0 2.5-1.1 2.5-2.5S15.4 6.8 14 6.8h-.7c-.1 0-.2-.1-.2-.2V5.3c0-.1.1-.2.2-.2h.7c2.3 0 4.2 1.9 4.2 4.2s-1.9 4.2-4.2 4.2zm-7.2-.3H14c2.1 0 3.8-1.7 3.8-3.8S16.1 5.5 14 5.5h-.5v1h.5c1.6 0 2.8 1.3 2.8 2.8s-1.3 2.8-2.8 2.8H6.8v1.1z"/>
+                                  <path class="st0" d="M5.3 13.5h-.6C2.4 13.5.5 11.6.5 9.3s1.9-4.2 4.2-4.2H12c.1 0 .2.1.2.2v1.3c0 .1-.1.2-.2.2H4.7C3.3 6.8 2.2 8 2.2 9.3s1.1 2.5 2.5 2.5h.7c.1 0 .2.1.2.2v1.3c-.1.1-.2.2-.3.2zm-.6-8C2.6 5.5.9 7.2.9 9.3s1.7 3.8 3.8 3.8h.5v-1h-.5c-1.6 0-2.8-1.3-2.8-2.8s1.3-2.8 2.8-2.8h7.2v-1H4.7z"/>
+                                  <path class="st0" d="M13.3 12.2H12c-.1 0-.2-.1-.2-.2V4.7c0-1.4-1.1-2.5-2.5-2.5-1.3 0-2.5 1.1-2.5 2.5v.7c0 .1-.1.2-.2.2H5.3c-.1 0-.2-.1-.2-.2v-.7C5.1 2.4 7 .5 9.3.5c2.3 0 4.2 1.9 4.2 4.2V12c0 .1-.1.2-.2.2zm-1.1-.4h1V4.7c0-2.1-1.7-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8v.5h1v-.5c0-1.6 1.3-2.8 2.8-2.8s2.8 1.3 2.8 2.8v7.1z"/>
+                                  <path class="st0" d="M9.3 18.2c-2.3 0-4.2-1.9-4.2-4.2V6.7c0-.1.1-.2.2-.2h1.3c.1 0 .2.1.2.2V14c0 1.4 1.1 2.5 2.5 2.5s2.5-1.1 2.5-2.5v-.7c0-.1.1-.2.2-.2h1.3c.1 0 .2.1.2.2v.7c0 2.3-1.9 4.2-4.2 4.2zM5.5 6.8V14c0 2.1 1.7 3.8 3.8 3.8 2.1 0 3.8-1.7 3.8-3.8v-.5h-1v.5c0 1.6-1.3 2.8-2.8 2.8S6.5 15.6 6.5 14V6.8h-1zM0 0h.3v.3H0zM1.3 0h.3v.3h-.3zM0 1.3h.3v.3H0zM0 2.7h.3V3H0zM1.3 1.3h.3v.3h-.3zM2.7 0H3v.3h-.3z"/>
+                                  <g>
+                                    <path class="st0" d="M18.3 18.3h.3v.3h-.3zM17 18.3h.3v.3H17zM18.3 17h.3v.3h-.3zM17 17h.3v.3H17zM15.7 18.3h.3v.3h-.3zM15.7 17h.3v.3h-.3zM18.3 15.7h.3v.3h-.3zM17 15.7h.3v.3H17zM15.7 15.7h.3v.3h-.3z"/>
+                                  </g>
+                                </g>
+                            </svg>
+                            Brand Assets
+                        </div>
+                        
+                    </div>
+                    <div class="upload-primary-wrapper">
+                        <div class="onboarding-section-subtitle mt-1">
+                        Upload your brand assets
                         </div>
                         <label for="upload-assets" class="df acc upload-wrapper">
                             <i class="fa-light fa-upload"></i>
@@ -54,6 +100,41 @@
                     </div>
                     <div class="upload-btn-wrapper d-none">
                         <button onclick="uploadAssets()" style="margin-top: 1rem;" class="btn btn-primary px-4 upload-assets-btn"><i class="fas fa-arrow-right"></i>Upload your logos</button>
+                    </div>
+                </div>
+
+                <div class="onboarding-section onboarding-logos">
+                    <div class="d-flex justify-content-between">
+                        <div class="onboarding-section-title">
+                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 18.7 18.7" xml:space="preserve">
+                                <g id="LOGO_7_">
+                                  <path class="st0" d="M14 13.5H6.7c-.1 0-.2-.1-.2-.2V12c0-.1.1-.2.2-.2H14c1.4 0 2.5-1.1 2.5-2.5S15.4 6.8 14 6.8h-.7c-.1 0-.2-.1-.2-.2V5.3c0-.1.1-.2.2-.2h.7c2.3 0 4.2 1.9 4.2 4.2s-1.9 4.2-4.2 4.2zm-7.2-.3H14c2.1 0 3.8-1.7 3.8-3.8S16.1 5.5 14 5.5h-.5v1h.5c1.6 0 2.8 1.3 2.8 2.8s-1.3 2.8-2.8 2.8H6.8v1.1z"/>
+                                  <path class="st0" d="M5.3 13.5h-.6C2.4 13.5.5 11.6.5 9.3s1.9-4.2 4.2-4.2H12c.1 0 .2.1.2.2v1.3c0 .1-.1.2-.2.2H4.7C3.3 6.8 2.2 8 2.2 9.3s1.1 2.5 2.5 2.5h.7c.1 0 .2.1.2.2v1.3c-.1.1-.2.2-.3.2zm-.6-8C2.6 5.5.9 7.2.9 9.3s1.7 3.8 3.8 3.8h.5v-1h-.5c-1.6 0-2.8-1.3-2.8-2.8s1.3-2.8 2.8-2.8h7.2v-1H4.7z"/>
+                                  <path class="st0" d="M13.3 12.2H12c-.1 0-.2-.1-.2-.2V4.7c0-1.4-1.1-2.5-2.5-2.5-1.3 0-2.5 1.1-2.5 2.5v.7c0 .1-.1.2-.2.2H5.3c-.1 0-.2-.1-.2-.2v-.7C5.1 2.4 7 .5 9.3.5c2.3 0 4.2 1.9 4.2 4.2V12c0 .1-.1.2-.2.2zm-1.1-.4h1V4.7c0-2.1-1.7-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8v.5h1v-.5c0-1.6 1.3-2.8 2.8-2.8s2.8 1.3 2.8 2.8v7.1z"/>
+                                  <path class="st0" d="M9.3 18.2c-2.3 0-4.2-1.9-4.2-4.2V6.7c0-.1.1-.2.2-.2h1.3c.1 0 .2.1.2.2V14c0 1.4 1.1 2.5 2.5 2.5s2.5-1.1 2.5-2.5v-.7c0-.1.1-.2.2-.2h1.3c.1 0 .2.1.2.2v.7c0 2.3-1.9 4.2-4.2 4.2zM5.5 6.8V14c0 2.1 1.7 3.8 3.8 3.8 2.1 0 3.8-1.7 3.8-3.8v-.5h-1v.5c0 1.6-1.3 2.8-2.8 2.8S6.5 15.6 6.5 14V6.8h-1zM0 0h.3v.3H0zM1.3 0h.3v.3h-.3zM0 1.3h.3v.3H0zM0 2.7h.3V3H0zM1.3 1.3h.3v.3h-.3zM2.7 0H3v.3h-.3z"/>
+                                  <g>
+                                    <path class="st0" d="M18.3 18.3h.3v.3h-.3zM17 18.3h.3v.3H17zM18.3 17h.3v.3h-.3zM17 17h.3v.3H17zM15.7 18.3h.3v.3h-.3zM15.7 17h.3v.3h-.3zM18.3 15.7h.3v.3h-.3zM17 15.7h.3v.3H17zM15.7 15.7h.3v.3h-.3z"/>
+                                  </g>
+                                </g>
+                            </svg>
+                            Profile Picture
+                        </div>
+                        
+                    </div>
+                    <div class="upload-primary-wrapper">
+                        <div class="onboarding-section-subtitle mt-1">
+                            Upload your profile picture
+                        </div>
+
+                        <label for="upload-avatar" class="df acc upload-wrapper floating" style="gap:15px">
+                            <i id="avatar-upload-icon" class="fa-light fa-upload"></i>
+                            <img id="avatar-img" class="d-none" style="height:80%; object-fit:contain;" />
+                            <div>
+                                <p class="fs14">Drop here to upload</p>
+                                <p class="fs10 mb-0 text-underline">Or click to browse</p>
+                            </div>
+                        </label>
+                        <input hidden type="file" id="upload-avatar"/>
                     </div>
                 </div>
 
@@ -74,15 +155,15 @@
                           </svg>
                         Colors
                     </div>
-                    <div class="row mt-3">
-                        <div class="col-4">
-                            <div class="onboarding-color-outer">
+                    <div class="d-flex justify-content-center mt-3" style="gap:30px;">
+                        <div >
+                            <div class="onboarding-color-outer"  style="height:150px;width: 150px;">
                                 <input class="onboarding-color-inner" type="color" name="primary" value="<%= user.account.brand.colors.primary || '#1A428A' %>" data-primary-color="<%= user.account.brand_primary || '#1A428A' %>">
                             </div>
                             <div class="onboarding-label mt-1">Primary Color</div>
                         </div>
-                        <div class="col-4">
-                            <div class="onboarding-color-outer">
+                        <div >
+                            <div class="onboarding-color-outer" style="height:150px;width: 150px;">
                                 <input class="onboarding-color-inner" type="color" name="secondary" value="<%= user.account.brand.colors.secondary || '#D5BA8C' %>" data-secondary-color="<%= user.account.brand_secondary || '#D5BA8C' %>">
                             </div>
                             <div class="onboarding-label mt-1">Secondary Color</div>
@@ -90,7 +171,73 @@
                     </div>
                 </div>
 
-                <div class="onboarding-section onboarding-fonts">
+                <div class="onboarding-section onboarding-info">
+                    <div class="d-flex justify-content-between">
+                        <div class="onboarding-section-title">
+                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 18.7 18.7" xml:space="preserve">
+                                <g id="LOGO_7_">
+                                  <path class="st0" d="M14 13.5H6.7c-.1 0-.2-.1-.2-.2V12c0-.1.1-.2.2-.2H14c1.4 0 2.5-1.1 2.5-2.5S15.4 6.8 14 6.8h-.7c-.1 0-.2-.1-.2-.2V5.3c0-.1.1-.2.2-.2h.7c2.3 0 4.2 1.9 4.2 4.2s-1.9 4.2-4.2 4.2zm-7.2-.3H14c2.1 0 3.8-1.7 3.8-3.8S16.1 5.5 14 5.5h-.5v1h.5c1.6 0 2.8 1.3 2.8 2.8s-1.3 2.8-2.8 2.8H6.8v1.1z"/>
+                                  <path class="st0" d="M5.3 13.5h-.6C2.4 13.5.5 11.6.5 9.3s1.9-4.2 4.2-4.2H12c.1 0 .2.1.2.2v1.3c0 .1-.1.2-.2.2H4.7C3.3 6.8 2.2 8 2.2 9.3s1.1 2.5 2.5 2.5h.7c.1 0 .2.1.2.2v1.3c-.1.1-.2.2-.3.2zm-.6-8C2.6 5.5.9 7.2.9 9.3s1.7 3.8 3.8 3.8h.5v-1h-.5c-1.6 0-2.8-1.3-2.8-2.8s1.3-2.8 2.8-2.8h7.2v-1H4.7z"/>
+                                  <path class="st0" d="M13.3 12.2H12c-.1 0-.2-.1-.2-.2V4.7c0-1.4-1.1-2.5-2.5-2.5-1.3 0-2.5 1.1-2.5 2.5v.7c0 .1-.1.2-.2.2H5.3c-.1 0-.2-.1-.2-.2v-.7C5.1 2.4 7 .5 9.3.5c2.3 0 4.2 1.9 4.2 4.2V12c0 .1-.1.2-.2.2zm-1.1-.4h1V4.7c0-2.1-1.7-3.8-3.8-3.8-2.1 0-3.8 1.7-3.8 3.8v.5h1v-.5c0-1.6 1.3-2.8 2.8-2.8s2.8 1.3 2.8 2.8v7.1z"/>
+                                  <path class="st0" d="M9.3 18.2c-2.3 0-4.2-1.9-4.2-4.2V6.7c0-.1.1-.2.2-.2h1.3c.1 0 .2.1.2.2V14c0 1.4 1.1 2.5 2.5 2.5s2.5-1.1 2.5-2.5v-.7c0-.1.1-.2.2-.2h1.3c.1 0 .2.1.2.2v.7c0 2.3-1.9 4.2-4.2 4.2zM5.5 6.8V14c0 2.1 1.7 3.8 3.8 3.8 2.1 0 3.8-1.7 3.8-3.8v-.5h-1v.5c0 1.6-1.3 2.8-2.8 2.8S6.5 15.6 6.5 14V6.8h-1zM0 0h.3v.3H0zM1.3 0h.3v.3h-.3zM0 1.3h.3v.3H0zM0 2.7h.3V3H0zM1.3 1.3h.3v.3h-.3zM2.7 0H3v.3h-.3z"/>
+                                  <g>
+                                    <path class="st0" d="M18.3 18.3h.3v.3h-.3zM17 18.3h.3v.3H17zM18.3 17h.3v.3h-.3zM17 17h.3v.3H17zM15.7 18.3h.3v.3h-.3zM15.7 17h.3v.3h-.3zM18.3 15.7h.3v.3h-.3zM17 15.7h.3v.3H17zM15.7 15.7h.3v.3h-.3z"/>
+                                  </g>
+                                </g>
+                            </svg>
+                            Additional Information
+                        </div>
+                        
+                    </div>
+                    <form id="onboarding-info-form" class="row mt-4">
+                        <div class="col-12 mb-4 ">
+                            <div class="input-group input-group-lg">
+                                <div class="input-group-prepend">
+                                <span class="input-group-text bg-white">                                
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20.257" height="20.244" viewBox="0 0 20.257 20.244">
+                                            <path d="M1413.28,915.92a9.728,9.728,0,0,1-1.326-.138,9.935,9.935,0,0,1-2.234-.686,18.527,18.527,0,0,1-2.945-1.614,22.035,22.035,0,0,1-3.494-2.945,23.112,23.112,0,0,1-2.436-2.772,19.972,19.972,0,0,1-1.559-2.456,13.464,13.464,0,0,1-.892-2.063,10.971,10.971,0,0,1-.406-1.606,5.366,5.366,0,0,1-.087-1.1c.013-.231.02-.363.02-.4a.478.478,0,0,1,0-.048,2.355,2.355,0,0,1,.218-.693,1.9,1.9,0,0,1,.433-.6l2.74-2.74a1.258,1.258,0,0,1,.911-.393,1.117,1.117,0,0,1,.688.226,1.77,1.77,0,0,1,.436.475c.005.008.01.016.015.025l2.215,4.2a1.351,1.351,0,0,1,.137.961,1.646,1.646,0,0,1-.448.839l-1,1-.005.015-.009.029a3.563,3.563,0,0,0,.329.846,8.907,8.907,0,0,0,.739,1.166,13.11,13.11,0,0,0,1.43,1.6,13.388,13.388,0,0,0,1.617,1.447,9.258,9.258,0,0,0,1.164.748,2.815,2.815,0,0,0,.653.268l.193.039.02-.007.015,0,1.16-1.181.018-.017a1.62,1.62,0,0,1,1.1-.419,1.468,1.468,0,0,1,.681.142.31.31,0,0,1,.077.031l4,2.36a1.389,1.389,0,0,1,.684.917l0,.024a1.3,1.3,0,0,1-.39,1.123L1415,915.259a1.873,1.873,0,0,1-.582.419,2.37,2.37,0,0,1-.693.218.382.382,0,0,1-.05,0l-.089.009C1413.5,915.916,1413.4,915.92,1413.28,915.92Zm-14.655-15.741c0,.06-.009.194-.021.4a4.778,4.778,0,0,0,.079.949,10.339,10.339,0,0,0,.381,1.5,12.732,12.732,0,0,0,.846,1.953,19.24,19.24,0,0,0,1.5,2.367,22.4,22.4,0,0,0,2.364,2.689,21.37,21.37,0,0,0,3.381,2.854,17.871,17.871,0,0,0,2.83,1.552,8.787,8.787,0,0,0,3.291.77c.1,0,.177,0,.238-.009l.117-.01a1.658,1.658,0,0,0,.475-.153,1.214,1.214,0,0,0,.379-.271l2.766-2.746a.6.6,0,0,0,.19-.521.7.7,0,0,0-.355-.441l-3.94-2.327a.332.332,0,0,1-.072-.031.743.743,0,0,0-.378-.074.92.92,0,0,0-.628.235l-1.17,1.191a.68.68,0,0,1-.273.16.6.6,0,0,1-.317.043l-.259-.052a3.5,3.5,0,0,1-.835-.331,9.788,9.788,0,0,1-1.259-.806,14,14,0,0,1-1.7-1.519,13.737,13.737,0,0,1-1.5-1.684,9.521,9.521,0,0,1-.8-1.26,4.082,4.082,0,0,1-.4-1.085.333.333,0,0,1-.007-.066.834.834,0,0,1,.05-.268.683.683,0,0,1,.156-.271l1.015-1.015a.933.933,0,0,0,.256-.485.655.655,0,0,0-.066-.48l-2.213-4.2a1.072,1.072,0,0,0-.257-.278.418.418,0,0,0-.266-.086.561.561,0,0,0-.413.186l-2.753,2.753a1.227,1.227,0,0,0-.283.39A1.683,1.683,0,0,0,1398.625,900.179Z" transform="translate(-1397.897 -895.676)" fill="#b6bacb" stroke="#b6bacb" stroke-width="1.0"/>
+                                        </svg>
+                                </span>
+                                </div>
+                                <input type="tel" id="phone" placeholder="Phone" class="form-control">
+                            </div>
+                            <div class="text-danger" data-field="phone"></div>
+                        </div>
+
+                        <div class="col-12 mb-4 ">
+                            <div class="input-group input-group-lg">
+                                <div class="input-group-prepend">
+                                <span class="input-group-text bg-white">                                
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20.257" height="20.244" viewBox="0 0 20.257 20.244" fill="none" stroke="#b6bacb" stroke-width="1.5">
+                                        <path d="M10.129 1.5c-3.866 0-7 3.134-7 7 0 4.524 7 10.244 7 10.244s7-5.72 7-10.244c0-3.866-3.134-7-7-7z"/>
+                                        <circle cx="10.129" cy="8.5" r="2"/>
+                                      </svg>                                      
+                                      
+                                </span>
+                                </div>
+                                <input type="text" id="location-city" placeholder="City" class="form-control">
+                            </div>
+                            <div class="text-danger" data-field="city"></div>
+                        </div>
+
+                        <div class="col-12 mb-4 ">
+                            <div class="input-group input-group-lg">
+                                <div class="input-group-prepend">
+                                <span class="input-group-text bg-white">                                
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20.257" height="20.244" viewBox="0 0 20.257 20.244" fill="none" stroke="#b6bacb" stroke-width="1.5">
+                                        <path d="M10.129 1.5c-3.866 0-7 3.134-7 7 0 4.524 7 10.244 7 10.244s7-5.72 7-10.244c0-3.866-3.134-7-7-7z"/>
+                                        <circle cx="10.129" cy="8.5" r="2"/>
+                                      </svg>                                      
+                                </span>
+                                </div>
+                                <input type="tel" id="location-country" placeholder="Country" class="form-control">
+                            </div>
+                            <div class="text-danger" data-field="country"></div>
+                        </div>
+                    </f>
+                </div>
+
+                <div class="onboarding-section onboarding-fonts d-none">
                     <div class="onboarding-section-title">
                         <div class="d-flex align-items-center justify-content-between w-100">
                             <div class="">
@@ -295,10 +442,9 @@
 
 <script>
     
-    var draft_brand = <%- JSON.stringify(brand) %>;
+    var draft_brand = '<%- JSON.stringify(brand) %>';
 
     function getFiles(e) {
-
         let $container = $("#selected-files-list")
         
         $container.empty()
@@ -308,6 +454,26 @@
         })
         $(".file-list").append('<span class="fa-stack"><i style="color:#EBB221;" class="fas fa-circle fa-stack-2x"></i><i class="fas fa-info fa-xs fa-stack-1x fa-inverse"></i></span>')
     }
+
+    $(document).ready(() => {
+        // $("#upload-logo-label").hover(() => {
+        //     $("#logo-preview").toggleClass("lower-opacity")
+        //     $("#select-prompt").toggleClass("d-none")
+        // })
+
+        $("#upload-logo-label")
+            .on("mouseenter", () => {
+                if($(".logo-container").attr("hidden") !== undefined) return
+
+                $("#logo-preview").addClass("lower-opacity")
+                $("#select-prompt").removeClass("d-none")
+            }).on("mouseleave", () => {
+                if($(".logo-container").attr("hidden") !== undefined) return
+
+                $("#logo-preview").removeClass("lower-opacity")
+                $("#select-prompt").addClass("d-none")
+            })
+    })
 </script>
 
 <script src="/static/js/jquery.fontpicker.js?<%=Date.now()%>"></script>

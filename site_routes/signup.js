@@ -28,9 +28,39 @@ module.exports = () => {
     body("password").custom((value, { req, loc, path }) => {
       if (value !== req.body.confirm_password) {
         throw new Error("Passwords don't match");
-      } else {
-        return value;
-      }
+      } 
+
+      /*
+        at least 1 uppercase character (A-Z)
+        at least 1 lowercase character (a-z)
+        at least 1 digit (0-9)
+        at least 1 special character(punctuation) — do not forget to treat space as special characters too
+
+        10 chars min
+      */
+
+      if(value.length < 10)
+        throw new Error("Password must be at least be 10 characters.");
+      
+
+      if(new RegExp(/[^A-Za-z0-9!@#$%^&*()+=]/).test(value) === true)
+        throw new Error("Password contains invalid characters.");
+
+      if(new RegExp(/[^A-Za-z0-9!@#$%^&*()+=]/).test(value) === true)
+        throw new Error("Password contains invalid characters.");
+
+      // strong password validation
+      const rules = [
+        /[A-Z]{1}/,
+        /[A-Z]{1}/,
+        /[0-9]{1}/,
+        /[!@#$%^&*()+=]{1}/
+      ]
+
+      if(!rules.every(rule => rule.test(value)))
+        throw new Error("Password is not strong enough.");
+
+      return value;
     }),
     async (req, res, next) => {
       const errors = validationResult(req);
