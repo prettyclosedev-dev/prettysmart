@@ -317,6 +317,7 @@ app.use("/clip-studio", require("./site_routes/clip-studio")());
 app.use("/real-estate", require("./site_routes/real-estate")());
 app.use("/mortgage-news", require("./site_routes/mortgage-news")());
 app.use("/mortgage-rates", require("./site_routes/mortgage-rates")());
+app.use("/ai", require("./site_routes/ai")());
 
 /** STATIC FILES - DO NOT DEPLOY TO SERVER **/
 app.use("/static", express.static(path.join(__dirname, "static")));

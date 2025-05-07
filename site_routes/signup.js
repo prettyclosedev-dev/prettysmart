@@ -51,14 +51,28 @@ module.exports = () => {
 
       // strong password validation
       const rules = [
-        /[A-Z]{1}/,
-        /[A-Z]{1}/,
-        /[0-9]{1}/,
-        /[!@#$%^&*()+=]{1}/
-      ]
+        {
+          error: "Password must contain at least one uppercase character",
+          regex: /[A-Z]{1}/,
+        },
+        {
+          error: "Password must contain at least one lowercase character",
+          regex: /[a-z]{1}/,
+        },
+        {
+          error: "Password must contain at least one digit",
+          regex: /[0-9]{1}/,
+        },
+        {
+          error: "Password must contain at least one special character",
+          regex: /[!@#$%^&*()+=]{1}/,
+        },
+      ];
 
-      if(!rules.every(rule => rule.test(value)))
-        throw new Error("Password is not strong enough.");
+      rules.forEach((rule) => {
+        if(new RegExp(rule.regex).test(value) === false)
+          throw new Error(rule.error);
+      })
 
       return value;
     }),

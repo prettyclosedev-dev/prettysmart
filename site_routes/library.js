@@ -62,16 +62,6 @@ module.exports = () => {
       newFile
         .save()
         .then(function (doc) {
-          //   res.send({
-          //     path:
-          //       config.BASE_URL +
-          //       "/files/" +
-          //       req.user.account._id +
-          //       "/" +
-          //       doc.name, // https://prettyclose.co
-          //     file: doc,
-          //   });
-
           res.send({
             path: config.BASE_URL + "/library/" + "/" + doc.name,
             file: doc,

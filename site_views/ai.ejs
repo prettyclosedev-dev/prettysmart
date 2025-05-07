@@ -1,0 +1,125 @@
+<%- include('partials/header', {async: true}); %>
+
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+<div class="h-[90vh] flex flex-col gap-1 pt-4">
+  <div class="h-full container flex flex-col gap-1">
+    <div class="text-4xl mb-[20px]">AI Configuration</div>
+
+    <div class="grow min-h-0 flex gap-4">
+      <div
+        id="prompts"
+        class="w-full flex flex-col gap-1 overflow-y-auto p-3 bg-white rounded-[10px]"
+      >
+        <% prompts.forEach(prompt => { %>
+        <div
+          id="prompt-<%= prompt.id %>"
+          class="px-2 hover:bg-gray-300 cursor-pointer select-none"
+        >
+          <%= prompt.name %>
+        </div>
+        <% }) %>
+      </div>
+
+      <form
+        id="prompt-form"
+        class="w-full flex flex-col gap-3 p-3 bg-white rounded-[10px]"
+      >
+        <div>
+          <label class="label">NAME</label>
+          <input
+            id="prompt-name"
+            name="name"
+            type="text"
+            class="form-control"
+          />
+        </div>
+        <div class="grow min-h-0 flex flex-col">
+          <label class="label">PROMPT</label>
+          <textarea
+            id="prompt-prompt"
+            name="prompt"
+            class="form-control grow min-h-0"
+          ></textarea>
+        </div>
+        <div class="flex justify-center gap-2">
+          <button
+            type="button"
+            id="test-prompt"
+            class="my-button my-primary-button medium add-user-button"
+          >
+            <i class="fa-light fa-bolt" aria-hidden="true"></i> Test Prompt
+          </button>
+          <button
+            type="button"
+            id="new-prompt"
+            class="my-button my-primary-button medium add-user-button"
+          >
+            <i class="fa-light fa-plus" aria-hidden="true"></i> New Prompt
+          </button>
+          <button
+            type="submit"
+            class="my-button my-primary-button medium add-user-button"
+          >
+            <i class="fa-light fa-check" aria-hidden="true"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    console.log("ready")
+    <% prompts.forEach(prompt => { %>
+      $("#prompt-<%= prompt.id %>").on("click", function () {
+        console.log('<%= prompt.id %>');
+        $(this).addClass("bg-gray-300");
+        $("#prompts > div").not(this).removeClass("bg-gray-300");
+        $("#prompt-name").val(`<%= prompt.name %>`);
+        $("#prompt-prompt").val(`<%= prompt.prompt %>`);
+        $("#prompt-response").val(`<%= prompt.response %>`);
+      });
+    <% }); %>
+
+    $("#prompt-form").on("submit", function (e) {
+      e.preventDefault();
+
+      const name = $("#prompt-name").val();
+      const prompt = $("#prompt-prompt").val();
+      const response = $("#prompt-response").val();
+
+      console.log(name, prompt, response);
+
+      fetch("/api/ai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, prompt, response }),
+      });
+    });
+
+    $("#test-prompt").on("click", function () {
+      const prompt = $("#prompt-prompt").val();
+      console.log("prompt", JSON.stringify({ prompt }));
+
+      fetch("/ai/test", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      }).then((response) => response.json()).then((data) => console.log(data));
+    });
+
+    $("#new-prompt").on("click", function () {
+      $("#prompt-name").val("");
+      $("#prompt-prompt").val("");
+      $("#prompt-response").val("");
+    });
+  });
+</script>
+
+<%- include('partials/footer', {async: true}); %>

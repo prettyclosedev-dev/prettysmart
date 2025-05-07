@@ -141,7 +141,10 @@ $('textarea').each(function(){
 function closeFileModal(){
     $('body').removeClass('modal-open');
     $('.modal-backdrop').removeClass('show d-block');
+    $('.modal-backdrop').remove();
     $('#fileModal').removeClass('show d-block');
+    $('.modal-backdrop').add();
+    $('#fileModal').modal('hide');
 }
 
 function uploadFile(formData){
@@ -155,20 +158,32 @@ function uploadFile(formData){
         cache: false,
         type: 'POST',
         success: function(data) {
-            $('[name="form_file"]').val(data.path);
-            $('.form-file-upload').addClass('d-none');
-            $('.form-file-uploaded').removeClass('d-none').find('.file-preview').css('background-image','url('+ data.path +')');
-            $('#upload-image-preview').attr('src', data.path);
-            $('#upload-image-preview').attr('hidden', false);
-            $('#upload-image-placeholder').attr('hidden', true);
-            closeFileModal();
-            $('.file-loader').addClass('d-none');
-            $('[data-insert]').attr('disabled', false)
+            try {
+                console.log("data.path", data);
+                $('[name="form_file"]').val(data.path);
+                $('.form-file-upload').addClass('d-none');
+                $('.form-file-uploaded').removeClass('d-none');
+                $('.form-file-uploaded').find('.file-preview').css('background-image',"url('" + data.path + "')");
+                $('.form-file-uploaded').find('.file-preview').css('cursor','pointer');
+                $('#img-preview').attr('src', data.path);
+                $('#img-preview').removeClass('d-none');
+    
+                setTimeout(() => {
+                    closeFileModal();
+                    $('.file-loader').addClass('d-none');
+                    $('[data-insert]').attr('disabled', false)
+                }, 100);
+            } catch (error) {
+                console.log("error on success", error);
+            }            
         },
         error: function(data) {
             console.error(data);
-            closeFileModal();
-            $('.file-loader').addClass('d-none');
+
+            setTimeout(() => {
+                closeFileModal();
+                $('.file-loader').addClass('d-none');
+            }, 100);
         }
      });
 }
