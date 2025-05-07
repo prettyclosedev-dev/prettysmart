@@ -328,7 +328,7 @@ module.exports = () => {
     }
   });
 
-  router.get("/category/:categoryId", async (req, res) => {
+  router.get("/category/:categoryId", async (req, res) => { // we can use this to get ai content to clyps api
     const sizes = req.session.sizes;
     const sizeNames = sizes.map((size) => size.name);
     const categoryId = req.params.categoryId;
@@ -340,6 +340,7 @@ module.exports = () => {
 
     try {
       const designsData = await getDesigns({
+        // ai data goes here
         where: {
           AND: [
             {
