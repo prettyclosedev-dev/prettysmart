@@ -1,20 +1,21 @@
 const config = require("./config.json");
-const OpenAI = require("openai-api");
 const _ = require("lodash");
-const OPENAI_API_KEY = config.OPENAI_API_KEY;
-const openai = new OpenAI(OPENAI_API_KEY);
+const OpenAI = require("openai");
 
-module.exports = {
-  // getIndustryAndWhatWeAre,
-  // getSlogan,
-  // getKeywordsA,
-  // getKeywordsB,
-  // getPlurals,
-  // getSuperlatives,
-  // getAIFields,
-  // getTagline,
-  // getShortSlogan,
-};
+const prompt = async (prompt) => {
+  try {
+    const client = new OpenAI({apiKey: config.OPENAI_API_KEY});
+
+    const response = await client.responses.create({
+      model: "gpt-4.1",
+      input: prompt,
+    });
+
+    return (response.output_text);
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 // async function getIndustryAndWhatWeAre(options = {}) {
 //   return null;
@@ -680,3 +681,16 @@ module.exports = {
 // function toArray(str) {
 //   return str ? str.split(",") : [];
 // }
+
+module.exports = {
+  // getIndustryAndWhatWeAre,
+  // getSlogan,
+  // getKeywordsA,
+  // getKeywordsB,
+  // getPlurals,
+  // getSuperlatives,
+  // getAIFields,
+  // getTagline,
+  // getShortSlogan,
+  prompt
+};

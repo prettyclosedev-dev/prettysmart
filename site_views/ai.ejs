@@ -4,45 +4,202 @@
 
 <div class="h-[90vh] flex flex-col gap-1 pt-4">
   <div class="h-full container flex flex-col gap-1">
-    <div class="text-4xl mb-[20px]">AI Configuration</div>
+    <div class="text-4xl mb-[20px]">AI Generator</div>
 
-    <div class="grow min-h-0 flex gap-4">
+    <div class="form-loader">
+      <svg
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        x="0px"
+        y="0px"
+        viewBox="0 0 100 100"
+        enable-background="new 0 0 100 100"
+        xml:space="preserve"
+      >
+        <rect
+          fill="none"
+          stroke="#F7176D"
+          stroke-width="4"
+          x="25"
+          y="25"
+          width="50"
+          height="50"
+        >
+          <animateTransform
+            attributeName="transform"
+            dur="0.5s"
+            from="0 50 50"
+            to="180 50 50"
+            type="rotate"
+            id="strokeBox"
+            attributeType="XML"
+            begin="rectBox.end"
+          />
+        </rect>
+        <rect x="27" y="27" fill="#F7176D" width="46" height="50">
+          <animate
+            attributeName="height"
+            dur="1.3s"
+            attributeType="XML"
+            from="50"
+            to="0"
+            id="rectBox"
+            fill="freeze"
+            begin="0s;strokeBox.end"
+          />
+        </rect>
+      </svg>
+    </div>
+
+    <div class="w-full grow min-h-0 grid grid-cols-12 gap-4">
+      <% if(masterMode === true) { %>
       <div
         id="prompts"
-        class="w-full flex flex-col gap-1 overflow-y-auto p-3 bg-white rounded-[10px]"
+        class="h-full col-span-3 flex flex-col gap-1 overflow-y-auto p-3 bg-white rounded-[10px]"
       >
-        <% prompts.forEach(prompt => { %>
         <div
-          id="prompt-<%= prompt.id %>"
-          class="px-2 hover:bg-gray-300 cursor-pointer select-none"
+          id="prompts-container"
+          class="h-full flex flex-col gap-1 overflow-y-auto"
         >
-          <%= prompt.name %>
+          <input type="text" id="selected-id" class="hidden" />
+          <% prompts.forEach(prompt => { %>
+          <div
+            id="prompt-<%= prompt.id %>"
+            class="px-2 hover:bg-gray-300 cursor-pointer select-none"
+          >
+            <div><%= prompt.title %></div>
+            <div class="text-gray-500"><%= prompt.desc %></div>
+          </div>
+          <% }) %>
         </div>
-        <% }) %>
       </div>
-
+      <% } else { %>
+      <div
+        id="prompts"
+        class="h-full col-span-12 flex flex-col gap-1 p-3 bg-white rounded-[10px]"
+      >
+        <div
+          id="prompts-container"
+          class="grow min-h-0 flex flex-col gap-1 overflow-y-auto"
+        >
+          <input type="text" id="selected-id" class="hidden" />
+          <% prompts.forEach(prompt => { %>
+          <div
+            id="prompt-<%= prompt.id %>"
+            class="px-2 hover:bg-gray-300 cursor-pointer select-none"
+            data-id="<%= prompt.id %>"
+          >
+            <div><%= prompt.title %></div>
+            <div class="text-gray-500"><%= prompt.desc %></div>
+          </div>
+          <% }) %>
+        </div>
+        <div class="flex justify-center">
+          <button
+            type="button"
+            id="generate"
+            class="my-button my-primary-button medium add-user-button"
+          >
+            <i class="fa-light fa-bolt" aria-hidden="true"></i> Generate
+          </button>
+        </div>
+      </div>
+      <% } %> <% if (masterMode === true) { %>
       <form
         id="prompt-form"
-        class="w-full flex flex-col gap-3 p-3 bg-white rounded-[10px]"
+        class="h-full col-span-9 flex flex-col gap-3 p-3 bg-white rounded-[10px]"
       >
-        <div>
-          <label class="label">NAME</label>
+        <div class="hidden">
+          <label class="label">ID</label>
           <input
-            id="prompt-name"
-            name="name"
+            id="prompt-id"
+            name="id"
+            type="text"
+            class="form-control"
+            readonly
+          />
+        </div>
+        <div>
+          <label class="label">TITLE</label>
+          <input
+            id="prompt-title"
+            name="title"
+            type="text"
+            class="form-control"
+            required
+          />
+        </div>
+        <div>
+          <label class="label">DESCRIPTION</label>
+          <input
+            id="prompt-desc"
+            name="desc"
             type="text"
             class="form-control"
           />
         </div>
-        <div class="grow min-h-0 flex flex-col">
-          <label class="label">PROMPT</label>
+        <div>
+          <label class="label">CATEGORY</label>
+          <select
+            id="prompt-category"
+            name="category"
+            class="form-control"
+            required
+          >
+            <option value="0"></option>
+            <% categories.sort((a,b,) => b.id - a.id).forEach(category => { %>
+            <option value="<%= category.id %>">
+              (<%= category.id %>) <%= category.name %>
+            </option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="grow min-h-0 flex flex-col gap-1">
+          <div class="flex items-center relative">
+            <label class="label">PROMPT</label>
+            <div class="grow"></div>
+            <div class="h-full relative inline-block text-left">
+              <label
+                id="dropdown-toggle"
+                class="h-full p-0 px-3 bg-gray-200 rounded-lg cursor-pointer select-none"
+              >
+                ...
+              </label>
+              <div
+                id="field-templates-dropdown"
+                class="absolute top-[30px] right-0 mt-2 w-40 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-10 hidden"
+              >
+                <div class="py-1 flex flex-col gap-2">
+                  <% fieldTemplates.forEach(field => { %>
+                  <a
+                    href="#"
+                    class="px-2 text-gray-700 hover:bg-gray-100 text-base font-medium"
+                    ><%= field.key %></a
+                  >
+                  <% }) %>
+                </div>
+              </div>
+            </div>
+          </div>
           <textarea
             id="prompt-prompt"
             name="prompt"
             class="form-control grow min-h-0"
+            required
           ></textarea>
         </div>
         <div class="flex justify-center gap-2">
+          <button
+            type="button"
+            id="generate"
+            class="my-button my-primary-button medium add-user-button"
+          >
+            <i class="fa-light fa-bolt" aria-hidden="true"></i> Generate
+          </button>
+
+          <% if(masterMode === true) { %>
+
           <button
             type="button"
             id="test-prompt"
@@ -50,6 +207,7 @@
           >
             <i class="fa-light fa-bolt" aria-hidden="true"></i> Test Prompt
           </button>
+
           <button
             type="button"
             id="new-prompt"
@@ -63,63 +221,146 @@
           >
             <i class="fa-light fa-check" aria-hidden="true"></i> Save Changes
           </button>
+          <% } %>
         </div>
       </form>
+      <% } %>
     </div>
   </div>
 </div>
 
 <script>
-  $(document).ready(function () {
-    console.log("ready")
-    <% prompts.forEach(prompt => { %>
-      $("#prompt-<%= prompt.id %>").on("click", function () {
-        console.log('<%= prompt.id %>');
-        $(this).addClass("bg-gray-300");
-        $("#prompts > div").not(this).removeClass("bg-gray-300");
-        $("#prompt-name").val(`<%= prompt.name %>`);
-        $("#prompt-prompt").val(`<%= prompt.prompt %>`);
-        $("#prompt-response").val(`<%= prompt.response %>`);
+    function insertAtCaret(el, text) {
+      el.focus();
+      // modern browsers
+      if (typeof el.selectionStart === "number" && typeof el.selectionEnd === "number") {
+        const start = el.selectionStart;
+        const end   = el.selectionEnd;
+        el.value = el.value.slice(0, start)
+                + text
+                + el.value.slice(end);
+        // move caret after the inserted text
+        el.selectionStart = el.selectionEnd = start + text.length;
+      }
+      // IE <= 8
+      else if (document.selection && el.createTextRange) {
+        const range = document.selection.createRange();
+        range.text = text;
+        range.collapse(false);
+        range.select();
+      }
+    }
+
+    function setLoading(status) {
+      if(status === true) {
+        $("#prompt-form :input").attr("disabled", "disabled");
+        $("#generate").attr("disabled", "disabled");
+        $("#test-prompt").attr("disabled", "disabled");
+        $("#new-prompt").attr("disabled", "disabled");
+        $("#save-changes").attr("disabled", "disabled");
+        $(".form-loader").addClass("d-flex");
+      }
+      else {
+        $("#prompt-form :input").removeAttr("disabled");
+        $("#generate").removeAttr("disabled");
+        $("#test-prompt").removeAttr("disabled");
+        $("#new-prompt").removeAttr("disabled");
+        $("#save-changes").removeAttr("disabled");
+        $(".form-loader").removeClass("d-flex");
+      }
+    }
+
+    $(document).ready(function () {
+      $("#dropdown-toggle").on("click", function (e) {
+        e.stopPropagation();
+        $("#field-templates-dropdown").removeClass("hidden");
       });
-    <% }); %>
 
-    $("#prompt-form").on("submit", function (e) {
-      e.preventDefault();
+      $(this).on("click", function () {
+        $("#field-templates-dropdown").addClass("hidden");
+      });
 
-      const name = $("#prompt-name").val();
-      const prompt = $("#prompt-prompt").val();
-      const response = $("#prompt-response").val();
+      $("#field-templates-dropdown a").on("click", function () {
+        insertAtCaret(document.getElementById("prompt-prompt"), "{{" + $(this).html() + "}}");
 
-      console.log(name, prompt, response);
+        $("#field-templates-dropdown").addClass("hidden");
+      });
 
-      fetch("/api/ai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, prompt, response }),
+      <% prompts.forEach(prompt => { %>
+        $("#prompt-<%= prompt.id %>").on("click", function () {
+          $(this).addClass("selected bg-gray-300");
+          $("#prompts-container > div").not(this).removeClass("selected bg-gray-300");
+          $("#selected-id").val(`<%= prompt.id %>`);
+          $("#prompt-id").val(`<%= prompt.id %>`);
+          $("#prompt-title").val(`<%= prompt.title ?? "" %>`);
+          $("#prompt-desc").val(`<%= prompt.desc ?? "" %>`);
+          $("#prompt-category").val(`<%= prompt.category ?? 0 %>`);
+          $("#prompt-prompt").val(`<%= prompt.prompt ?? "" %>`);
+        });
+      <% }); %>
+
+      $("#prompt-form").on("submit", function (e) {
+        e.preventDefault();
+
+        setLoading(true)
+
+        const id = $("#prompt-id").val();
+        const title = $("#prompt-title").val();
+        const desc = $("#prompt-desc").val() ?? "";
+        const category = $("#prompt-category").val() ?? "0";
+        const prompt = $("#prompt-prompt").val();
+
+        const payload = { id, title, desc, category, prompt }
+
+        console.log(payload);
+
+        fetch("/ai", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }).then((response) => response.json())
+        .then((data) => console.log(data))
+        .finally(() => {
+          setLoading(false)
+        });
+      });
+
+      $("#test-prompt").on("click", function () {
+        const prompt = $("#prompt-prompt").val();
+        console.log("prompt", JSON.stringify({ prompt }));
+
+        fetch("/ai/test", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ prompt }),
+        }).then((response) => response.json())
+        .then((data) => console.log(data));
+      });
+
+      $("#new-prompt").on("click", function () {
+        $("#prompt-title").val("");
+        $("#prompt-desc").val("");
+        $("#prompt-category").val("0");
+        $("#prompt-prompt").val("");
+        $("#prompt-response").val("");
+      });
+
+      $("#generate").on("click", function () {
+        const id = $("#selected-id").val();
+
+        if(!id) return;
+
+        setLoading(true)  
+
+        fetch("/ai/" + id).then((response) => response.json()).then((data) => {
+          window.location = "/templates/category/" + data.category;
+        });
       });
     });
-
-    $("#test-prompt").on("click", function () {
-      const prompt = $("#prompt-prompt").val();
-      console.log("prompt", JSON.stringify({ prompt }));
-
-      fetch("/ai/test", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt }),
-      }).then((response) => response.json()).then((data) => console.log(data));
-    });
-
-    $("#new-prompt").on("click", function () {
-      $("#prompt-name").val("");
-      $("#prompt-prompt").val("");
-      $("#prompt-response").val("");
-    });
-  });
 </script>
 
 <%- include('partials/footer', {async: true}); %>

@@ -6,6 +6,8 @@ const config = require("../config.json");
 const serverUrl = config.BASE_URL;
 const path = require("path");
 const User = require("../schemas/user");
+const Prompts = require("../schemas/prompts");
+const { prompt } = require("../openAi");
 const {
   getBrandedDesigns,
   getDesignsCount,
@@ -34,6 +36,7 @@ module.exports = () => {
         row: { templates: [] },
         cache: true,
         filename: "templates",
+        categoryId: null,
       });
     } catch (error) {
       console.log(error);
@@ -241,6 +244,9 @@ module.exports = () => {
   });
 
   router.get("/preview/:id", async (req, res) => {
+
+    console.log({content:req.session});
+
     const variables = {
       user: req.user,
       where: {
@@ -251,7 +257,7 @@ module.exports = () => {
       },
       previewOptions: {
         pixelRatio: 1,
-      }
+      },
     };
 
     if (req.session.content) {
@@ -261,6 +267,8 @@ module.exports = () => {
       };
       delete variables.form_file; // should we pass form_file instead of house?
     }
+
+    // console.log(variables);
 
     try {
       let brandedDesignData = await getBrandedDesign(variables);
@@ -280,6 +288,68 @@ module.exports = () => {
         .send("An error occurred while fetching the preview.");
     }
   });
+
+  // router.post("/preview/:id", async (req, res) => {
+  //   const { categoryId } = req.body;
+
+  //   const aiResponse = await runAI(categoryId, req.user);
+  //   const additional = JSON.parse(aiResponse)
+
+  //   console.log({ aiResponse });
+
+  //   if (categoryId) {
+  //     Prompts.findOne({ id: parseInt(categoryId) }, (err, data) => {
+  //       if (data) {
+  //         console.log({ data });
+  //       }
+  //     });
+  //   }
+
+  //   const variables = {
+  //     user: req.user,
+  //     email: req.user.email,
+  //     where: {
+  //       id: parseInt(req.params.id),
+  //     },
+  //     brandWhere: {
+  //       prettySmartId: req.user.account._id.toString(),
+  //     },
+  //     previewOptions: {
+  //       mimeType: "application/png",
+  //       pixelRatio: 2,
+  //     },
+  //     withPreview: true,
+  //     additional,
+  //   };
+
+  //   console.log(variables)
+
+  //   if (req.session.content) {
+  //     variables.additional = {
+  //       ...req.session.content,
+  //       house: req.session.content.form_file,
+  //     };
+  //     delete variables.form_file; // should we pass form_file instead of house?
+  //   }
+
+  //   try {
+  //     let brandedDesignData = await getBrandedDesign(variables);
+  //     if (
+  //       brandedDesignData &&
+  //       brandedDesignData.brandedDesign &&
+  //       brandedDesignData.brandedDesign.preview
+  //     ) {
+  //       return res.status(200).send(brandedDesignData.brandedDesign.preview);
+  //     }
+
+  //     return res.status(404).send("Preview not found.");
+  //   } catch (error) {
+  //     console.log(error);
+  //     return res
+  //       .status(500)
+  //       .send("An error occurred while fetching the preview.");
+  //   }
+  // });
 
   router.get("/export/:templateId", async function (req, res) {
     const { templateId } = req.params;
@@ -328,7 +398,8 @@ module.exports = () => {
     }
   });
 
-  router.get("/category/:categoryId", async (req, res) => { // we can use this to get ai content to clyps api
+  router.get("/category/:categoryId", async (req, res) => {
+    // we can use this to get ai content to clyps api
     const sizes = req.session.sizes;
     const sizeNames = sizes.map((size) => size.name);
     const categoryId = req.params.categoryId;
@@ -337,6 +408,20 @@ module.exports = () => {
 
     const favoritesData = await getUserFavorites(userEmail);
     const favoriteIds = favoritesData.map((fav) => fav.id);
+
+    const aiResponse = await runAI(categoryId, req.user);
+
+    if (categoryId) {
+      const data = await Prompts.findOne({ category: parseInt(categoryId) })
+      
+      console.log({data});
+
+      if (data) {
+        const additional = JSON.parse(aiResponse)
+        console.log({ additional });
+        req.session.content = additional;
+      }
+    }
 
     try {
       const designsData = await getDesigns({
@@ -451,6 +536,7 @@ module.exports = () => {
 
     return res.render("templates", {
       sizes, // This could be a separate query if needed
+      categoryId,
       templates: categorizedDesigns,
       row: { templates: [] },
       cache: true,
@@ -603,4 +689,38 @@ async function handleResize(req, res) {
     filename: "templates",
     loading: false,
   });
+}
+
+async function runAI(categoryId, user) {
+  if(!categoryId) return "{}";
+
+  console.log(categoryId, user);
+
+  const promptObject = await Prompts.findOne({ category: categoryId });
+
+  let newPrompt = promptObject.prompt;
+
+  if (!promptObject) return res.send("Prompt is required");
+
+  // replace fields
+  if (newPrompt.indexOf("{{location_city}}") > -1) {
+    newPrompt = newPrompt.replace(
+      "{{location_city}}",
+      user.account.location_city
+    );
+  }
+
+  if (newPrompt.indexOf("{{location_country}}") > -1) {
+    newPrompt = newPrompt.replace(
+      "{{location_country}}",
+      user.account.location_country
+    );
+  }
+
+  try {
+    return await prompt(newPrompt);
+  } catch (error) {
+    console.log({ error });
+    throw error;
+  }
 }

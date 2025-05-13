@@ -1,15 +1,15 @@
 const request = require("request-promise");
 const config = require("./config.json");
 
-async function getBrandedDesigns({user, where, take = 30, skip, orderBy, cursor, brandWhere, withPreview = false}) {
+async function getBrandedDesigns({user, email = "", where, take = 30, skip, orderBy, cursor, brandWhere, withPreview = false, additional = {}}) {
   const query = `
-    query getBrandedDesigns($where: DesignWhereInput, $take: Int, $skip: Int, $orderBy: [DesignOrderByWithRelationInput!], $cursor: DesignWhereUniqueInput, $email: String!, $brandWhere: BrandWhereUniqueInput, $withPreview: Boolean) {
-      brandedDesigns(where: $where, take: $take, skip: $skip, orderBy: $orderBy, cursor: $cursor, email: $email, brandWhere: $brandWhere, withPreview: $withPreview)
+    query getBrandedDesigns($where: DesignWhereInput, $take: Int, $skip: Int, $orderBy: [DesignOrderByWithRelationInput!], $cursor: DesignWhereUniqueInput, $email: String!, $brandWhere: BrandWhereUniqueInput, $withPreview: Boolean, $additional: Json, $previewOptions: Json) {
+      brandedDesigns(where: $where, take: $take, skip: $skip, orderBy: $orderBy, cursor: $cursor, email: $email, brandWhere: $brandWhere, withPreview: $withPreview, additional: $additional, previewOptions: $previewOptions)
     }
   `;
 
   const variables = {
-    email: user.email,
+    email: user?.email ?? email,
     where,
     take,
     skip,
@@ -17,7 +17,10 @@ async function getBrandedDesigns({user, where, take = 30, skip, orderBy, cursor,
     cursor,
     brandWhere,
     withPreview,
+    additional,
   };
+
+  console.log(variables)
 
   return graphqlRequest(query, variables);
 }
@@ -144,7 +147,6 @@ const getCategoriesWithDesignsQuery = `
 `;
 
 async function getCategoriesWithDesigns(variables) {
-  console.log(variables)
   const options = {
     headers: {
       Authorization: `Bearer ${config.CLYPS_API_KEY}`,

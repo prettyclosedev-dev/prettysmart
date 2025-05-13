@@ -144,6 +144,7 @@
           },
         });
 
+        console.log("getting customizations....")
         getCustomization({});
       },
       error: function (err) {
@@ -167,6 +168,7 @@
 </script>
 
 <script>
+  const categoryId = '<%= categoryId %>';
   var swiper = new Swiper('.swiper', {
     slidesPerView: 'auto',
     spaceBetween: 14,

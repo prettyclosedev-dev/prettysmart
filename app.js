@@ -235,6 +235,13 @@ app.use(function (req, res, next) {
   next();
 });
 
+// if(config.isDev) {
+//   app.use(function (req, res, next) {
+//     console.log(req.method, req.url);
+//     next();
+//   });
+// }
+
 app.use(function (error, req, res, next) {
   if (error.errors) {
     res.status(400).send({
@@ -332,15 +339,19 @@ app.use(function (req, res) {
 });
 
 app.settings.env = config.isDev ? "development" : "production";
-app.listen(config.SITE_PORT, function () {
-  console.log(app.settings.env);
-});
 
-mongoose.connection.on("error", (error) => {
-  console.log(error);
-});
-mongoose.connection.once("open", () => {
-  console.log("DB Connected!!!");
+app.listen(config.SITE_PORT, function () {
+  mongoose.connection.on("error", (error) => {
+    console.log(error);
+  });
+
+  mongoose.connection.once("open", () => {
+    console.log("DB Connected!!!");
+  });
+
+  console.clear();
+  console.log("🚀 App is running on http://localhost:" + config.SITE_PORT);
+  console.log(app.settings.env);
 });
 
 exports.app = frontEndApp;

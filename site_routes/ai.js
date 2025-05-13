@@ -2,96 +2,68 @@ const express = require("express");
 const router = express.Router();
 const OpenAI = require("openai");
 const config = require("../config.json");
-
-// // v4 SDK: default export
-// const openai = new OpenAI({
-//   apiKey: config.OPENAI_API_KEY,
-//   // organization: process.env.ORGANIZATION, // if you need it
-// });
+const Prompts = require("../schemas/prompts");
+const { v4: uuidv4 } = require("uuid");
+const { getFullCategories } = require("../clyps_api");
 
 module.exports = () => {
   router.get("/", async (req, res) => {
-    res.render("ai", {
-      prompts: [
-        {
-          id: "parks",
-          name: "Parks",
-          prompt: `Create a JSON-formatted social media post about parks in {{location_city}}, {{location_country}} with the following structure:
+    const prompts = await Prompts.find({});
 
-            title
+    const categories = await getFullCategories({});
 
-            subheadline1 (brief description)
-
-            subheadline2 (intro to list)
-
-            5 items each with:
-
-            title
-
-            picture (search for actual links)
-
-            description
-
-            Output: JSON only.`,
+    const value = {
+      masterMode: req.user.master ?? false,
+      prompts: prompts.map((i) => ({
+        id: i.id,
+        title: i.title,
+        desc: i.desc,
+        category: i.category,
+        prompt: i.prompt,
+      })),
+      fieldTemplates: [
+        {
+          key: "location_city",
+          value: req.user.account.location_city,
         },
         {
-          id: "tourist-spots",
-          name: "Tourist Spots",
-          prompt:
-            "Find me a tourist spot in {{location_city}}, {{location_country}}",
-        },
-        {
-          id: "restaurants",
-          name: "Restaurants",
-          prompt:
-            "Find me a restaurant in {{location_city}}, {{location_country}}",
-        },
-        {
-          id: "hotels",
-          name: "Hotels",
-          prompt: "Find me a hotel in {{location_city}}, {{location_country}}",
-        },
-        {
-          id: "attractions",
-          name: "Attractions",
-          prompt:
-            "Find me an attraction in {{location_city}}, {{location_country}}",
-        },
-        {
-          id: "things-to-do",
-          name: "Things to do",
-          prompt:
-            "Find me things to do in {{location_city}}, {{location_country}}",
-        },
-        {
-          id: "things-to-see",
-          name: "Things to see",
-          prompt:
-            "Find me things to see in {{location_city}}, {{location_country}}",
-        },
-        {
-          id: "things-to-eat",
-          name: "Things to eat",
-          prompt:
-            "Find me things to eat in {{location_city}}, {{location_country}}",
-        },
-        {
-          id: "things-to-drink",
-          name: "Things to drink",
-          prompt:
-            "Find me things to drink in {{location_city}}, {{location_country}}",
-        },
-        {
-          id: "things-to-visit",
-          name: "Things to visit",
-          prompt:
-            "Find me things to visit in {{location_city}}, {{location_country}}",
+          key: "location_country",
+          value: req.user.account.location_country,
         },
       ],
-    });
+      categories: categories,
+    };
+
+    res.render("ai", value);
   });
 
-  router.post("/", async (req, res) => {});
+  router.post("/", async (req, res) => {
+    /** Save prompt to database */
+
+    try {
+      let payload = req.body;
+
+      console.log("saving prompt", req.body);
+
+      if (!payload.id) payload.id = uuidv4();
+
+      console.log("saving prompt 1", req.body);
+
+      const result = await Prompts.findOneAndUpdate(
+        {
+          id: payload.id,
+        },
+        payload,
+        { upsert: true }
+      );
+
+      console.log({ result });
+      res.send({ success: true, id: payload.id });
+    } catch (error) {
+      console.log(error);
+      res.send({ success: false, error: JSON.stringify(error) });
+    }
+  });
 
   /**
    * Test prompt to ChatGPT and return response
@@ -112,7 +84,7 @@ module.exports = () => {
       const client = new OpenAI({ apiKey: config.OPENAI_API_KEY });
 
       const response = await client.responses.create({
-        model: "gpt-4o-mini",
+        model: "gpt-4.1-nano",
         input: newPrompt,
       });
 
@@ -123,6 +95,18 @@ module.exports = () => {
       console.log({ error });
       res.send({ error });
     }
+  });
+
+  router.get("/:id", async (req, res) => {
+    const { id } = req.params;
+
+    console.log("id", id);
+
+    const prompt = await Prompts.findOne({ id });
+
+    console.log("prompt ", prompt.category);
+    
+    res.send(prompt);
   });
 
   return router;
