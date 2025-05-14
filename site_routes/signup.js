@@ -6,10 +6,11 @@ const Account = require("../schemas/account");
 const User = require("../schemas/user");
 const { body, validationResult } = require("express-validator");
 const openAi = require("../openAi");
+const {firebaseConfig} = require('../firebase')
 
 module.exports = () => {
   router.get("/", async (req, res) => {
-    res.render("signup", {});
+    res.render("signup", {firebaseConfig});
   });
 
   router.post(
