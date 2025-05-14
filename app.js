@@ -18,6 +18,8 @@ global._ = require("lodash");
 global.db = db;
 global.isDev = config.isDev;
 
+require("./firebase")
+
 mongoose.connect(config.database, {
   useNewUrlParser: true,
   useUnifiedTopology: true,

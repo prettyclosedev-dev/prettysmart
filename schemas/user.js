@@ -10,6 +10,7 @@ let userSchema = new Schema(
     first_name: String,
     last_name: String,
     user_additional: String,
+    googleuid: String,
     avatar: {
       type: String,
       get: function (name) {
