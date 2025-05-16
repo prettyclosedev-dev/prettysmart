@@ -52,7 +52,7 @@ let userSchema = new Schema(
     phone: String,
     password: {
       type: String,
-      required: [true, "Password is required"],
+      // required: [true, "Password is required"],
       trim: true,
     },
     status: String,

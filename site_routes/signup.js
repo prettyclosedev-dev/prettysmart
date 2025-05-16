@@ -6,15 +6,19 @@ const Account = require("../schemas/account");
 const User = require("../schemas/user");
 const { body, validationResult } = require("express-validator");
 const openAi = require("../openAi");
-const {firebaseConfig} = require('../firebase')
+const { firebaseConfig } = require('../firebase')
 
 module.exports = () => {
   router.get("/", async (req, res) => {
-    res.render("signup", {firebaseConfig});
+    res.render("signup", { firebaseConfig, googleInfo: req.session.google });
   });
 
   router.post(
     "/",
+    async(req, res, next) => {
+      console.log(req.body)
+      next();
+    },
     body("email")
       .isEmail()
       .custom((value) => {
@@ -26,21 +30,31 @@ module.exports = () => {
           }
         });
       }),
-    body("password").custom((value, { req, loc, path }) => {
-      if (value !== req.body.confirm_password) {
-        throw new Error("Passwords don't match");
-      } else {
-        return value;
-      }
-    }),
+     body("password")
+      // 1) If googleuid exists, treat empty‐string as “optional”
+      .if((_, { req }) => !!req.body.googleuid)
+        .optional({ nullable: true, checkFalsy: true })
+      // 2) If googleuid is _absent_, enforce confirm‐match
+      .if((_, { req }) => !req.body.googleuid)
+        .custom((value, { req }) => {
+          if (!value) {
+            throw new Error("Password is required");
+          }
+          if (value !== req.body.confirm_password) {
+            throw new Error("Passwords don't match");
+          }
+          return true;
+      }),
     async (req, res, next) => {
       const errors = validationResult(req);
+      console.log("errors", errors)
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
 
       let data = req.body;
       let new_user = new User(data);
+      console.log("new_user", new_user)
       let new_account = new Account({
         name: data.company,
         industry_description: data.industry_description,
