@@ -6,15 +6,19 @@ const Account = require("../schemas/account");
 const User = require("../schemas/user");
 const { body, validationResult } = require("express-validator");
 const openAi = require("../openAi");
-const {firebaseConfig} = require('../firebase')
+const { firebaseConfig } = require('../firebase')
 
 module.exports = () => {
   router.get("/", async (req, res) => {
-    res.render("signup", {firebaseConfig});
+    res.render("signup", { firebaseConfig, googleInfo: req.session.google });
   });
 
   router.post(
     "/",
+    async(req, res, next) => {
+      console.log(req.body)
+      next();
+    },
     body("email")
       .isEmail()
       .custom((value) => {
@@ -26,51 +30,31 @@ module.exports = () => {
           }
         });
       }),
-    body("password").custom((value, { req, loc, path }) => {
-      if (value !== req.body.confirm_password) {
-        throw new Error("Passwords don't match");
-      } 
-
-      /*
-        at least 1 uppercase character (A-Z)
-        at least 1 lowercase character (a-z)
-        at least 1 digit (0-9)
-        at least 1 special character(punctuation) — do not forget to treat space as special characters too
-
-        10 chars min
-      */
-
-      if(value.length < 10)
-        throw new Error("Password must be at least be 10 characters.");
-      
-
-      if(new RegExp(/[^A-Za-z0-9!@#$%^&*()+=]/).test(value) === true)
-        throw new Error("Password contains invalid characters.");
-
-      if(new RegExp(/[^A-Za-z0-9!@#$%^&*()+=]/).test(value) === true)
-        throw new Error("Password contains invalid characters.");
-
-      // strong password validation
-      const rules = [
-        /[A-Z]{1}/,
-        /[A-Z]{1}/,
-        /[0-9]{1}/,
-        /[!@#$%^&*()+=]{1}/
-      ]
-
-      if(!rules.every(rule => rule.test(value)))
-        throw new Error("Password is not strong enough.");
-
-      return value;
-    }),
+     body("password")
+      // 1) If googleuid exists, treat empty‐string as “optional”
+      .if((_, { req }) => !!req.body.googleuid)
+        .optional({ nullable: true, checkFalsy: true })
+      // 2) If googleuid is _absent_, enforce confirm‐match
+      .if((_, { req }) => !req.body.googleuid)
+        .custom((value, { req }) => {
+          if (!value) {
+            throw new Error("Password is required");
+          }
+          if (value !== req.body.confirm_password) {
+            throw new Error("Passwords don't match");
+          }
+          return true;
+      }),
     async (req, res, next) => {
       const errors = validationResult(req);
+      console.log("errors", errors)
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
 
       let data = req.body;
       let new_user = new User(data);
+      console.log("new_user", new_user)
       let new_account = new Account({
         name: data.company,
         industry_description: data.industry_description,

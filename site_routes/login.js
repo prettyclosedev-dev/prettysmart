@@ -24,7 +24,15 @@ module.exports = () => {
     // console.log("Successfully created Huddle accounts for:", result.success);
     // console.log("Failed to create Huddle accounts for:", result.failed);
 
-    res.render("login", {});
+    if(req.user && req.user.account) {
+      if (req.user.account.plan_id) {
+        res.redirect("/templates");
+      } else {
+        res.redirect("/plans");
+      }
+    }
+    
+    res.render("login", { firebaseConfig: config.firebaseConfig });
   });
 
   router.get("/:account", async (req, res) => {
@@ -85,88 +93,127 @@ module.exports = () => {
   });
 
   router.post("/", (req, res, next) => {
-    passport.authenticate("local", async (err, user, info) => {
-      if (err) {
-        return next(err);
-      }
 
-      if (!user) {
-        return res.status(400).json({
-          errors: [
-            {
-              param: "login",
-              msg: info,
-            },
-          ],
-        });
-      }
+    console.log(req.headers);
 
-      // console.log('Authenticated user:', user);
+    if(req.body.googleuid && req.body.idToken) {
+      console.log("google login")
+      
+      req.session.google = req.body
+      req.headers.authorization = `Bearer ${req.body.idToken}`
+      
+      passport.authenticate("bearer", (err, user, info) => {
+        console.log({ err, user, info })
 
-      try {
-        User.findOneAndUpdate(
+        if (err) return next(err);
+
+        if (!user) return res.send({ route: "/signup" });
+
+        req.logIn(
           {
-            _id: user._id,
+            id: user._id,
           },
-          {
-            $set: {
-              login_date: Date.now(),
-            },
-          },
-          {
-            new: true,
-          }
-        )
-          .populate("account")
-          .populate("multiAccounts")
-          .then(async (user) => {
-            const { country, state, city } = req.body;
-            if (country || state || city) {
-              try {
-                const contactID = await searchContactByEmail(user.email);
-                if (contactID) {
-                  await updateContact(contactID, {
-                    last_login_location: `${city || ""}${city ? ", " : ""}${
-                      state || ""
-                    }${state ? ", " : ""}${country || ""}`,
-                  });
-                }
-              } catch (e) {
-                console.log(e);
-              }
+          (err, u) => {
+            if (user.account.plan_id) {
+              res.send({ route: "/templates", error: err });
+            } else {
+              res.send({ route: "/plans", error: err });
             }
+          }
+        );
+      })(req, res, next);
+    }
+    else {
+      passport.authenticate("local", async (err, user, info) => {
+        if (err) {
+          return next(err);
+        }
 
-            req.logIn(
+        console.log({
+          err,
+          user,
+          info,
+        })
+
+        if (!user) {
+          return res.status(400).json({
+            errors: [
               {
-                id: user._id,
-                master: info,
+                param: "login",
+                msg: info,
               },
-              (err, u) => {
-                if (user.account.plan_id) {
-                  res.send({ route: "/templates", error: err });
-                } else {
-                  res.send({ route: "/plans", error: err });
+            ],
+          });
+        }
+
+        // console.log('Authenticated user:', user);
+
+        try {
+          User.findOneAndUpdate(
+            {
+              _id: user._id,
+            },
+            {
+              $set: {
+                login_date: Date.now(),
+              },
+            },
+            {
+              new: true,
+            }
+          )
+            .populate("account")
+            .populate("multiAccounts")
+            .then(async (user) => {
+              const { country, state, city } = req.body;
+              if (country || state || city) {
+                try {
+                  const contactID = await searchContactByEmail(user.email);
+                  if (contactID) {
+                    await updateContact(contactID, {
+                      last_login_location: `${city || ""}${city ? ", " : ""}${
+                        state || ""
+                      }${state ? ", " : ""}${country || ""}`,
+                    });
+                  }
+                } catch (e) {
+                  console.log(e);
                 }
               }
-            );
-          })
-          .catch((error) => {
-            console.log(error);
-            res.send({ error: error });
-          });
-      } catch (error) {
-        console.log(error);
 
-        return res.status(400).json({
-          errors: [
-            {
-              param: "login",
-              msg: JSON.stringify(error),
-            },
-          ],
-        });
-      }
-    })(req, res, next);
+              req.logIn(
+                {
+                  id: user._id,
+                  master: info,
+                },
+                (err, u) => {
+                  if (user.account.plan_id) {
+                    res.send({ route: "/templates", error: err });
+                  } else {
+                    res.send({ route: "/plans", error: err });
+                  }
+                }
+              );
+            })
+            .catch((error) => {
+              console.log(error);
+              res.send({ error: error });
+            });
+        } catch (error) {
+          console.log(error);
+
+          return res.status(400).json({
+            errors: [
+              {
+                param: "login",
+                msg: JSON.stringify(error),
+              },
+            ],
+          });
+        }
+      })(req, res, next);
+    }
+    
   });
 
   return router;
