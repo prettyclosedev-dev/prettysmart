@@ -43,6 +43,51 @@ module.exports = () => {
           if (value !== req.body.confirm_password) {
             throw new Error("Passwords don't match");
           }
+
+          /*
+            at least 1 uppercase character (A-Z)
+            at least 1 lowercase character (a-z)
+            at least 1 digit (0-9)
+            at least 1 special character(punctuation) — do not forget to treat space as special characters too
+
+            10 chars min
+          */
+
+          if(value.length < 10)
+            throw new Error("Password must be at least be 10 characters.");
+          
+
+          if(new RegExp(/[^A-Za-z0-9!@#$%^&*()+=]/).test(value) === true)
+            throw new Error("Password contains invalid characters.");
+
+          if(new RegExp(/[^A-Za-z0-9!@#$%^&*()+=]/).test(value) === true)
+            throw new Error("Password contains invalid characters.");
+
+          // strong password validation
+          const rules = [
+            {
+              error: "Password must contain at least one uppercase character",
+              regex: /[A-Z]{1}/,
+            },
+            {
+              error: "Password must contain at least one lowercase character",
+              regex: /[a-z]{1}/,
+            },
+            {
+              error: "Password must contain at least one digit",
+              regex: /[0-9]{1}/,
+            },
+            {
+              error: "Password must contain at least one special character",
+              regex: /[!@#$%^&*()+=]{1}/,
+            },
+          ];
+
+          rules.forEach((rule) => {
+            if(new RegExp(rule.regex).test(value) === false)
+              throw new Error(rule.error);
+          })
+
           return true;
       }),
     async (req, res, next) => {

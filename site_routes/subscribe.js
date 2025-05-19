@@ -30,7 +30,7 @@ module.exports = () => {
         res.render("subscribe", {
           products: plans,
           subscription,
-          interval: "year",
+          interval: currentInterval,
           cache: true,
           filename: "subscribe",
         });
@@ -38,7 +38,7 @@ module.exports = () => {
         res.render("subscribe", {
           products: {},
           subscription: {},
-          interval: "year",
+          interval: month,
           error: {
             message: "Failed to get plans.",
           },
@@ -50,7 +50,7 @@ module.exports = () => {
       res.render("subscribe", {
         products: {},
         subscription: {},
-        interval: "year",
+        interval: month,
         error,
         cache: true,
         filename: "subscribe",
