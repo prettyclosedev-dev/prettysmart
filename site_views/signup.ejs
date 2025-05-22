@@ -213,7 +213,7 @@
         </div>
       </div>
 
-      <div id="next-container" class="step-1">
+      <div id="next-button next-container" class="step-1">
         <div class="row">
           <div class="col-12 mb-4">
             <div class="d-flex justify-content-center align-items-center">
@@ -223,31 +223,6 @@
                 type="button"
               >
                 <span> Next </span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="w-100 step-1">
-        <div class="w-100 d-flex flex-row align-items-center font-bold mb-4 step-1">
-            <div style="height: 1px; flex-grow: 1; border: 1px solid #aaa9a9"></div>
-            <span class="px-3">Or</span>
-            <div style="height: 1px; flex-grow: 1; border: 1px solid #aaa9a9"></div>
-        </div>
-      </div>
-
-      <div id="google-logged-out" class="step-1">
-        <div class="row">
-          <div class="col-12 mb-4">
-            <div class="d-flex justify-content-center align-items-center">
-              <button
-                id="google-signin"
-                class="btn btn-block btn-primary"
-                type="button"
-              >
-                <i class="fa-brands fa-google mr-3"></i>
-                <span> Use Your google account </span>
               </button>
             </div>
           </div>
@@ -435,7 +410,7 @@
         </div>
       </div>
 
-      <div id="password-row" class="row step-2 d-none">
+      <div id="password-row" class="row google-logged-out step-2 d-none">
         <div class="col-12 col-lg-6 mb-4 mb-4">
           <div class="input-group input-group-lg">
             <div class="input-group-prepend">
@@ -502,7 +477,7 @@
         </div>
       </div>
 
-      <div class="step-2 d-none ">
+      <div class="submit-button step-2 d-none mb-4">
         <input
           type="submit"
           value="Sign up"
@@ -510,7 +485,32 @@
         />
       </div>
 
-      <div id="google-logged-in" class="step-2 d-none mt-4">
+      <div class="w-100 google-logged-out step-1">
+        <div class="w-100 d-flex flex-row align-items-center font-bold mb-4 step-1">
+            <div style="height: 1px; flex-grow: 1; border: 1px solid #aaa9a9"></div>
+            <span class="px-3">Or</span>
+            <div style="height: 1px; flex-grow: 1; border: 1px solid #aaa9a9"></div>
+        </div>
+      </div>
+
+      <div class="google-logged-out step-1">
+        <div class="row">
+          <div class="col-12 mb-4">
+            <div class="d-flex justify-content-center align-items-center">
+              <button
+                id="google-signin"
+                class="btn btn-block btn-primary"
+                type="button"
+              >
+                <i class="fa-brands fa-google mr-3"></i>
+                <span> Use Your google account </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="google-logged-in d-none mt-4">
         <div class="row">
           <!-- <div class="col-lg-6 mb-4">
                         <div class="d-flex justify-content-center align-items-center">
@@ -652,7 +652,8 @@
     }).fail(function (res) {
       if (res.responseJSON && res.responseJSON.errors) {
         res.responseJSON.errors.forEach(function (error) {
-          $('[data-field="' + error.param + '"]').text(error.msg);
+          console.log(error)
+          $('[data-field="' + error.path + '"]').text(error.msg);
         });
       } else if (res.responseJSON && res.responseJSON.error) {
         $('[data-field="signup"]').text(res.responseJSON.error.message);
@@ -695,8 +696,8 @@
   } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
 
   // injected by Express
-  const firebaseConfig = <%- JSON.stringify(firebaseConfig ?? {}) %>;
-  const googleInfo = <%- JSON.stringify(googleInfo ?? {}) %>;
+  const firebaseConfig = JSON.parse('<%- JSON.stringify(firebaseConfig ?? {}) %>');
+  const googleInfo = JSON.parse('<%- JSON.stringify(googleInfo ?? {}) %>');
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -704,6 +705,16 @@
 
   let firstName = googleInfo.firstName
   let lastName = googleInfo.lastName
+
+  
+  const onStep1 = () => {
+    $(".step-1").each(function() {
+        $(this).removeClass("d-none");
+    });
+    $(".step-2").each(function() {
+        $(this).addClass("d-none");
+    });
+  }
 
   const prev = () => {
     $(".step-2").each(function() {
@@ -742,23 +753,28 @@
         $("input[name='first_name']").attr("readonly", "readonly");
         $("input[name='last_name']").val(lastName ?? result.user.displayName.split(' ').slice(1).join(' '));
         $("input[name='last_name']").attr("readonly", "readonly");
-        $("#google-logged-in").removeClass("d-none");
-        $("#google-logged-out").addClass("d-none");
+        $(".google-logged-in").removeClass("d-none");
+        $(".google-logged-out").addClass("d-none");
+        
+        $(".signup-form").submit();
+
+        next(); 
+
+        $("#password-row").addClass("d-none");
         $("input[name='password']").removeAttr("required");
         $("input[name='confirm_password']").removeAttr("required");
-        $("#password-row").addClass("d-none");
-        
-        next();
+
     } catch (err) {
       console.error('Auth error', err);
     }
   };
 
   onAuthStateChanged(auth, (user) => {
+
     if (user && user.uid === googleInfo.googleuid) {
         console.log({ user, googleInfo });
-        $("#google-logged-in").removeClass("d-none");
-        $("#google-logged-out").addClass("d-none");
+        $(".google-logged-in").removeClass("d-none");
+        $(".google-logged-out").addClass("d-none");
         $("input[name='googleuid']").val(user.uid);
         $("input[name='email']").val(user.email);
         $("input[name='email']").attr("readonly", "readonly");
@@ -773,8 +789,8 @@
         $("input[name='password']").removeAttr("required");
         $("input[name='confirm_password']").removeAttr("required");
     } else {
-        $("#google-logged-in").addClass("d-none");
-        $("#google-logged-out").removeClass("d-none");
+        $(".google-logged-in").addClass("d-none");
+        $(".google-logged-out").removeClass("d-none");
         $("input[name='googleuid']").val("");
         $("input[name='email']").val("");
         $("input[name='email']").removeAttr("readonly");
@@ -789,26 +805,15 @@
         $("input[name='confirm_password']").attr("required");
         prev();
     }
+
+    $(".text-danger").each(function() {
+        $(this).text("");
+    })
   });
 
   $("#google-signin").on("click", signIn);
 
-  $("#google-signout").on("click", () => {
-    signOut(auth);
-    $("#google-logged-in").addClass("d-none");
-    $("#google-logged-out").removeClass("d-none");
-    $("input[name='googleuid']").val("");
-    $("input[name='email']").val("");
-    $("input[name='email']").removeAttr("readonly");
-    $("input[name='first_name']").val("");
-    $("input[name='first_name']").removeAttr("readonly");
-    $("input[name='last_name']").val("");
-    $("input[name='last_name']").removeAttr("readonly");
-    $("input[name='phone']").val("");
-    $("input[name='phone']").removeAttr("readonly");
-
-    prev();
-  })
+  $("#google-signout").on("click", () => signOut(auth))
 
   $("#next").on("click", () => {
       next();

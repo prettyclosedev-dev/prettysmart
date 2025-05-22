@@ -110,33 +110,41 @@ module.exports = function (passport) {
         try {
           // verifyIdToken checks signature + expiry
           const decoded = await admin.auth().verifyIdToken(idToken);
-          const user = await admin.auth().getUser(decoded.uid);
+          const googleUser = await admin.auth().getUser(decoded.uid);
 
-          User.findOne({
-            email: { $regex: new RegExp("^" + user.email.toLowerCase(), "i") },
-            googleuid: user.uid,
+          const user = await User.findOne({
+            $or: [
+              {
+                email: {
+                  $regex: new RegExp("^" + googleUser.email.toLowerCase(), "i"),
+                },
+              },
+              { googleuid: googleUser.uid },
+            ],
           })
             .populate("account")
             .populate("multiAccounts")
             .lean()
-            .then((user) => {
-              console.log("user", user);
 
-              if (!user) {
-                return done(
-                  null,
-                  false,
-                  "No user found with this email address."
-                );
-              }
+          console.log("user", user);
 
-              return done(null, user);
-            })
-            .catch((err) => {
-              return done(null, false, err);
-            });
+          if (!user) {
+            return done(
+              null,
+              false,
+              "No user found with this email address."
+            );
+          }
+
+          // associate account with google account
+          await User.findOneAndUpdate(
+            { _id: user._id },
+            { $set: { googleuid: googleUser.uid } }
+          );
+
+          return done(null, user);
         } catch (err) {
-          return done(null, false);
+          return done(null, false, err);
         }
       }
     )

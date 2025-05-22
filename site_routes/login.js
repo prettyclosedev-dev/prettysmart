@@ -102,7 +102,7 @@ module.exports = () => {
       req.session.google = req.body
       req.headers.authorization = `Bearer ${req.body.idToken}`
       
-      passport.authenticate("bearer", (err, user, info) => {
+      passport.authenticate("bearer", async (err, user, info) => {
         console.log({ err, user, info })
 
         if (err) return next(err);
