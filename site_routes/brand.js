@@ -524,26 +524,32 @@ module.exports = () => {
     req.files[req.body.name].mv(upload_path, async (err) => {
       if (fileExt !== "svg") {
         try {
-          const file = fs.readFileSync(upload_path);
-          const newPath = upload_path.replace(fileExt, "svg");
-          const svg = await vectorExpress.convert(fileExt, "svg", {
-            file: file,
-            save: true,
-            path: newPath,
-            transformers : ['auto']
+          const fs = require('fs');
+          const FormData = require('form-data');
+          const fetch = require('node-fetch');
+
+          const data = new FormData();
+          data.append('image', fs.createReadStream(upload_path), fileName); // pass filename explicitly
+          data.append('name', fileName);
+
+          // Let FormData compute headers including proper multipart boundary
+          const imgtosvgurl = config.ImageToSVG_URL +  "/upload"
+          const response = await fetch(imgtosvgurl, {
+            method: 'POST',
+            body: data,
+            headers: data.getHeaders() // use this to set the proper multipart boundary
           });
 
-          fileName = fileName.replace("." + fileExt, ".svg");
-          fileExt = "svg";
+          const svg = await response.text();
+          fs.writeFileSync(upload_path.replace(fileExt, "svg"), svg);
         } catch (e) {
-          console.log("convert failed");
-          // console.log(e);
-          res.send({ error: e, success: false });
+          console.log("convert failed", e);
+          res.send({ error: "Conversion of image to svg failed.", success: false });
           return;
         }
       }
 
-      var cleanFile = fs.readFileSync(upload_path);
+      var cleanFile = fs.readFileSync(upload_path.replace(fileExt, "svg"));
       cleanFile = cleanFile.toString();
 
       if (!cleanFile.includes("path") || cleanFile.includes("image")) {
