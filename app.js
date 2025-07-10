@@ -204,15 +204,15 @@ app.use((req, res, next) => {
       !url.startsWith("brand/brand-assets-payment") &&
       !url.startsWith("brand/logo") &&
       (!brand || !brand.logos || !brand.logos.logo) &&
-      (!url.startsWith("onboarding") ||
+      (!url.startsWith("brand") ||
         (req.user.master && !url.startsWith("setup")))
     ) {
       updateTimesSentToSetup();
-      return req.user.master ? next() : res.redirect("/onboarding");
+      return req.user.master ? next() : res.redirect("/brand");
     }
 
     if (
-      url.startsWith("onboarding") ||
+      url.startsWith("brand") ||
       (req.user.master && url.startsWith("setup"))
     ) {
       updateTimesSentToSetup();
@@ -333,15 +333,18 @@ app.use(function (req, res) {
 });
 
 app.settings.env = config.isDev ? "development" : "production";
-app.listen(config.SITE_PORT, function () {
-  console.log(app.settings.env);
-});
 
 mongoose.connection.on("error", (error) => {
   console.log(error);
 });
+
 mongoose.connection.once("open", () => {
   console.log("DB Connected!!!");
+});
+
+app.listen(config.SITE_PORT, function () {
+  console.log("Application is running on: http://localhost:" + config.SITE_PORT);
+  console.log("Environment: " + app.settings.env);
 });
 
 exports.app = frontEndApp;

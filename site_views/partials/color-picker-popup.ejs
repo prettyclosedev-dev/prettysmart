@@ -12,7 +12,7 @@
             onclick="closeColorPicker()"
           >
             <i
-              class="fa-regular fa-xmark"
+              class="fa-solid fa-xmark"
               style="color: <%= user.account.brand.colors.primary %>"
             ></i>
           </div>
@@ -21,7 +21,7 @@
           <div class="color-wrapper">
             <div class="label ffp brand-label">PRIMARY COLOR</div>
             <% if(typeof showLock != "undefined" && showLock === true) { %> 
-              <div class="color-lock lock-primary<%= user.account.brand.colors.primaryLocked ? ' selected' : '' %>"  onclick="updateLocked('primary')"><i class="fa-regular fa-lock<%= !user.account.brand.colors.primaryLocked ? '-open' : '' %>"></i></div>
+              <div class="color-lock lock-primary<%= user.account.brand.colors.primaryLocked ? ' selected' : '' %>"  onclick="updateLocked('primary')"><i class="fa-solid fa-lock<%= !user.account.brand.colors.primaryLocked ? '-open' : '' %>"></i></div>
             <% } %>
             <input
               style="
@@ -40,7 +40,7 @@
           <div class="color-wrapper">
             <div class="label ffp brand-label">SECONDARY COLOR</div>
             <% if(typeof showLock != "undefined" && showLock === true) { %> 
-              <div class="color-lock lock-secondary<%= user.account.brand.colors.secondaryLocked ? ' selected' : '' %>" onclick="updateLocked('secondary')"><i class="fa-regular fa-lock<%= !user.account.brand.colors.secondaryLocked ? '-open' : '' %>"></i></div>
+              <div class="color-lock lock-secondary<%= user.account.brand.colors.secondaryLocked ? ' selected' : '' %>" onclick="updateLocked('secondary')"><i class="fa-solid fa-lock<%= !user.account.brand.colors.secondaryLocked ? '-open' : '' %>"></i></div>
             <% } %>
             <input
               style="
@@ -58,7 +58,7 @@
         </div>
       </div>
       <button class="save-brand fs14" data-save-brand>
-        <i class="fa-regular fa-check"></i>Save Changes
+        <i class="fa-solid fa-check"></i>Save Changes
       </button>
     </div>
   </div>

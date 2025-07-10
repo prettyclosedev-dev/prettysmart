@@ -92,7 +92,7 @@
   <% if (typeof infobox !== "undefined" && false) { %>
   <div class="info-box df aic ffp fs13">
     <p class="mb-0"><%= infobox.text %> <a href="<%= infobox.button.link %>"><%= infobox.button.text %></a></p>
-    <div class="df acc mla"><i class="fa-regular fa-xmark"></i></div>
+    <div class="df acc mla"><i class="fa-solid fa-xmark"></i></div>
   </div>
   <% } %>
   <div class="clip-header">
@@ -102,14 +102,14 @@
           <div class="color-secondary" style="background-color: <%= user.account.brand.colors.secondary || '#D5BA8C' %>"></div>
         </div>
         <p>Colors</p>
-        <i class="fa-light fa-chevron-down arrow"></i>
+        <i class="fa-solid fa-chevron-down arrow"></i>
       </button>
       <button class="dropdown dropdown-fonts" onclick="openFontPicker()">
         <div class="font-icon">
-          <i class="fa-light fa-font-case fa-sm"></i>
+          <i class="fa-solid fa-font-case fa-sm"></i>
         </div>
         <p>Fonts</p>
-        <i class="fa-light fa-chevron-down arrow"></i>
+        <i class="fa-solid fa-chevron-down arrow"></i>
         <!-- <input id="font-picker" hidden type="hidden" name="Regular" class="google_font" value="<%= user.account.brand.fonts && brand.fonts.Regular ? user.account.brand.fonts.Regular.value : '' %>" placeholder="Search Google Fonts" class="" /> -->
         <!-- <button class="dropdown-item font-button-item" value="poppins">Poppins</button> -->
       </button>
@@ -120,11 +120,11 @@
       <button class="dropdown-item font-button-item" style="font-family: Arial, Helvetica, sans-serif;" value="helvetica">Helvetica</button>
     </div> -->
 
-      <!-- <button class="update-button"><i class="fa-light fa-arrows-rotate"></i><p>Update</p></button> -->
+      <!-- <button class="update-button"><i class="fa-solid fa-arrows-rotate"></i><p>Update</p></button> -->
     </div>
     <div class="clip-row" style="justify-content: flex-end; margin-right: 10px;">
       <button onclick="<%= !user || !user.account || (!user.account.brand_email && !user.email) ? 'openLoginPopup();' : 'openProfilePopup();' %>" class="clip-button user-button"><i class="fa-solid fa-user"></i></button>
-      <button onclick="openPlansPopup()" class="clip-button plan-button"><i class="fa-light fa-coins"></i>Buy credits</button>
+      <button onclick="openPlansPopup()" class="clip-button plan-button"><i class="fa-solid fa-coins"></i>Buy credits</button>
     </div>
   </div>
   <%- include('./color-picker-popup', {async: true,showLock:true}); %>

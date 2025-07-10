@@ -67,7 +67,7 @@
                                         </div>
                                         <div class="df mla buttons-wrapper">
                                             <div onclick="genSelected(<%= JSON.stringify(gen) %>, <%= JSON.stringify(currentUser) %>)" class="df acc pointer button edit">
-                                                <i class="checkmark-<%= gen._id %> fa-regular fa-circle<%= gen.hasAccess ? '-check' : ''%>"></i>
+                                                <i class="checkmark-<%= gen._id %> fa-solid fa-circle<%= gen.hasAccess ? '-check' : ''%>"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -77,7 +77,7 @@
                             <div class="user-list">
                                 <% pages.forEach(page => { %>
                                     <div class="df aic user-line">
-                                        <i style="margin-right: 20px" class="fa-light fa-<%= page.icon %>"></i>                                        
+                                        <i style="margin-right: 20px" class="fa-solid fa-<%= page.icon %>"></i>                                        
                                         <div>
                                             <p class="fs18 mb-0">
                                             <%-page.name %>
@@ -85,7 +85,7 @@
                                         </div>
                                         <div class="df mla buttons-wrapper">
                                             <div onclick="pageSelected(<%= JSON.stringify(page) %>, <%= JSON.stringify(currentUser) %>)" class="df acc pointer button edit">
-                                                <i class="checkmark-<%= page.name %> fa-regular fa-circle<%= page.hasAccess ? '-check' : ''%>"></i>
+                                                <i class="checkmark-<%= page.name %> fa-solid fa-circle<%= page.hasAccess ? '-check' : ''%>"></i>
                                             </div>
                                         </div>
                                     </div>

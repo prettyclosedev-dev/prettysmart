@@ -123,7 +123,7 @@
 
   <% const renderSignUp = (inverted) => { %>
   <a href='<%= authenticated ? "templates" :  "signup" %>' class="fs14 menu-button button-text <%= inverted ? 'sign-up-inverted' : 'sign-up' %>">
-    <i class="fa-regular <%= authenticated ? 'fa-icons' : 'fa-plus'%>"></i><%= authenticated ? "Go to App" :  "Sign Up" %>
+    <i class="fa-solid <%= authenticated ? 'fa-icons' : 'fa-plus'%>"></i><%= authenticated ? "Go to App" :  "Sign Up" %>
   </a>
   <% } %>
 
@@ -180,7 +180,7 @@
           <% if (!authenticated) { %>
             <div class="margin-horizontal-10">
               <a href="login" class="fs14 menu-button button-text sign-in">
-                <i class="fa-regular fa-sign-in"></i>Sign In
+                <i class="fa-solid fa-sign-in"></i>Sign In
               </a>
             </div>
           <% } %>
@@ -293,9 +293,9 @@
       <div class="section-content">
         <p class="tiny-red section-title">How it works</p>
         <div class="wowo fadeInLeft" id="how-it-works">
-          <%= renderHowItem("fa-light fa-upload", "Upload your brand", "Upload your logo, font, and colors when you create your account"); %>
-          <%= renderHowItem("fa-light fa-keyboard", "Tell us what you need", "Then, tell us what you're looking for whenever you need a new post."); %>
-          <%= renderHowItem("fa-light fa-face-explode", "Create your post", "You'll get fresh copy and design in seconds!", true); %>
+          <%= renderHowItem("fa-solid fa-upload", "Upload your brand", "Upload your logo, font, and colors when you create your account"); %>
+          <%= renderHowItem("fa-solid fa-keyboard", "Tell us what you need", "Then, tell us what you're looking for whenever you need a new post."); %>
+          <%= renderHowItem("fa-solid fa-face-explode", "Create your post", "You'll get fresh copy and design in seconds!", true); %>
         </div>
       </div>
     </section>

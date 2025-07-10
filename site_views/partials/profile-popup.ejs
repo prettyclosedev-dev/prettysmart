@@ -13,14 +13,14 @@
             onclick="closeProfilePopup()"
             >
               <i
-                class="fa-regular fa-xmark"
+                class="fa-solid fa-xmark"
                 style="color: <%= user.account.brand.colors.primary %>"
               ></i>
             </div>
           </div>
         </div>
         <button class="logout fs14" data-login onclick="login()">
-          <i class="fa-regular fa-left-from-bracket"></i>Login
+          <i class="fa-solid fa-left-from-bracket"></i>Login
         </button>
       <% } else { %>
       <div>
@@ -32,7 +32,7 @@
             onclick="closeProfilePopup()"
           >
             <i
-              class="fa-regular fa-xmark"
+              class="fa-solid fa-xmark"
               style="color: <%= user.account.brand.colors.primary %>"
             ></i>
           </div>
@@ -57,7 +57,7 @@
         </div>
       </div>
       <button class="logout fs14" data-logout onclick="logout()">
-        <i class="fa-regular fa-right-from-bracket"></i>Logout
+        <i class="fa-solid fa-right-from-bracket"></i>Logout
       </button>
       <% } %>
     </div>
