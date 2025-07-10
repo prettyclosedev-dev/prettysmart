@@ -46,7 +46,8 @@
     "unsplash-js": "^7.0.15"
   },
   "scripts": {
-    "dev": "nodemon -e ejs,js app.js"
+    "dev": "nodemon -e ejs,js app.js",
+    "dev-all": "concurrently \"nodemon -e ejs,js app.js\" \"sass site_static/css --watch\" \"sass static/css --watch\""
   },
   "repository": {
     "type": "git",
@@ -57,5 +58,8 @@
   "homepage": "https://bitbucket.org/weblewsolutions/prettysmart#readme",
   "volta": {
     "node": "12.22.7"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
   }
 }

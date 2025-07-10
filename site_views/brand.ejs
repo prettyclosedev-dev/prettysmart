@@ -1,114 +1,19 @@
-<%- include('partials/header', {async: true}); %>
+    <%- include('partials/header', {async: true}); %>
+
     <link rel="stylesheet" href="/static/css/new-brand.css?<%=Date.now()%>">
-    <style>
-        @font-face {
-            font-family: "<%= brand.fonts.Regular.name %>";
-            <% if (!brand.fonts.Regular.google) { %> src: url("/files/<%= user.account.id %>/fonts/<%= brand.fonts.Regular.path %>") format('truetype'); <% } %>
-            font-weight: normal;
-            font-style: normal;
-        }
-
-        @font-face {
-            font-family: "<%= brand.fonts.Bold.name %>";
-            <% if (!brand.fonts.Regular.google) { %> src: url("/files/<%= user.account.id %>/fonts/<%= brand.fonts.Bold.path %>") format('truetype'); <% } %>
-            font-weight: bold;
-            font-style: normal;
-        }
-
-        @font-face {
-            font-family: "<%= brand.fonts.Italic.name %>";
-            <% if (!brand.fonts.Regular.google) { %> src: url("/files/<%= user.account.id %>/fonts/<%= brand.fonts.Italic.path %>") format('truetype'); <% } %>
-            font-weight: normal;
-            font-style: italic;
-        }
-
-        @font-face {
-            font-family: "<%= brand.fonts.BoldItalic.name %>";
-            <% if (!brand.fonts.Regular.google) { %> src: url("/files/<%= user.account.id %>/fonts/<%= brand.fonts.BoldItalic.path %>") format('truetype'); <% } %>
-            font-weight: bold;
-            font-style: italic;
-        }
-
-        .userRegularFont {
-            font-family: "<%= brand.fonts.Regular.name %>";
-            font-weight: normal;
-            font-style: normal;
-        }
-
-        .userBoldFont {
-            font-family: "<%= brand.fonts.Bold.name %>";
-            font-weight: bold;
-            font-style: normal;
-        }
-
-        .userItalicFont {
-            font-family: "<%= brand.fonts.Italic.name %>";
-            font-weight: normal;
-            font-style: italic;
-        }
-
-        .userBoldItalicFont {
-            font-family: "<%= brand.fonts.BoldItalic.name %>";
-            font-weight: bold;
-            font-style: italic;
-        }
-    </style>
-    <script>
-        $(document).ready(function() {
-            var brand = <%- JSON.stringify(brand) %>;
-            var fonts = brand && brand.fonts;
-            if (fonts && Object.keys(fonts).length) {
-                Object.keys(fonts).forEach(function(key) {
-                    const {name, path, google} = fonts[key];
-                    if (google) {
-                        $('head').append(`<link href='https://fonts.googleapis.com/css?family=${name.replace(/([A-Z][a-z0-9]+)/g, '+$1 ').replace(/\s{2}/g," ").trim().replace(/ /g, "")}' rel='stylesheet' type='text/css'>`)
-                        $(`.user${key}Font`).css({
-                            'font-family': name.replace(/([a-z])([A-Z])/g, '$1 $2'), 
-                            'font-weight': key === 'Italic'
-                                    ? 'normal'
-                                    : key === 'BoldItalic'
-                                    ? 'bold'
-                                    : key.toLowerCase(), 
-                            'font-style': key === 'Italic' || key === 'BoldItalic'
-                                    ? 'italic'
-                                    : 'normal'
-                        });
-                    } /*else {
-                        $("head").append(`<style type='text/css'>
-                            @font-face {
-                                font-family: 'user${key}Font';
-                                src: url('/files/${user.account.id}/fonts/${path}') format('truetype');
-                                font-weight: ${
-                                name === "Italic"
-                                    ? "normal"
-                                    : name === "BoldItalic"
-                                    ? "bold"
-                                    : name.toLowerCase()
-                                };
-                                font-style: ${
-                                name === "Italic" || name === "BoldItalic"
-                                    ? "italic"
-                                    : "normal"
-                                };
-                            }
-                        </style>`);
-                        $(`.user${key}Font`).css('font-family', `user${key}Font`);
-                    }*/
-                });
-            }
-        });
-    </script>
+    
     <script src="https://js.stripe.com/v3/"></script>
-    <link rel="stylesheet" href="/static/css/jquery.fontpicker.css">
+
     <div class="df page-wrapper df ffp">
-        <%- include('partials/nav', {async: true}); %>
+
+      <%- include('partials/nav'); %>
 
       <div class="page-content">
         <div class="new-brand-page">
             <div class="page-content-wrapper">
                 <div class="page-title-container">
                     <h2 class="page-title">My brand<span class="text-primary">.</span></h2>
-                    <button class="save-brand fs14" data-save-brand><i class="fa-regular fa-check" ></i>Save Changes</button>
+                    <button class="save-brand fs14" data-save-brand><i class="fa-solid fa-check" ></i>Save Changes</button>
                 </div>
                 <div class="inner-content-wrapper help d-none" data-content="ask-help-sec">
                     <div class="df tab-content">
@@ -131,7 +36,7 @@
                                 <h4 class="fs30 ">Upload your logo.</h4>
                                 <p class="" style="max-width: 268px;">You can upload business cards, letterheads etc.</p>
                                <label for="upload-assets" class="df acc upload-wrapper">
-                                    <i class="fa-light fa-upload"></i>
+                                    <i class="fa-solid fa-upload"></i>
                                     <div>
                                         <p class="fs14">Drop here to upload</p>
                                         <p class="fs10 mb-0 text-underline">Or click to browse</p>
@@ -149,7 +54,7 @@
                                         <div class="df aic new-popup-header">
                                             <p class="fs30 title">Payment</p>
 
-                                            <div class="df acc mla close-button pointer" onclick='$("#cards-popup").addClass("d-none");'><i class="fa-regular fa-xmark"></i></div>
+                                            <div class="df acc mla close-button pointer" onclick='$("#cards-popup").addClass("d-none");'><i class="fa-solid fa-xmark"></i></div>
                                         </div>
 
                                         <div class="new-popup-content">
@@ -286,24 +191,24 @@
                                                         <%- brand.logos.logo %>
                                                         <div class="df aic logo-select-wrapper floating">
                                                             <div class="df aic">
-                                                                <i class="fa-light fa-upload"></i>
+                                                                <i class="fa-solid fa-upload"></i>
                                                                 <div class="text-wrapper">
                                                                     <p class="text fs12 mb-0">Drop here to upload Logo</p>
                                                                     <p class="text fs10 mb-0 text-underline">Or click to browse</p>
                                                                 </div>
                                                             </div>
-                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'logo')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'logo')"><i class="fa-solid fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
                                                         </div>
                                                     <% } else { %>
                                                         <div class="df aic logo-select-wrapper">
                                                             <div class="df aic">
-                                                                <i class="fa-light fa-upload"></i>
+                                                                <i class="fa-solid fa-upload"></i>
                                                                 <div class="text-wrapper">
                                                                     <p class="text fs12 mb-0">Drop here to upload Logo</p>
                                                                     <p class="text fs10 mb-0 text-underline">Or click to browse</p>
                                                                 </div>
                                                             </div>
-                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'logo')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'logo')"><i class="fa-solid fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
                                                         </div>
                                                     <% }  %>
                                                 </span>
@@ -321,24 +226,24 @@
                                                         <%- addViewBox(brand.logos.icon) %>
                                                         <div class="df aic logo-select-wrapper floating">
                                                             <div class="df aic">
-                                                                <i class="fa-light fa-upload"></i>
+                                                                <i class="fa-solid fa-upload"></i>
                                                                 <div class="text-wrapper">
                                                                     <p class="text fs12 mb-0">Drop here to upload Icon</p>
                                                                     <p class="text fs10 mb-0 text-underline">Or click to browse</p>
                                                                 </div>
                                                             </div>
-                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'icon')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'icon')"><i class="fa-solid fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
                                                         </div>
                                                     <% } else { %>
                                                         <div class="df aic logo-select-wrapper">
                                                             <div class="df aic">
-                                                                <i class="fa-light fa-upload"></i>
+                                                                <i class="fa-solid fa-upload"></i>
                                                                 <div class="text-wrapper">
                                                                     <p class="text fs12 mb-0">Drop here to upload Icon</p>
                                                                     <p class="text fs10 mb-0 text-underline">Or click to browse</p>
                                                                 </div>
                                                             </div>
-                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'icon')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'icon')"><i class="fa-solid fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
                                                         </div>
                                                     <% }  %>
                                                 </span>
@@ -359,24 +264,24 @@
                                                             <%- addViewBox(brand.logos.watermark) %>
                                                             <div class="df aic logo-select-wrapper floating">
                                                                 <div class="df aic">
-                                                                    <i class="fa-light fa-upload"></i>
+                                                                    <i class="fa-solid fa-upload"></i>
                                                                     <div class="text-wrapper">
                                                                         <p class="text fs12 mb-0">Drop here to upload Wordmark</p>
                                                                         <p class="text fs10 mb-0 text-underline">Or click to browse</p>
                                                                     </div>
                                                                 </div>
-                                                                <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'wordmark')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                                <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'wordmark')"><i class="fa-solid fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
                                                             </div>
                                                         <% } else { %>
                                                             <div class="df aic logo-select-wrapper">
                                                                 <div class="df aic">
-                                                                    <i class="fa-light fa-upload"></i>
+                                                                    <i class="fa-solid fa-upload"></i>
                                                                     <div class="text-wrapper">
                                                                         <p class="text fs12 mb-0">Drop here to upload Wordmark</p>
                                                                         <p class="text fs10 mb-0 text-underline">Or click to browse</p>
                                                                     </div>
                                                                 </div>
-                                                                <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'wordmark')"><i class="fa-light fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                                <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'wordmark')"><i class="fa-solid fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
                                                             </div>
                                                         <% }  %>
                                                     </span>
@@ -595,7 +500,7 @@
     <div class="dummy-select-or-edit" style="transform: scale(0)">
         <div class="df aic logo-select-wrapper floating">
           <div class="df aic">
-            <i class="fa-light fa-upload"></i>
+            <i class="fa-solid fa-upload"></i>
             <div class="text-wrapper">
               <p class="text fs12 mb-0">Drop here to upload <span>Wordmark</span></p>
               <p class="text fs10 mb-0 text-underline">Or click to browse</p>
@@ -605,7 +510,7 @@
             class="df acc upload-wrapper"
             onclick="openSVGEditor(event, 'Wordmark');"
           >
-            <i class="fa-light fa-crop-alt"></i>
+            <i class="fa-solid fa-crop-alt"></i>
             <p class="mb-0 fs12">Or select from logo</p>
           </div>
         </div>
@@ -615,7 +520,7 @@
         var draft_brand = <%- JSON.stringify(brand) %>;
      </script>
 
-    <script src="/static/js/jquery.js"></script>
+    <!-- <script src="/static/js/jquery.js"></script> -->
     <script src="/static/js/loader.js"></script>
     <script src="https://unpkg.com/vue@^3.4.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/svg-drag-select@0.4.2"></script>

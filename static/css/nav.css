@@ -426,4 +426,15 @@
   position: absolute;
 }
 
+.popover {
+  background-color: #db3965;
+  border: none;
+}
+.popover .popover-body {
+  color: white;
+}
+.popover .arrow::before, .popover .arrow::after {
+  border-right-color: #db3965 !important;
+}
+
 /*# sourceMappingURL=nav.css.map */
