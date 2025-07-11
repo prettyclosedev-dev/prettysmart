@@ -1,0 +1,155 @@
+<style>
+    .avatar {
+        position: relative;
+        height: 164px;
+        width: 164px;
+        object-fit: contain;
+        /* background-color: #db3965; */
+        border-radius: 100%;
+        border: 1px dashed #ababab
+    }
+
+    .avatar img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        height: 100%;
+        width: 100%;
+        object-fit: contain;
+        border-radius: 100%;
+    }
+
+    .avatar .upload-label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: black !important;
+        cursor: pointer;
+    }
+
+    .avatar label {
+        opacity: 1 !important;
+        cursor: pointer;
+    }
+
+    .profile-form {
+        gap: 16px;
+    }
+
+    .gap-1 {
+        gap: 8px;
+    }
+
+    #user-avatar {
+        cursor: pointer;
+    }
+</style>
+
+<div class="tab-content profile d-none" data-tab-content="profile">
+    <form data-hs-cf-bound="true" class="profile-form d-flex flex-column">
+
+        <div id="user-avatar" class="input-wrapper d-flex flex-column align-items-center gap-2 relative">
+            <label class="label brand-label">AVATAR</label>
+            <div id="avatar" class="avatar">
+
+                <span id="upload-label"
+                    class="d-none upload-label d-flex flex-column align-items-center justify-content-center w-100">
+                    <label for="avatar-input">Select file </label>
+                    <i class="fa-solid fa-upload"></i>
+                </span>
+
+                <img id="avatar-img" />
+            </div>
+        </div>
+
+        <input id="avatar-input" name="avatar" type="file" hidden>
+
+        <div class="input-wrapper">
+            <label class="label ffp brand-label">COMPANY NAME</label>
+            <input type="text" name="name" value="<%= user.account.name %>" class="form-control" required>
+        </div>
+    </form>
+
+</div>
+
+<script>
+    function setUserAvatar(userAvatar) {
+
+        if (userAvatar) {
+            $("#avatar-img").attr("src", userAvatar)
+            $("#upload-label").addClass("d-none");
+            $("#upload-label label").addClass("d-none");
+            $("#upload-label i").addClass("d-none");
+            $("#avatar-img").removeClass("d-none");
+        }
+        else {
+            $("#avatar-img").attr("src", '')
+            $("#upload-label").removeClass("d-none");
+            $("#upload-label label").removeClass("d-none");
+            $("#upload-label i").removeClass("d-none");
+            $("#avatar-img").addClass("d-none");
+        }
+    }
+
+    const user = <%- JSON.stringify(user) %>
+        
+    $(document).ready(function () {
+
+        setUserAvatar(user.avatar)
+
+        $("#avatar, #upload-label").on("click", function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            $("#avatar-input").trigger("click");
+        })
+
+        $("#avatar-input").on("change", function (e) {
+            var file = e.target.files[0];
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                setUserAvatar(e.target.result)
+            };
+            reader.readAsDataURL(file);
+            uploadAvatar(file)
+        })
+    })
+
+    function uploadAvatar() {
+        var $file = $("#avatar-input");
+        if ($file.length && $file[0].files.length) {
+            var type = $file.data("file-type"),
+                name = $file.attr("name"),
+                file = $file[0].files[0],
+                data = new FormData();
+
+            data.append(name, file);
+            data.append("name", name);
+
+            $.ajax({
+                url: "/settings/account/upload-avatar/" + user._id,
+                data: data,
+                type: "POST",
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    console.log("SUCCESS", res);
+                    if (!res.success) {
+                        alert(res.error || "Failed to upload avatar!")
+                    }
+                },
+                error: function (err) {
+                    console.log("ERROR", err);
+                    alert(JSON.stringify(err));
+                },
+            });
+        }
+    }
+</script>

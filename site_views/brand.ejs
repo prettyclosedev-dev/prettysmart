@@ -149,6 +149,7 @@
                                 <div id="colors-tab" class="df acc tab ffp" data-tab="colors">Colors</div>
                                 <div id="fonts-tab" class="df acc tab ffp d-none" data-tab="fonts">Fonts</div>
                                 <div id="info-tab" class="df acc tab ffp" data-tab="info">Info</div>
+                                <div id="profile-tab" class="df acc tab ffp" data-tab="profile">Profile</div>
                             </div>
 
                             <%
@@ -379,6 +380,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <% if(brand && brand.logos && brand.logos.logo){ %>
                                 <div class="df line mt-4">
                                     <div class="sec" id="logo">
@@ -435,6 +437,8 @@
                                     </form>
                                 
                                 </div>
+
+                                <%- include("partials/brand/profile", {user}) %>
                             </div>
                         </div>
                     </div>
