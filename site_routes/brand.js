@@ -13,6 +13,7 @@ const path = require("path");
 const openAi = require("../openAi");
 const _ = require("lodash");
 const { handleBrandChange } = require("../clyps_brand_update");
+const user = require("../schemas/user");
 const stripe = require("stripe")(config.stripe.prod.secret);
 const mailchimp = require("@mailchimp/mailchimp_transactional")(
   config.mandrill.apiKey
@@ -209,9 +210,8 @@ async function loadAssets(
 
 function loadSVG(logo_metrics, logo_path, fill = "#D5BA8C") {
   const logo = `
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${
-        logo_metrics.width + 121.63499999999999
-      } ${logo_metrics.height + 10.049999999999983}">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${logo_metrics.width + 121.63499999999999
+    } ${logo_metrics.height + 10.049999999999983}">
           <g>
               <path id="brand_icon" fill="${fill}" d="M39.5 31.2l10.1 10.1.1.1.1.1c1.1 1.1 2.5 1.7 4 1.7H54.1c1.5 0 3-.6 4.1-1.7L89.7 10c2.3-2.3 2.3-6 0-8.3-2.3-2.3-6-2.3-8.3 0L58.1 25l-4.2 4.2-12.4-12.5c-2.3-2.3-6-2.3-8.3 0-2.3 2.3-2.3 6 0 8.3l6.3 6.2zM106.3 81.4L83 58.1l-4.2-4.2 12.5-12.5c2.3-2.3 2.3-6 0-8.3-2.3-2.3-6-2.3-8.3 0l-6.3 6.3S66.3 49.7 66.3 49.8c-1.1 1.1-1.7 2.5-1.7 4V54.1c0 1.5.6 3 1.7 4.1L98 89.7c2.3 2.3 6 2.3 8.3 0 2.3-2.3 2.3-6 0-8.3zM68.5 76.8L58.2 66.5c-1.1-1.1-2.5-1.7-4-1.7H54h-.1c-1.5 0-3 .6-4.1 1.7L18.3 98c-2.3 2.3-2.3 6 0 8.3 2.3 2.3 6 2.3 8.3 0L49.9 83l4.2-4.2 12.5 12.5c2.3 2.3 6 2.3 8.3 0 2.3-2.3 2.3-6 0-8.3l-6.4-6.2zM16.7 74.8c2.3 2.3 6 2.3 8.3 0l6.3-6.3s10.3-10.4 10.4-10.4c1.1-1.1 1.7-2.5 1.7-4v-.2-.1c0-1.5-.6-3-1.7-4.1L10 18.3c-2.3-2.3-6-2.3-8.3 0-2.3 2.3-2.3 6 0 8.3L25 49.9l4.2 4.2-12.5 12.4c-2.3 2.3-2.3 6 0 8.3z"></path>
               <g id="brand_name">
@@ -266,7 +266,7 @@ async function setDefaultFonts(req, user_path) {
       __dirname,
       "../google-fonts/poppins/" + font + ".ttf"
     );
-    
+
     const destination = path.join(font_path, "/poppins/", font + ".ttf");
 
     console.log({
@@ -320,7 +320,7 @@ async function uploadFontToHuddle({
   brand_id,
   font_family_name,
   font_file_name,
-}) {}
+}) { }
 
 async function syncFontsWithAccount(req, fontFamilies) {
   let user_path = path.join(__dirname, "../files/" + req.user.account._id);
@@ -392,6 +392,7 @@ module.exports = () => {
     }
 
     res.render("brand", {
+      user: req.user,
       templates: [],
       brand: {
         ...(await Huddle.getBrandObject(req.user.account).catch(console.log)),
@@ -533,7 +534,7 @@ module.exports = () => {
           data.append('name', fileName);
 
           // Let FormData compute headers including proper multipart boundary
-          const imgtosvgurl = config.ImageToSVG_URL +  "/upload"
+          const imgtosvgurl = config.ImageToSVG_URL + "/upload"
           const response = await fetch(imgtosvgurl, {
             method: 'POST',
             body: data,
@@ -926,6 +927,8 @@ module.exports = () => {
   router.post("/info", async (req, res) => {
     let oldAccountData = await Account.findById(req.user.account._id);
     let accountNewData = { ...req.body };
+
+    console.log(accountNewData);
 
     if (req.user.master) {
       accountNewData.AI = req.body.AI;

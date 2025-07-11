@@ -33,7 +33,11 @@ $(document)
 
       updateFont($this, true, true);
       addTabState("fonts", "draft");
-    } else {
+    }
+    else if ($this.attr("name") === "avatar") {
+      addTabState("profile", "draft");
+    }
+    else {
       var $container = $this.closest(".onboarding-logo-inner");
       $container.find(".logo-select-wrapper").addClass("floating");
 
@@ -346,9 +350,8 @@ function processBrandAssetPayment(dirPM, skipPayment) {
   data.append("skipPayment", skipPayment);
 
   $.ajax({
-    url: `/brand/brand-assets-payment${
-      skipPayment ? "" : "?paymethod=" + pmId
-    }`,
+    url: `/brand/brand-assets-payment${skipPayment ? "" : "?paymethod=" + pmId
+      }`,
     data: data,
     type: "POST",
     contentType: false,
@@ -520,38 +523,36 @@ function updateFontCSS(ff, res) {
   $("head").append(
     res.brand.fonts[ff].google
       ? "<link href='https://fonts.googleapis.com/css?family=" +
-          res.brand.fonts[ff].name
-            .replace(/([A-Z][a-z0-9]+)/g, "+$1")
-            .replace(/\s{2}/g, "")
-            .trim()
-            .replace(/ /g, "")
-            .replace(/^\+/, "") +
-          "' rel='stylesheet' type='text/css'>"
+      res.brand.fonts[ff].name
+        .replace(/([A-Z][a-z0-9]+)/g, "+$1")
+        .replace(/\s{2}/g, "")
+        .trim()
+        .replace(/ /g, "")
+        .replace(/^\+/, "") +
+      "' rel='stylesheet' type='text/css'>"
       : `@font-face {
                     font-family: 'user${ff}Font';
                     src: url('/files/<%= user && user.account && user.account.id %>/fonts/<%= brand && brand.fonts && brand.fonts.${ff} && brand.fonts.${ff}.path %>') format('truetype');
-                    font-weight: ${
-                      ff === "Italic"
-                        ? "normal"
-                        : ff === "BoldItalic"
-                        ? "bold"
-                        : ff.toLowerCase()
-                    };
-                    font-style: ${
-                      ff === "Italic" || ff === "BoldItalic"
-                        ? "italic"
-                        : "normal"
-                    };
+                    font-weight: ${ff === "Italic"
+        ? "normal"
+        : ff === "BoldItalic"
+          ? "bold"
+          : ff.toLowerCase()
+      };
+                    font-style: ${ff === "Italic" || ff === "BoldItalic"
+        ? "italic"
+        : "normal"
+      };
                 }`
   );
 
   $(`.user${ff}Font`).css(
     "font-family",
     '"' +
-      res.brand.fonts[ff].name
-        .replace(/([a-z])([A-Z])/g, "$1 $2")
-        .replace(/ /g, " ") +
-      '"'
+    res.brand.fonts[ff].name
+      .replace(/([a-z])([A-Z])/g, "$1 $2")
+      .replace(/ /g, " ") +
+    '"'
   );
 }
 
@@ -566,6 +567,16 @@ function updateInfo(draft) {
 
     data[name] = val;
   });
+
+  $('[type="input"].touched').each(function () {
+    var $this = $(this);
+    $this.removeClass("touched");
+    var name = $this.attr("name"),
+      val = $this.val();
+
+    data[name] = val;
+  });
+
 
   if (!Object.keys(data).length) {
     return;
