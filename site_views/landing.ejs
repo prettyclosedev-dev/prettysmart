@@ -145,9 +145,20 @@
       <div class="section-content" style="border-bottom: none;">
         <div class="row-space wowo fadeInUp inner-content" style="width: 100%;">
           <div class="text-btn-wrpr">
+            <% if(text.header) { %>
+            <p class="large-text huge-text" style="color: white; margin-bottom: 7vh; line-height: 1.1;">
+              <%- text.header %>
+            </p>
+            <% } else { %>
             <p class="large-text huge-text" style="color: white; margin-bottom: 7vh; line-height: 1.1;">
               <%- text %>
             </p>
+            <% } %>
+            <% if(text.subheader) { %>
+            <p class="large-text" style="color: white; margin-bottom: 7vh; line-height: 1.1;">
+              <%- text.subheader %>
+            </p>
+            <% } %>
             <%= renderSignUp(true); %>
           </div>
           <img id="<%= imgId %>" src="<%= imgSource %>" />
@@ -192,11 +203,11 @@
       <div id="intro-text" class="wowo fadeInUp">
         <p class="tiny-red">Real Estate design in seconds.</p>
         <p class="large-text margin-vertical-2">
-          Effortlessly grow your real estate brand on social media—quickly, affordably, and with no hassle.
+          Grow your real estate business on social media.Generate on-brand posts in seconds for any platform.
         </p>
         <br/>
         <p class="plain-text margin-bottom-2">
-          Become a real estate expert with Prettyclose. Gain followers, close more deals, and attract new customers—without the effort!
+          Become a voice that matters in your area with Prettyclose. Gain views and followers with polished posts and attract new customers - without the effort!
         </p>
         <br/>
         <%= renderSignUp(); %>
@@ -234,29 +245,29 @@
             <h5 class="ffp">Fully Branded</h5>
             <p class="ffp">Every post showcases your name, photo, and contact info for a polished look.</p>
           </div>
-          
+
           <div class="sec">
             <img src="/site_static/images/landing/ai-copywriter.svg" style="z-index: 1;" />
-            <h5 class="ffp">Quick Listings</h5>
-            <p class="ffp">Enter property details and instantly receive a ready-to-share post.</p>
-          </div>
-
-          <div class="sec">
-            <img src="/site_static/images/landing/tons-of-templates.svg" style="z-index: 1;" />
-            <h5 class="ffp">Daily Expertise</h5>
-            <p class="ffp">Share helpful tips or advice to establish yourself as the go-to expert.</p>
-          </div>
-
-          <div class="sec">
-            <img src="/site_static/images/landing/super-scalable.svg" style="z-index: 1;" />
-            <h5 class="ffp">Interest Rates</h5>
-            <p class="ffp">Easily post the latest mortgage rates to keep your audience informed.</p>
+            <h5 class="ffp">Your information</h5>
+            <p class="ffp"> Add your name and contact info, or photos to leverage your audience</p>
           </div>
 
           <div class="sec">
             <img src="/site_static/images/landing/free-stock-photos.svg" style="z-index: 1;" />
             <h5 class="ffp">Unlimited Posts</h5>
             <p class="ffp">Enjoy endless ready-to-use content for your social media.</p>
+          </div>
+
+          <div class="sec">
+            <img src="/site_static/images/landing/tons-of-templates.svg" style="z-index: 1;" />
+            <h5 class="ffp">Template library</h5>
+            <p class="ffp">No inspiration for your next post? Use one of your 500+ templates to keep your momentum going</p>
+          </div>
+
+          <div class="sec">
+            <img src="/site_static/images/landing/super-scalable.svg" style="z-index: 1;" />
+            <h5 class="ffp">Post Categories</h5>
+            <p class="ffp">Generate a post about an open house, a recently sold unit, a new listing, current rates, or more, all in under a minute!</p>
           </div>
 
           <div class="sec">
@@ -308,20 +319,22 @@
           <div class="swiper wowo fadeInUp" style="width: 100%;">
               <div class="swiper-wrapper">
                 <div class="swiper-slide" style="width: 35%;">
-                    <% renderTestimonial("I used a fantastic agency for my social media posts. However, I waited days for every stupid post. I was ready to hire an in-house designer to get my design done fast - when a friend recommended prettyclose. I now spend under 3 minutes per post, do it myself, and truthfully they are just as nice.", "P. Schwartz", "Castling"); %>
+                    <% renderTestimonial("I used a fantastic agency for my social media posts. However, I waited days for every post. I was ready to hire an in-house designer to get my design done fast - when a friend recommended prettyclose. I now spend under 3 minutes per post, do it myself, my audience loves them and they help me sign new deals.", "P. Schwartz", "Castling"); %>
                 </div>
                 <div class="swiper-slide" style="width: 35%;">
                     <% renderTestimonial("Time in business is money. That is why I love Prettyclose, and I get beautiful designs done in seconds. The copy and design are impressive; it took my brand to the next level.", "Ari Greenfeld", "GreenTouch Media"); %>
                 </div>
                 <div class="swiper-slide" style="width: 35%;">
-                    <% renderTestimonial("As a business owner, I really, really appreciate prettyclose. There is absolutely no reason to hire a designer or copywriter when you can get it done for a fraction of the time and price.", "Mel Schlesinger", ""); %>
+                    <% renderTestimonial("As a business owner, I really, really appreciate PrettyClose. There is absolutely no reason to hire a designer or copywriter when you can get it done for a fraction of the time and price.", "Mel Schlesinger", ""); %>
                 </div>
               </div>
           </div>
         </div>
       </div>
     </section>
-    <% renderBanner("Your clients should be following you.<br/>You shouldn't be following them.<br/>No more cold calling and running after leads.", "img-4", "/site_static/images/landing/4.png") %>
+    <% renderBanner({
+      header: "Your clients should be following you.<br/>You shouldn't be following them.<br/>No more cold calling and running after leads.",
+      subheader: "Build your social media presence and get inbound leads every day."}, "img-4", "/site_static/images/landing/4.png") %>
     <section id="pricing" class="section">
       <div id="pricing-anchor" class="anchor"></div>
       <div class="section-content">
