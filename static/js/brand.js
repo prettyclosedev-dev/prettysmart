@@ -86,6 +86,8 @@ $(document)
       updateFonts();
       updateGoogleFonts();
       updateInfo();
+      uploadAvatar();
+      window.location.reload();
     } else {
       console.log("Nothing changed");
     }
@@ -620,6 +622,42 @@ function updateInfo(draft) {
       console.log(err);
     });
 }
+
+function uploadAvatar() {
+  var $file = $("#avatar-input");
+  if ($file.length && $file[0].files.length) {
+      var type = $file.data("file-type"),
+          name = $file.attr("name"),
+          file = $file[0].files[0],
+          data = new FormData();
+
+      data.append(name, file);
+      data.append("name", name);
+
+      $.ajax({
+          url: "/settings/account/upload-avatar/" + user._id,
+          data: data,
+          type: "POST",
+          contentType: false,
+          processData: false,
+          success: function (res) {
+              if (res.success) {
+                window.location.reload();
+                addTabState("profile", "success");
+              }
+              else {
+                console.error("Failed to upload avatar!", res)
+                addTabState("profile", "failed");
+              }
+          },
+          error: function (err) {
+              console.error("Failed to upload avatar!", err);
+              addTabState("profile", "failed");
+          },
+      });
+  }
+}
+
 
 function displayBrand(brand, runAI) {
   if (!window.location.pathname.includes("setup")) {
