@@ -199,6 +199,7 @@ app.use((req, res, next) => {
 
     let brand = req.user.account.brand;
     if (
+      !url.startsWith("settings") &&
       !url.startsWith("subscribe") &&
       !url.startsWith("payment") &&
       !url.startsWith("brand/brand-assets-payment") &&

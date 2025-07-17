@@ -70,7 +70,7 @@
             </div>
         </div>
 
-        <input id="avatar-input" name="avatar" type="file" hidden>
+        <input id="avatar-input" name="avatar" type="file" hidden accept="image/jpeg,image/png,image/svg+xml">
 
         <div class="input-wrapper">
             <label class="label ffp brand-label">COMPANY NAME</label>
@@ -118,7 +118,7 @@
                 setUserAvatar(e.target.result)
             };
             reader.readAsDataURL(file);
-            uploadAvatar(file)
+            // uploadAvatar(file)
         })
     })
 
