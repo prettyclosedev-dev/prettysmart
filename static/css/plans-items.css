@@ -17,7 +17,7 @@
   align-items: center;
   grid-gap: 2rem;
   grid-template-columns: repeat(auto-fit, 17rem);
-  grid-template-rows: repeat(auto-fill, 23rem);
+  grid-template-rows: repeat(auto-fill, 24.6rem);
 }
 
 .price-item {
@@ -34,10 +34,7 @@
   border-radius: 0.4rem;
   border-width: 0;
   border-color: transparent;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
+  padding: 0.8rem;
   align-self: center;
   width: 100%;
   margin-top: 1.5rem;
@@ -60,7 +57,8 @@
   font-style: normal;
   font-weight: 600;
   font-size: 1rem;
-  padding-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  line-height: 1.6rem;
 }
 @media only screen and (max-width: 768px) {
   .price-item-title {
@@ -74,7 +72,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 90%;
+  height: auto;
+  gap: 3px;
 }
 .stats-container .stats {
   display: flex;

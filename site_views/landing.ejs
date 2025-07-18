@@ -170,7 +170,7 @@
 <% const renderTestimonial = (text, testifier, brand) => { %>
   <div class="testimonial">
     <p class="plain-text"><%= text %></p>
-    <p class="plain-text" style="font-weight: 600; margin-top: 1vw"><%= testifier %><br><%= brand %></p>
+    <p class="plain-text" style="font-weight: 600; margin-top: 1vw; user-select: none; cursor: context-menu"><%= testifier %><br><%= brand %></p>
   </div>
 <% } %>
 
@@ -201,12 +201,15 @@
     </section>
     <section id="intro" class="row-space padding-horizontal">
       <div id="intro-text" class="wowo fadeInUp">
-        <p class="tiny-red">Real Estate design in seconds.</p>
-        <p class="large-text margin-vertical-2">
-          Grow your real estate business on social media.Generate on-brand posts in seconds for any platform.
+        <p class="tiny-red margin-bottom-2">Real Estate design in seconds.</p>
+        <p class="large-text">
+          Grow your real estate business on social media.
+        </p>
+        <p class="large-text">
+          Generate on-brand posts in seconds for any platform.
         </p>
         <br/>
-        <p class="plain-text margin-bottom-2">
+        <p class="medium-text margin-bottom-2">
           Become a voice that matters in your area with Prettyclose. Gain views and followers with polished posts and attract new customers - without the effort!
         </p>
         <br/>
@@ -243,7 +246,7 @@
           <div class="sec">
             <img src="/site_static/images/landing/seamless-design.svg" style="z-index: 1;" />
             <h5 class="ffp">Fully Branded</h5>
-            <p class="ffp">Every post showcases your name, photo, and contact info for a polished look.</p>
+            <p class="ffp">Every post uses your brand colors and logos for a polished look.</p>
           </div>
 
           <div class="sec">
@@ -273,7 +276,7 @@
           <div class="sec">
             <img src="/site_static/images/landing/easy-editor.svg" style="z-index: 1;" />
             <h5 class="ffp">Emails and printables</h5>
-            <p class="ffp">If you need it for your marketing, we will surely have it!</p>
+            <p class="ffp">Generate other branded assets including emails, letterheads, business cards and more on the same platform.</p>
           </div>
         </div>
       </div>
@@ -319,10 +322,10 @@
           <div class="swiper wowo fadeInUp" style="width: 100%;">
               <div class="swiper-wrapper">
                 <div class="swiper-slide" style="width: 35%;">
-                    <% renderTestimonial("I used a fantastic agency for my social media posts. However, I waited days for every post. I was ready to hire an in-house designer to get my design done fast - when a friend recommended prettyclose. I now spend under 3 minutes per post, do it myself, my audience loves them and they help me sign new deals.", "P. Schwartz", "Castling"); %>
+                    <% renderTestimonial("I used a fantastic agency for my social media posts. However, I waited days for every post. I was ready to hire an in-house designer to get my design done fast - when a friend recommended PrettyClose. I now spend under 3 minutes per post, do it myself, my audience loves them and they help me sign new deals.", "P. Schwartz", "Castling"); %>
                 </div>
                 <div class="swiper-slide" style="width: 35%;">
-                    <% renderTestimonial("Time in business is money. That is why I love Prettyclose, and I get beautiful designs done in seconds. The copy and design are impressive; it took my brand to the next level.", "Ari Greenfeld", "GreenTouch Media"); %>
+                    <% renderTestimonial("Time in business is money. That is why I love PrettyClose, and I get beautiful designs done in seconds. The copy and design are impressive; it took my brand to the next level.", "Ari Greenfeld", "GreenTouch Media"); %>
                 </div>
                 <div class="swiper-slide" style="width: 35%;">
                     <% renderTestimonial("As a business owner, I really, really appreciate PrettyClose. There is absolutely no reason to hire a designer or copywriter when you can get it done for a fraction of the time and price.", "Mel Schlesinger", ""); %>
@@ -332,9 +335,7 @@
         </div>
       </div>
     </section>
-    <% renderBanner({
-      header: "Your clients should be following you.<br/>You shouldn't be following them.<br/>No more cold calling and running after leads.",
-      subheader: "Build your social media presence and get inbound leads every day."}, "img-4", "/site_static/images/landing/4.png") %>
+    <% renderBanner({header: "Build your social media presence and get inbound leads every day."}, "img-4", "/site_static/images/landing/4.png") %>
     <section id="pricing" class="section">
       <div id="pricing-anchor" class="anchor"></div>
       <div class="section-content">
@@ -399,4 +400,12 @@
     <% renderBanner("Get agency level posts<br>Let them think you have an<br>in-house social media genius.", "img-5", "/site_static/images/landing/5.png") %>
     <%- include('partials/footer', {async: true, authenticated}); %>
   </body>
+
+  <script>
+    $(document).ready(function () {
+      // add static $45 per agent
+      $(".price-item-title")[0].innerHTML += ("<br/><span>&nbsp;</span> ")
+      $(".price-item-title")[1].innerHTML += ("<br/>$45 per agent")
+    })
+  </script>
 </html>

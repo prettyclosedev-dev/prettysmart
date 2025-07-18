@@ -9,7 +9,7 @@
 <% const renderPriceItem = (id, primeColor, secondColor, title, button1, button2, children, darkText, price, canceled) => { %>
 <div class="price-item" style="background-color: <%= primeColor %>; color: <%= darkText || secondColor %>;">
   <div style="margin-bottom: 1.5rem;">
-    <p class="price-item-title" style="color: <%= darkText || secondColor %>;"><%= title %><% if (canceled) { %> <span style="margin-left: 10px; color: 'gray'; font-size: 9px;">Canceled</span> <% } %></p>
+    <p id="<%= title %>" class="price-item-title" style="color: <%= darkText || secondColor %>;"><%= title %><% if (canceled) { %> <span style="margin-left: 10px; color: 'gray'; font-size: 9px;">Canceled</span> <% } %></p>
     <div style="background-color: <%= darkText || secondColor %>; height: 1px; width: 100%; opacity: 0.3;"></div>
     <div class="stats-container">
       <% children.forEach(function(child) { %>

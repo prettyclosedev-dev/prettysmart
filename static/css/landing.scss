@@ -311,6 +311,14 @@ a.sign-up-inverted:hover {
   line-height: 1.5rem;
 }
 
+.medium-text {
+  font-family: Poppins;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 1.4rem;
+  line-height: 1.5rem;
+}
+
 .tiny-text {
   font-family: Poppins;
   font-style: normal;
@@ -404,7 +412,8 @@ a.sign-up-inverted:hover {
         // padding: 6px;
 
         .video-mask {
-          width: 100%;
+          height: 100%;
+          // width: 100%;
 
           #video {
             border-radius: 0px;
@@ -554,13 +563,15 @@ a.sign-up-inverted:hover {
 
 .video-mask {
   width: 100%;
+  display: flex;
+  justify-content: center;
   overflow: hidden;
   box-sizing: border-box;
 }
 
 #video {
-  width: 100%;
-  height: 100%;
+  width: 75%;
+  height: 75%;
   -webkit-transform: translateZ(0);
   border-radius: 0.55rem;
 }

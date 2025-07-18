@@ -33,7 +33,7 @@ module.exports = () => {
       signup_link: "/signup",
       authenticated: req.isAuthenticated(),
       products: plans,
-      interval: currentInterval,
+      interval: "year",
       cache: true,
       filename: "landing",
     });
@@ -49,7 +49,7 @@ module.exports = () => {
       signup_link: "/signup",
       authenticated: req.isAuthenticated(),
       products: plans,
-      interval: currentInterval,
+      interval: "year",
       cache: true,
       filename: "landing",
     });
@@ -200,9 +200,15 @@ async function getPlans() {
         return a.prices.month.amount - b.prices.month.amount;
       });
 
+
+      console.log({
+        plans: JSON.stringify(plans),
+        // products: JSON.stringify(products),
+      })
+      
       return products;
     }
-  } catch (error) {}
+  } catch (error) { }
 }
 
 async function downloadFile(url, dest) {
