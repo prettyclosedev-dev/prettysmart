@@ -37,21 +37,23 @@ TEST*.xml
 Thumbs.db
 
 # Applications
-*.app
-*.exe
-*.war
+**.app
+**.exe
+**.war
 
 # Large media files
-*.mp4
-*.tiff
-*.avi
-*.flv
-*.mov
-*.wmv
+**.mp4
+**.tiff
+**.avi
+**.flv
+**.mov
+**.wmv
 
-
-config.json
+# Other Folders
 files/
 google-fonts/
 .vscode/
 keys/
+
+# Other Files
+config.json
