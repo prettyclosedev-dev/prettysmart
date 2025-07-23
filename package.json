@@ -47,7 +47,8 @@
   },
   "scripts": {
     "dev": "nodemon -e ejs,js app.js",
-    "dev-all": "concurrently \"nodemon -e ejs,js app.js\" \"sass site_static/css --watch\" \"sass static/css --watch\""
+    "dev-all": "concurrently \"nodemon -e ejs,js app.js\" \"sass site_static/css --watch\" \"sass static/css --watch\"",
+    "sass": "sass site_static/css && sass static/css"
   },
   "repository": {
     "type": "git",
