@@ -294,62 +294,6 @@
                                     </div>
                                 </div>
 
-                                <div class="tab-content fonts d-none" data-tab-content="fonts">
-                                
-                                    <div class="onboarding-font-row font-line" data-font-form="Regular">
-                                        <p class="brand-label title">REGULAR FONT <%if(brand && brand.fonts && brand.fonts.Regular && brand.fonts.Regular.name){%> • <span class="font-name"><%-brand.fonts.Regular.name%></span><%}%></p>
-                                        <%if(brand && brand.fonts && brand.fonts.Regular && brand.fonts.Regular.name){%> 
-                                            <div class="font-preview userRegularFont">This is your font</div>
-                                        <%}%> 
-                                            <div class="<% if(brand && brand.fonts && brand.fonts.Regular && brand.fonts.Regular.name){ %>hovering<% } %> df font-upload-sec">
-                                                <label for="reg-input" class="df aic left-sec"><div class="icon"></div><div class="text"><p class="fs10 label">Drop here to upload font</p><p class="fs8"><u>Or click to browse</u></p></div></label>
-                                                <input id="reg-input" type="file" data-file-type="font" accept=".ttf" name="Regular" hidden>
-                                                <div class="df acc right-sec"> 
-                                                    <input name="Regular" class="google_font" value="<%= brand && brand.fonts && brand.fonts.Regular ? brand.fonts.Regular.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
-                                                </div>
-                                            </div>
-                                    </div> 
-                                    <div class="onboarding-font-row font-line" data-font-form="Italic">
-                                        <p class="brand-label  title">ITALIC FONT <%if(brand && brand.fonts && brand.fonts.Italic && brand.fonts.Italic.name){%> • <span class="font-name"><%-brand.fonts.Italic.name%></span><%}%></p>
-                                        <%if(brand && brand.fonts && brand.fonts.Italic && brand.fonts.Italic.name){%> 
-                                            <div class="font-preview userItalicFont">This is your font</div>
-                                            <%}%> 
-                                            <div class="<% if(brand && brand.fonts && brand.fonts.Italic && brand.fonts.Italic.name){ %>hovering<% } %> df font-upload-sec">
-                                                <label for="ital-input" class="df aic left-sec"><div class="icon"></div><div class="text"><p class="fs10 label">Drop here to upload font</p><p class="fs8"><u>Or click to browse</u></p></div></label>
-                                                <input id="ital-input" type="file" data-file-type="font" accept=".ttf" name="Italic" hidden>
-                                                <div class="df acc right-sec"> 
-                                                    <input name="Italic" class="google_font" value="<%= brand && brand.fonts && brand.fonts.Italic ? brand.fonts.Italic.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
-                                                </div>
-                                            </div>
-                                    </div>
-                                    <div class="onboarding-font-row font-line" data-font-form="Bold">
-                                        <p class="brand-label  title">BOLD FONT <%if(brand && brand.fonts && brand.fonts.Bold && brand.fonts.Bold.name){%> • <span class="font-name"><%-brand.fonts.Bold.name%></span><%}%></p>
-                                        <%if(brand && brand.fonts && brand.fonts.Bold && brand.fonts.Bold.name){%> 
-                                            <div class="font-preview userBoldFont">This is your font</div>
-                                            <%}%> 
-                                            <div class="<% if(brand && brand.fonts && brand.fonts.Bold && brand.fonts.Bold.name){ %>hovering<% } %> df font-upload-sec">
-                                                <label for="bold-input" class="df aic left-sec"><div class="icon"></div><div class="text"><p class="fs10 label">Drop here to upload font</p><p class="fs8"><u>Or click to browse</u></p></div></label>
-                                                <input id="bold-input" type="file" data-file-type="font" accept=".ttf" name="Bold" hidden>
-                                                <div class="df acc right-sec"> 
-                                                    <input name="Bold" class="google_font" value="<%= brand && brand.fonts && brand.fonts.Bold ? brand.fonts.Bold.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
-                                                </div>
-                                            </div>
-                                    </div>
-                                    <div class="onboarding-font-row font-line" data-font-form="BoldItalic">
-                                        <p class="brand-label  title">BOLD ITALIC FONT <%if(brand && brand.fonts && brand.fonts.BoldItalic && brand.fonts.BoldItalic.name){%> • <span class="font-name"><%-brand.fonts.BoldItalic.name%></span><%}%></p>
-                                        <%if(brand && brand.fonts && brand.fonts.BoldItalic && brand.fonts.BoldItalic.name){%> 
-                                            <div class="font-preview userBoldItalicFont">This is your font</div>
-                                            <%}%> 
-                                            <div class="<% if(brand && brand.fonts && brand.fonts.BoldItalic && brand.fonts.BoldItalic.name){ %>hovering<% } %> df font-upload-sec">
-                                                <label for="boldital-input" class="df aic left-sec"><div class="icon"></div><div class="text"><p class="fs10 label">Drop here to upload font</p><p class="fs8"><u>Or click to browse</u></p></div></label>
-                                                <input id="boldital-input" type="file" data-file-type="font" accept=".ttf" name="BoldItalic" hidden>
-                                                <div class="df acc right-sec"> 
-                                                    <input name="BoldItalic" class="google_font" value="<%= brand && brand.fonts && brand.fonts.BoldItalic ? brand.fonts.BoldItalic.value : '' %>" placeholder="Search Google Fonts" class="form-control badge-pill pt-2 px-3" />
-                                                </div>
-                                            </div>
-                                    </div>
-                                </div>
-
                                 <div class="tab-content colors d-none" data-tab-content="colors">
                                     <div>
                                     <div class="df colors-wrapper  p-4">
@@ -862,45 +806,45 @@
 
 <script>
     // Instance the tour
-    var tour = new Tour({
-        steps: [
-            {
-                element: ".page-title",
-                title: "On this page you can edit your brand.",
-                content: "What you see is a dummy brand we created for you, feel free to edit to your liking."
-            },
-            {
-                element: ".right-sec",
-                title: "Brand Preview",
-                content: "See a preview of how your brand's design will look like. Save changes to update preview."
-            },
-            {
-                element: "#logo",
-                title: "Here you edit your brand logo.",
-                content: "Upload a svg, open pdf, or ai file of your logo here."
-            },
-            {
-                element: ".sec.icon",
-                title: "Here you edit your brand icon.",
-                content: "Either upload your icon here or select it out of the logo you uploaded."
-            },
-            {
-                element: ".sec.wordmark",
-                title: "Here you edit your brand wordmark.",
-                content: "Either upload your wordmark here or select it out of the logo you uploaded. A wordmark is the actual name of your company without the icon."
-            },
-            {
-                element: "#colors-tab",
-                title: "Here you edit your brand colors.",
-                content: "Choose the primary and secondary color of your brand. You can click on the color picker tool and choose the colors from your logo below."
-            },
-            {
-                element: "#fonts-tab",
-                title: "Here you edit your brand fonts.",
-                content: "Upload your fonts here. You can choose a google font or leave the default font."
-            }
-        ],
-    });
+    // var tour = new Tour({
+    //     steps: [
+    //         {
+    //             element: ".page-title",
+    //             title: "On this page you can edit your brand.",
+    //             content: "What you see is a dummy brand we created for you, feel free to edit to your liking."
+    //         },
+    //         {
+    //             element: ".right-sec",
+    //             title: "Brand Preview",
+    //             content: "See a preview of how your brand's design will look like. Save changes to update preview."
+    //         },
+    //         {
+    //             element: "#logo",
+    //             title: "Here you edit your brand logo.",
+    //             content: "Upload a svg, open pdf, or ai file of your logo here."
+    //         },
+    //         {
+    //             element: ".sec.icon",
+    //             title: "Here you edit your brand icon.",
+    //             content: "Either upload your icon here or select it out of the logo you uploaded."
+    //         },
+    //         {
+    //             element: ".sec.wordmark",
+    //             title: "Here you edit your brand wordmark.",
+    //             content: "Either upload your wordmark here or select it out of the logo you uploaded. A wordmark is the actual name of your company without the icon."
+    //         },
+    //         {
+    //             element: "#colors-tab",
+    //             title: "Here you edit your brand colors.",
+    //             content: "Choose the primary and secondary color of your brand. You can click on the color picker tool and choose the colors from your logo below."
+    //         },
+    //         {
+    //             element: "#fonts-tab",
+    //             title: "Here you edit your brand fonts.",
+    //             content: "Upload your fonts here. You can choose a google font or leave the default font."
+    //         }
+    //     ],
+    // });
 
     // Initialize the tour
     // tour.init();
