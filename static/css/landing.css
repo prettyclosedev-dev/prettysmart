@@ -250,10 +250,20 @@ a.sign-up-inverted:hover {
   font-size: 3rem;
 }
 
+@media screen and (max-width: 768px) {
+  .large-text {
+    font-size: 2.2rem;
+  }
+}
 .huge-text {
   font-size: 3.4rem;
 }
 
+@media screen and (max-width: 1366px) {
+  .huge-text {
+    font-size: 3rem;
+  }
+}
 .semi-large-text {
   font-family: Poppins;
   font-style: normal;
@@ -280,6 +290,15 @@ a.sign-up-inverted:hover {
   line-height: 1.5rem;
 }
 
+@media screen and (max-width: 768px) {
+  #intro-text .medium-text {
+    font-family: Poppins;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 1.2rem;
+    line-height: 1.5rem;
+  }
+}
 .tiny-text {
   font-family: Poppins;
   font-style: normal;
@@ -296,7 +315,7 @@ a.sign-up-inverted:hover {
   position: relative;
 }
 
-@media only screen and (max-width: 576px) {
+@media only screen and (max-width: 1024px) {
   #logo {
     display: block;
     max-width: 5vw;
@@ -312,7 +331,7 @@ a.sign-up-inverted:hover {
     padding-bottom: 58px;
   }
   #intro #img-1 {
-    width: 122px;
+    width: 60%;
     margin-bottom: 20px;
   }
   #intro #intro-text {
@@ -331,12 +350,6 @@ a.sign-up-inverted:hover {
     line-height: 42px;
     margin-top: 18px;
   }
-  #intro .margin-bottom-2 {
-    line-height: 18px;
-    font-size: 13px;
-    max-width: 247px;
-    margin: 0px auto 24px;
-  }
   #intro .button-text {
     padding: 12px 50px;
   }
@@ -354,6 +367,7 @@ a.sign-up-inverted:hover {
   }
   #what .section-content .section-title {
     font-size: 13px;
+    margin-bottom: 20px;
   }
   #what .section-content .row-no-space {
     flex-flow: column;
@@ -362,7 +376,7 @@ a.sign-up-inverted:hover {
     overflow: hidden;
   }
   #what .section-content .row-no-space .video-mask {
-    height: 100%;
+    width: 100%;
   }
   #what .section-content .row-no-space .video-mask #video {
     border-radius: 0px;
@@ -387,9 +401,6 @@ a.sign-up-inverted:hover {
   margin-right: 15%;
   padding-top: 5vw;
   padding-bottom: 5vw;
-}
-.section-content details[open] summary {
-  font-size: 1rem;
 }
 .section-content details summary {
   transition: all 0.2s ease;
@@ -421,7 +432,7 @@ a.sign-up-inverted:hover {
 }
 
 .section-title {
-  margin-bottom: 5vw;
+  margin-bottom: 5vh;
 }
 
 .works-with .section-content {
@@ -606,7 +617,6 @@ a.sign-up-inverted:hover {
 
 .margin-bottom-2 {
   margin-bottom: 20px;
-  max-width: 368px;
 }
 
 #img-5 {
@@ -617,14 +627,21 @@ a.sign-up-inverted:hover {
 .why-pretty-smart-grid {
   grid-template-columns: 19.75rem 19.75rem 19.75rem;
   column-gap: 50px;
-  row-gap: 42px;
+  row-gap: 50px;
 }
 
-@media screen and (max-width: 1340px) {
+@media screen and (max-width: 1366px) {
   .why-pretty-smart-grid {
-    grid-template-columns: 19.75rem 19.75rem;
+    grid-template-columns: 19.75rem 19.75rem !important;
     column-gap: 40px;
-    row-gap: 34px;
+    row-gap: 55px !important;
+  }
+}
+@media screen and (max-width: 768px) {
+  .why-pretty-smart-grid {
+    grid-template-columns: 19.75rem !important;
+    column-gap: 40px;
+    row-gap: 55px !important;
   }
 }
 @media screen and (max-width: 870px) {

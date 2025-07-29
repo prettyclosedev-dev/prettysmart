@@ -288,9 +288,27 @@ a.sign-up-inverted:hover {
   font-size: 3rem;
 }
 
+@media screen and (max-width: 768px) {
+  .large-text {
+    font-size: 2.2rem;
+  }
+}
+
 .huge-text {
   font-size: 3.4rem;
 }
+
+@media screen and (max-width: 1366px) {
+  .huge-text {
+    font-size: 3rem;
+  }
+}
+
+// @media screen and (max-width: 768px) {
+//   .huge-text {
+//     font-size: 2.5rem;
+//   }
+// }
 
 .semi-large-text {
   font-family: Poppins;
@@ -319,6 +337,16 @@ a.sign-up-inverted:hover {
   line-height: 1.5rem;
 }
 
+@media screen and (max-width: 768px) {
+  #intro-text .medium-text {
+    font-family: Poppins;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 1.2rem;
+    line-height: 1.5rem;
+  }
+}
+
 .tiny-text {
   font-family: Poppins;
   font-style: normal;
@@ -335,7 +363,7 @@ a.sign-up-inverted:hover {
   position: relative;
 }
 
-@media only screen and (max-width: 576px) {
+@media only screen and (max-width: 1024px) {
   #logo {
     display: block;
     max-width: 5vw;
@@ -352,7 +380,7 @@ a.sign-up-inverted:hover {
     padding-bottom: 58px;
 
     #img-1 {
-      width: 122px;
+      width: 60%;
       margin-bottom: 20px;
     }
 
@@ -375,13 +403,6 @@ a.sign-up-inverted:hover {
       margin-top: 18px;
     }
 
-    .margin-bottom-2 {
-      line-height: 18px;
-      font-size: 13px;
-      max-width: 247px;
-      margin: 0px auto 24px;
-    }
-
     .button-text {
       padding: 12px 50px;
     }
@@ -402,6 +423,7 @@ a.sign-up-inverted:hover {
 
       .section-title {
         font-size: 13px;
+        margin-bottom: 20px;
       }
 
       .row-no-space {
@@ -412,8 +434,8 @@ a.sign-up-inverted:hover {
         // padding: 6px;
 
         .video-mask {
-          height: 100%;
-          // width: 100%;
+          // height: 100%;
+          width: 100%;
 
           #video {
             border-radius: 0px;
@@ -447,9 +469,6 @@ a.sign-up-inverted:hover {
   padding-bottom: 5vw;
   // border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 
-  details[open] summary {
-    font-size: 1rem;
-  }
   details {
     summary {
       transition: all 0.2s ease;
@@ -487,7 +506,7 @@ a.sign-up-inverted:hover {
 }
 
 .section-title {
-  margin-bottom: 5vw;
+  margin-bottom: 5vh;
 }
 
 .works-with {
@@ -681,7 +700,7 @@ a.sign-up-inverted:hover {
 
 .margin-bottom-2 {
   margin-bottom: 20px;
-  max-width: 368px;
+  // max-width: 368px;
 }
 
 #img-5 {
@@ -692,14 +711,22 @@ a.sign-up-inverted:hover {
 .why-pretty-smart-grid {
   grid-template-columns: 19.75rem 19.75rem 19.75rem;
   column-gap: 50px;
-  row-gap: 42px;
+  row-gap: 50px;
 }
 
-@media screen and (max-width: 1340px) {
+@media screen and (max-width: 1366px) {
   .why-pretty-smart-grid {
-    grid-template-columns: 19.75rem 19.75rem;
+    grid-template-columns: 19.75rem 19.75rem !important;
     column-gap: 40px;
-    row-gap: 34px;
+    row-gap: 55px !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .why-pretty-smart-grid {
+    grid-template-columns: 19.75rem !important;
+    column-gap: 40px;
+    row-gap: 55px !important;
   }
 }
 
