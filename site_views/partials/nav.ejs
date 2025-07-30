@@ -72,10 +72,27 @@
           }
           
           function isModuleLocked() {
-            if(!user.phone) return true;
-            if(!user.account.brand) return true;
-            if(!user.account.brand.logos) return true
-            if(!user.account.brand.logos.logo) return true
+            console.log("checking if brand has been setup completely...")
+            
+            if(!user.phone && !user.account.brand_phone) {
+              console.error("no phone number setup!")
+              return true;
+            }
+            
+            if(!user.account.brand) {
+              console.error("no account brand setup!")
+              return true;
+            }
+            
+            if(!user.account.brand.logos) {
+              console.error("no logos setup!")
+              return true;
+            }
+            
+            if(!user.account.brand.logos.logo) {
+              console.error("no logo setup!")
+              return true;
+            }
             
             return false
           }
