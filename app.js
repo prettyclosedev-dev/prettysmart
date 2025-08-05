@@ -198,6 +198,8 @@ app.use((req, res, next) => {
     };
 
     let brand = req.user.account.brand;
+    let user = req.user;
+
     if (
       !url.startsWith("settings") &&
       !url.startsWith("subscribe") &&
