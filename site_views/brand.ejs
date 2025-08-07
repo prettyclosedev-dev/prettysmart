@@ -442,13 +442,20 @@
       
         <div class="editor-backdrop"></div>
       </div>
-
-      
-      
-  
     </div>
 
-    
+    <div data-tg-tour="Welcome to the tour"
+
+    data-tg-title="Get started"
+
+    data-tg-group="my-first-tour"
+
+    data-tg-scroll-margin="0"
+
+    data-tg-fixed
+
+    > ... </div>
+
     <div class="dummy-select-or-edit" style="transform: scale(0)">
         <div class="df aic logo-select-wrapper floating">
           <div class="df aic">
@@ -818,54 +825,16 @@
 </script>
 
 <script>
-    // Instance the tour
-    var tour = new Tour({
-        steps: [
-            {
-                element: ".page-title",
-                title: "On this page you can edit your brand.",
-                content: "What you see is a dummy brand we created for you, feel free to edit to your liking."
-            },
-            {
-                element: ".right-sec",
-                title: "Brand Preview",
-                content: "See a preview of how your brand's design will look like. Save changes to update preview."
-            },
-            {
-                element: "#logo",
-                title: "Here you edit your brand logo.",
-                content: "Upload a svg, open pdf, or ai file of your logo here."
-            },
-            {
-                element: ".sec.icon",
-                title: "Here you edit your brand icon.",
-                content: "Either upload your icon here or select it out of the logo you uploaded."
-            },
-            {
-                element: ".sec.wordmark",
-                title: "Here you edit your brand wordmark.",
-                content: "Either upload your wordmark here or select it out of the logo you uploaded. A wordmark is the actual name of your company without the icon."
-            },
-            {
-                element: "#colors-tab",
-                title: "Here you edit your brand colors.",
-                content: "Choose the primary and secondary color of your brand. You can click on the color picker tool and choose the colors from your logo below."
-            },
-            {
-                element: "#fonts-tab",
-                title: "Here you edit your brand fonts.",
-                content: "Upload your fonts here. You can choose a google font or leave the default font."
-            }
-        ],
-    });
-
-    // Initialize the tour
-    tour.init();
-
-    // Start the tour
-    tour.start();
+    const steps = [{
+        content: "This is a short guide to get you set up and show you where things are",
+        title: "Welcome aboard 👋",
+        target: ".page-title",
+        order: "1",
+        group: "my-first-tour",
+    }]
+    const tg = new tourguide.TourGuideClient({steps})
+    tg.start()
 </script>
-
 
 <script src="/static/js/jquery.fontpicker.js?<%=Date.now()%>"></script>
 <script src="/static/js/templates.js?<%=Date.now()%>"></script>
