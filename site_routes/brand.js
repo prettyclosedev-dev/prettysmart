@@ -52,6 +52,7 @@ async function setupDefaults(req) {
   // await setupDefaultColors(req);
   await setDefaultFonts(req, user_path);
   // await setDefaultAssets(req, user_path);
+  await setDefaultAvatar(req, user_path);
 }
 
 async function setDefaultInformation(req) {
@@ -307,6 +308,53 @@ async function setupDefaultColors(req) {
     );
   }
 }
+
+async function setDefaultAvatar(req) {
+  const avatars_path = path.join(
+      __dirname,
+      "../files/" + req.user.account._id + "/avatars/" + req.user.id
+  );
+
+  if(!fs.existsSync(avatars_path))
+    fs.mkdirSync(avatars_path, { recursive: true });
+    
+  const hasAvatarInDB = req.user.avatar
+  const hasAvatarInFiles = fs.existsSync(avatars_path + "/avatar.jpg")
+
+  console.log("hasAvatarInDB", hasAvatarInDB);
+  console.log("hasAvatarInFiles", hasAvatarInFiles);
+
+  if (hasAvatarInDB && hasAvatarInFiles) return;  
+
+  const filename = "avatar.jpg"; 
+
+  fs.copyFileSync(
+    path.join(__dirname, "../defaults/avatars/" + filename),
+    avatars_path + "/" + filename
+  );
+
+  console.log("filename", filename);
+  console.log("_id", req.user.id);
+
+  await User.findOneAndUpdate(
+    {
+      _id: req.user.id,
+    },
+    {
+      $set: {
+        avatar: filename,
+      },
+    },
+    {
+      new: true,
+    }
+  ).then(async (user) => {
+    console.log("Added default avatar to user:", user);
+  }).catch((error) => {
+    console.log("Error adding default avatar to user:", error);
+  });
+}
+
 
 function copyFile(from, to) {
   fs.copyFile(from, to, (err) => {

@@ -83,6 +83,8 @@
 <script>
     function setUserAvatar(userAvatar) {
 
+        console.log("userAvatar", userAvatar)
+
         if (userAvatar) {
             $("#avatar-img").attr("src", userAvatar)
             $("#upload-label").addClass("d-none");
