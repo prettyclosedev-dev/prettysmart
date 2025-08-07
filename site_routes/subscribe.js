@@ -24,7 +24,8 @@ module.exports = () => {
 
       const plans = await getPlans(req.session.affiliate);
       if (plans && plans.data && plans.data.length) {
-        let currentInterval = getCurrentInterval(plans, subscription, req);
+        // let currentInterval = getCurrentInterval(plans, subscription, req);
+        let currentInterval = "year";
 
 
         res.render("subscribe", {
@@ -38,7 +39,7 @@ module.exports = () => {
         res.render("subscribe", {
           products: {},
           subscription: {},
-          interval: month,
+          interval: "year",
           error: {
             message: "Failed to get plans.",
           },
@@ -50,7 +51,7 @@ module.exports = () => {
       res.render("subscribe", {
         products: {},
         subscription: {},
-        interval: month,
+        interval: "year",
         error,
         cache: true,
         filename: "subscribe",

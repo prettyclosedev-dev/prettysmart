@@ -38,8 +38,8 @@
                                <label for="upload-assets" class="df acc upload-wrapper">
                                     <i class="fa-solid fa-upload"></i>
                                     <div>
-                                        <p class="fs14">Drop here to upload</p>
-                                        <p class="fs10 mb-0 text-underline">Or click to browse</p>
+                                        <p class="fs14">Upload or drop</p>
+                                        
                                     </div>
                                 </label>
                                 <input onchange="getFiles(event)" hidden type="file" id="upload-assets" multiple/>
@@ -181,7 +181,7 @@
                             %>
                             <div class="tabs-content-wrapper">
                                 <div class="tab-content logo" data-tab-content="logo">  
-                                    <div class="df aic ffp fs12 need-help"><p>Don't have your logo files as an .ai, open .pdf or .svg?</p><button class="mla" onclick="openMiniHelp();">Ask for help </button></div>
+                                    <div class="df aic ffp fs12 need-help"><p>Don't have your logo files as an jpeg, png or svg?</p><button class="mla" onclick="openMiniHelp();">Ask for help </button></div>
                                     <div class="df line">
                                         <div class="sec" id="logo">
                                             <div class="onboarding-label mt-1 mb-20  fs12">LOGO</div>
@@ -190,26 +190,26 @@
                                                 <span class="onboarding-logo-preview" id="logo-preview">
                                                     <% if(brand && brand.logos && brand.logos.logo){ %>
                                                         <%- brand.logos.logo %>
-                                                        <div class="df aic logo-select-wrapper floating">
-                                                            <div class="df aic">
+                                                        <div class="df aic jcc logo-select-wrapper floating">
+                                                            <div class="df aic jcc">
                                                                 <i class="fa-solid fa-upload"></i>
                                                                 <div class="text-wrapper">
-                                                                    <p class="text fs12 mb-0">Drop here to upload Logo</p>
-                                                                    <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+                                                                    <p class="text fs12 mb-0 text-underline" style="white-space: nowrap;">Upload or drop Logo</p>
+                                                                    
                                                                 </div>
                                                             </div>
-                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'logo')"><i class="fa-solid fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                            <!-- <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'logo')"><i class="fa-solid fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div> -->
                                                         </div>
                                                     <% } else { %>
-                                                        <div class="df aic logo-select-wrapper">
-                                                            <div class="df aic">
+                                                        <div class="df aic jcc logo-select-wrapper">
+                                                            <div class="df aic jcc">
                                                                 <i class="fa-solid fa-upload"></i>
                                                                 <div class="text-wrapper">
-                                                                    <p class="text fs12 mb-0">Drop here to upload Logo</p>
-                                                                    <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+                                                                    <p class="text fs12 mb-0 text-underline" style="white-space: nowrap;">Upload or drop Logo</p>
+                                                                    
                                                                 </div>
                                                             </div>
-                                                            <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'logo')"><i class="fa-solid fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
+                                                            <!-- <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'logo')"><i class="fa-solid fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div> -->
                                                         </div>
                                                     <% }  %>
                                                 </span>
@@ -229,8 +229,9 @@
                                                             <div class="df aic">
                                                                 <i class="fa-solid fa-upload"></i>
                                                                 <div class="text-wrapper">
-                                                                    <p class="text fs12 mb-0">Drop here to upload Icon</p>
-                                                                    <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+                                                                    <p class="text fs12 mb-0 text-underline">Upload or</p>
+                                                                    <p class="text fs12 mb-0 text-underline">drop Icon</p>
+                                                                    
                                                                 </div>
                                                             </div>
                                                             <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'icon')"><i class="fa-solid fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
@@ -240,8 +241,9 @@
                                                             <div class="df aic">
                                                                 <i class="fa-solid fa-upload"></i>
                                                                 <div class="text-wrapper">
-                                                                    <p class="text fs12 mb-0">Drop here to upload Icon</p>
-                                                                    <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+                                                                    <p class="text fs12 mb-0 text-underline">Upload or</p>
+                                                                    <p class="text fs12 mb-0 text-underline">drop Icon</p>
+                                                                    
                                                                 </div>
                                                             </div>
                                                             <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'icon')"><i class="fa-solid fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
@@ -267,8 +269,9 @@
                                                                 <div class="df aic">
                                                                     <i class="fa-solid fa-upload"></i>
                                                                     <div class="text-wrapper">
-                                                                        <p class="text fs12 mb-0">Drop here to upload Wordmark</p>
-                                                                        <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+                                                                        <p class="text fs12 mb-0 text-underline">Upload or</p>
+                                                                        <p class="text fs12 mb-0 text-underline">drop Wordmark</p>
+                                                                        
                                                                     </div>
                                                                 </div>
                                                                 <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'wordmark')"><i class="fa-solid fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
@@ -278,8 +281,9 @@
                                                                 <div class="df aic">
                                                                     <i class="fa-solid fa-upload"></i>
                                                                     <div class="text-wrapper">
-                                                                        <p class="text fs12 mb-0">Drop here to upload Wordmark</p>
-                                                                        <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+                                                                        <p class="text fs12 mb-0 text-underline">Upload or</p>
+                                                                        <p class="text fs12 mb-0 text-underline">drop Wordmark</p>
+                                                                        
                                                                     </div>
                                                                 </div>
                                                                 <div class="df acc upload-wrapper" onclick="openSVGEditor(event,'wordmark')"><i class="fa-solid fa-crop-alt"></i><p class="mb-0 fs12">Or select from logo</p></div>
@@ -298,7 +302,7 @@
                                     <div>
                                     <div class="df colors-wrapper  p-4">
                                         <div class="color-wrapper">
-                                            <div class="label ffp brand-label ">PRIMARY COLOR</div>
+                                            <div class="label ffp brand-label ">DARK COLOR</div>
                                             <input 
                                                 style="background-color: <%= user.account.brand.colors.primary || '#D5BA8C' %>"
                                                 type="color" 
@@ -311,7 +315,7 @@
                                         </div>
                                     
                                         <div class="color-wrapper">
-                                            <div class="label ffp brand-label ">SECONDARY COLOR</div>
+                                            <div class="label ffp brand-label ">LIGHT COLOR</div>
                                             <input
                                                 style="background-color: <%= user.account.brand.colors.secondary || '#D5BA8C' %>"
                                                 class="color" 
@@ -430,7 +434,7 @@
           <!-- <div class="ftr text-center"> -->
             <div class="editor-buttons">
                 <button type="button" class="cancel-editor fs14" onclick="$('#svg-editor-popup-wrpr').addClass('d-none')">Cancel</button> 
-                <button id="editor-generate" type="button" class="save-editor fs14" @click="generate_svg()">Generate my</button>
+                <button id="editor-generate" type="button" class="save-editor fs14" @click="generate_svg()">Save my</button>
             </div>
         </div>
       
@@ -450,8 +454,9 @@
           <div class="df aic">
             <i class="fa-solid fa-upload"></i>
             <div class="text-wrapper">
-              <p class="text fs12 mb-0">Drop here to upload <span>Wordmark</span></p>
-              <p class="text fs10 mb-0 text-underline">Or click to browse</p>
+              <p class="text fs12 mb-0 text-underline">Upload or drop <span>Wordmark<</p>
+              <p class="text fs12 mb-0 text-underline">Upload or drop <span</span></p>
+              
             </div>
           </div>
           <div
@@ -503,6 +508,14 @@
 
         $(document).on('input', '#secondary', function(e){
            $(e.target).css('background-color', e.target.value);
+        })
+
+        $(document).ready(function() {
+            $(".upload-wrapper").addClass('<%= (brand && brand.logos && brand.logos.logo ? "":"d-none") %>');
+
+            $(".logo").on('change', function() {
+                $(".upload-wrapper").removeClass('d-none');
+            })
         })
 
         $(document).on('click', '[data-tab]', function(e){
