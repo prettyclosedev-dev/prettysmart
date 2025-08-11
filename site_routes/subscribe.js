@@ -24,9 +24,7 @@ module.exports = () => {
 
       const plans = await getPlans(req.session.affiliate);
       if (plans && plans.data && plans.data.length) {
-        // let currentInterval = getCurrentInterval(plans, subscription, req);
         let currentInterval = "year";
-
 
         res.render("subscribe", {
           products: plans,
@@ -155,58 +153,29 @@ module.exports = () => {
 async function getPlans() {
   try {
     const plans = await stripe.plans.list({ active: true, limit: 40 });
-    const products = await stripe.products.list({ active: true });
+    const products = await stripe.products.list({ active: true });   
 
-    const indexOfBasic = products.data
-      .map((prod) => prod.name)
-      .indexOf("Basic");
-    if (indexOfBasic > -1) {
-      products.data.splice(indexOfBasic, 1);
-    }
+    const allowedProductIds = [
+      "prod_SqgVHp8h05VYdK", // Single Agent
+      "prod_Qu2Wz2OqYYzvAU", // Team
+    ]
 
-    const indexOfBrandHelpProd = products.data
-      .map((prod) => prod.id)
-      .indexOf("prod_LFnXWepOlSCWVD");
-    if (indexOfBrandHelpProd > -1) {
-      products.data.splice(indexOfBrandHelpProd, 1);
-    }
+    const filteredProductsData = products.data.filter((prod) => allowedProductIds.includes(prod.id)).map((prod) => ({...prod}));
+  
+    /*
 
-    const indexOfFree = products.data.map((p) => p.name).indexOf("Free");
-    if (indexOfFree > -1) {
-      products.data.splice(indexOfFree, 1);
-    }
+      check for metadata.showinpricing
+      if there are NO metadata.showinpricing === true
+        then fallback to Single Agent and Teams
+      if there are metadata.showinpricing === true
+        then filter by metadata.showinpricing === true
+      
+    */
 
-    const indexOfStarter = products.data.map((p) => p.name).indexOf("Starter");
-    if (indexOfStarter > -1) {
-      products.data.splice(indexOfStarter, 1);
-    }
 
-    const indexOfUnlimited = products.data
-      .map((p) => p.name)
-      .indexOf("Unlimited");
-    if (indexOfUnlimited > -1) {
-      products.data.splice(indexOfUnlimited, 1);
-    }
-
-    const indexOfPro = products.data.map((p) => p.name).indexOf("Pro");
-    if (indexOfPro > -1) {
-      products.data.splice(indexOfPro, 1);
-    }
-
-    const indexOfBusiness = products.data
-      .map((p) => p.name)
-      .indexOf("Business");
-    if (indexOfBusiness > -1) {
-      products.data.splice(indexOfBusiness, 1);
-    }
-
-    const indexOfAgency = products.data.map((p) => p.name).indexOf("Agency");
-    if (indexOfAgency > -1) {
-      products.data.splice(indexOfAgency, 1);
-    }
-
-    if (products && products.data) {
-      products.data.map((product) => {
+    if (filteredProductsData) {
+      filteredProductsData.map((product) => {
+        console.log(product.id, product.name)
         product.prices = {
           year: getPricePerProduct(product.id, plans, "year"),
           month: getPricePerProduct(product.id, plans, "month"),
@@ -218,11 +187,14 @@ async function getPlans() {
         }
       });
 
-      products.data.sort((a, b) => {
+      filteredProductsData.sort((a, b) => {
         return a.prices.month.amount - b.prices.month.amount;
       });
 
-      return products;
+      return ({
+        ...products,
+        data: filteredProductsData
+      });
     }
   } catch (error) {}
 }
