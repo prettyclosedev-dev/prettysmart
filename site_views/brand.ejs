@@ -182,7 +182,7 @@
                             <div class="tabs-content-wrapper">
                                 <div class="tab-content logo" data-tab-content="logo">  
                                     <div class="df aic ffp fs12 need-help"><p>Don't have your logo files as an jpeg, png or svg?</p><button class="mla" onclick="openMiniHelp();">Ask for help </button></div>
-                                    <div class="df line">
+                                    <div id="logo-control" class="df line">
                                         <div class="sec" id="logo">
                                             <div class="onboarding-label mt-1 mb-20  fs12">LOGO</div>
                                             <label class="onboarding-logo-inner">
@@ -218,7 +218,7 @@
                                         </div>
                                     </div>
 
-                                        <div class="df line">
+                                        <div id="icon-control" class="df line">
                                         <div class="sec icon">
                                             <div class="onboarding-label mt-1 fs12">ICON</div>
                                             <label class="onboarding-logo-inner">
@@ -256,7 +256,8 @@
                                         
                                     
                                     </div>
-                                    <div class="df line">
+
+                                    <div id="wordmark-control" class="df line">
                                         <div class="sec wordmark">
                                             <div class="onboarding-label mt-1  fs12">WORDMARK</div>
                                                 <label class="onboarding-logo-inner">
@@ -443,18 +444,6 @@
         <div class="editor-backdrop"></div>
       </div>
     </div>
-
-    <div data-tg-tour="Welcome to the tour"
-
-    data-tg-title="Get started"
-
-    data-tg-group="my-first-tour"
-
-    data-tg-scroll-margin="0"
-
-    data-tg-fixed
-
-    > ... </div>
 
     <div class="dummy-select-or-edit" style="transform: scale(0)">
         <div class="df aic logo-select-wrapper floating">
@@ -826,14 +815,62 @@
 
 <script>
     const steps = [{
-        content: "This is a short guide to get you set up and show you where things are",
-        title: "Welcome aboard 👋",
-        target: ".page-title",
+        title: "Let’s Get You Posting in Style!",
+        content: "<p>You're just a few clicks away from unlocking hundreds of gorgeous, ready-to-use posts — branded just for you.</p><p>I'll walk you through it step by step — you'll be up and running in minutes. So… let’s go!</p>",
+        target: ".page-content-wrapper",
         order: "1",
-        group: "my-first-tour",
-    }]
-    const tg = new tourguide.TourGuideClient({steps})
-    tg.start()
+        group: "start",
+    },{
+        title: "📌 First things first: Upload Your Logo",
+        content: `
+        <p>Drag and drop or upload your logo (JPEG, PNG, or SVG — we love them all).</p>
+        `,
+        target: "#logo-control",
+        order: "1",
+        group: "logo-group",
+    },{
+        title: "📌 First things first: Upload Your or Pick Logo",
+        content: `
+        <p>Have an icon? Upload it or pull it from your logo.</p>
+        `,
+        target: "#icon-control",
+        order: "2",
+        group: "logo-group",
+    },{
+        title: "📌 First things first: Upload or Pick Your Watermark",
+        content: `
+        <p>Got a wordmark too? Same deal — upload it or grab it from your logo.</p>
+        `,
+        target: "#wordmark-control",
+        order: "3",
+        group: "logo-group",
+    },{
+        title: "📌 First things first: Upload or Pick Your Watermark",
+        content: `
+        <p>Got a wordmark too? Same deal — upload it or grab it from your logo.</p>
+        `,
+        target: ".save-brand",
+        order: "4",
+        group: "logo-group",
+    },]
+
+    const chain = ["start", "logo-group"];
+
+    let tg = new tourguide.TourGuideClient({
+        steps: steps.filter(step => step.group === chain[0]),
+        exitOnClickOutside: false,
+        exitOnEscape: false
+    });
+
+    tg.onFinish(()=>{
+        return new Promise((resolve) => {
+            alert("TEST")
+            return resolve(true)
+        })
+    })
+
+    tg.start();
+
 </script>
 
 <script src="/static/js/jquery.fontpicker.js?<%=Date.now()%>"></script>
