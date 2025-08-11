@@ -150,6 +150,16 @@ module.exports = () => {
   return router;
 };
 
+/*
+  TODO
+    
+  make sure this applies to landing page as well
+
+  MOVE THIS TO A PROPER LIBRARY FILE!!!
+    lib/services?
+    lib/helpers?
+  /
+*/
 async function getPlans() {
   try {
     const plans = await stripe.plans.list({ active: true, limit: 40 });
@@ -163,15 +173,17 @@ async function getPlans() {
     const filteredProductsData = products.data.filter((prod) => allowedProductIds.includes(prod.id)).map((prod) => ({...prod}));
   
     /*
+      TODO
 
       check for metadata.showinpricing
       if there are NO metadata.showinpricing === true
         then fallback to Single Agent and Teams
       if there are metadata.showinpricing === true
         then filter by metadata.showinpricing === true
-      
-    */
 
+      figure out if there is an active flag in stripe
+        check status field in stripe.products?
+    */
 
     if (filteredProductsData) {
       filteredProductsData.map((product) => {
@@ -180,6 +192,21 @@ async function getPlans() {
           year: getPricePerProduct(product.id, plans, "year"),
           month: getPricePerProduct(product.id, plans, "month"),
         };
+
+        /*
+          TODO
+          prevent hardcoded multiplier value. defer value to Stripe 
+
+          add metadata:
+            multiplier | 2
+
+          then, 
+            set multipler = product.metatadata.multiplier || 1 (fallback to 1 if no multiplier found)
+            multiply product.prices.month.amount by multipler
+            multiply product.prices.year.amount by multiplier
+
+          Make sure Ruchy sets this up
+        */
 
         if (product.name === "Team") {
           product.prices.month.amount *= 2; // Minimum of 2 agents
@@ -196,5 +223,7 @@ async function getPlans() {
         data: filteredProductsData
       });
     }
-  } catch (error) {}
+  } catch (error) {
+    // DO SOME PROPER ERROR HANDLING!
+  }
 }
