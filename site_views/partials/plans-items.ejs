@@ -6,10 +6,10 @@
   @import url("https://fonts.googleapis.com/css?family=Poppins:400,500,600");
 </style>
 
-<% const renderPriceItem = (id, primeColor, secondColor, title, button1, button2, children, darkText, price, canceled) => { %>
+<% const renderPriceItem = (id, primeColor, secondColor, title, subtitle, button1, button2, children, darkText, price, canceled) => { %>
 <div class="price-item" style="background-color: <%= primeColor %>; color: <%= darkText || secondColor %>;">
   <div style="margin-bottom: 1.5rem;">
-    <p id="<%= title %>" class="price-item-title" style="color: <%= darkText || secondColor %>;"><%= title %><% if (canceled) { %> <span style="margin-left: 10px; color: 'gray'; font-size: 9px;">Canceled</span> <% } %></p>
+    <p id="<%= title %>" class="price-item-title" style="color: <%= darkText || secondColor %>;"><%= title %><% if (canceled) { %> <span style="margin-left: 10px; color: 'gray'; font-size: 9px;">Canceled</span> <% } %> <%= subtitle %></p>
     <div style="background-color: <%= darkText || secondColor %>; height: 1px; width: 100%; opacity: 0.3;"></div>
     <div class="stats-container">
       <% children.forEach(function(child) { %>
@@ -35,7 +35,7 @@
     id="plan-button" class="price-button tiny-text" style="background-color: <%= secondColor %>;">
     <div class=" d-flex flex-column py-2" style="gap:10px;">
         <p style="color: <%= darkText || primeColor %>; font-size:20px;"><%= button1 %></p>
-        <p style="color: <%= darkText || primeColor %>; font-size:30px; font-weight:600;" ><%= button2 %></p>
+        <p style="color: <%= darkText || primeColor %>; font-size:27px; font-weight:600;" ><%= button2 %></p>
     </div>
   </button>
 </div>
@@ -126,7 +126,16 @@
                         });
 
                         if (product.prices[interval] && product.prices[interval].id) {
-                            renderPriceItem(product.prices[interval].id, getFirstColor(index), getSecondColor(index), "PrettyClose " + name, getPreText(product), (price ? "$" + price + "/" + getIntervalAbbrev() : "Free Forever" ), icons, index === 0 ? "black" : undefined, price, getCanceledStatus(product))
+                            renderPriceItem(
+                                product.prices[interval].id, 
+                                getFirstColor(index),
+                                getSecondColor(index),
+                                "PrettyClose " + name,
+                                product.metadata?.subtitle,
+                                getPreText(product),
+                                (price ? "US$" + price + "/" + getIntervalAbbrev() : "Free Forever" ),
+                                icons, index === 0 ? "black" : undefined, price, getCanceledStatus(product)
+                            )
                         }
                     }
                 }

@@ -4,7 +4,7 @@ const User = require("../schemas/user");
 const Account = require("../schemas/account");
 const config = require("../config");
 const stripe = require("stripe")(config.stripe.prod.secret);
-const { getPricePerProduct, getCurrentInterval } = require("./utils");
+const { getPlans } = require("../lib/stripe");
 
 module.exports = () => {
   router.get("/", async (req, res) => {
@@ -22,7 +22,8 @@ module.exports = () => {
         );
       }
 
-      const plans = await getPlans(req.session.affiliate);
+      const plans = await getPlans(req.user.id);
+    
       if (plans && plans.data && plans.data.length) {
         let currentInterval = "year";
 
@@ -114,7 +115,7 @@ module.exports = () => {
         );
       }
 
-      const plans = await getPlans(req.session.affiliate);
+      const plans = await getPlans(req.user.id);
       if (plans && plans.data && plans.data.length) {
         res.render("subscribe", {
           products: plans,
@@ -149,81 +150,3 @@ module.exports = () => {
 
   return router;
 };
-
-/*
-  TODO
-    
-  make sure this applies to landing page as well
-
-  MOVE THIS TO A PROPER LIBRARY FILE!!!
-    lib/services?
-    lib/helpers?
-  /
-*/
-async function getPlans() {
-  try {
-    const plans = await stripe.plans.list({ active: true, limit: 40 });
-    const products = await stripe.products.list({ active: true });   
-
-    const allowedProductIds = [
-      "prod_SqgVHp8h05VYdK", // Single Agent
-      "prod_Qu2Wz2OqYYzvAU", // Team
-    ]
-
-    const filteredProductsData = products.data.filter((prod) => allowedProductIds.includes(prod.id)).map((prod) => ({...prod}));
-  
-    /*
-      TODO
-
-      check for metadata.showinpricing
-      if there are NO metadata.showinpricing === true
-        then fallback to Single Agent and Teams
-      if there are metadata.showinpricing === true
-        then filter by metadata.showinpricing === true
-
-      figure out if there is an active flag in stripe
-        check status field in stripe.products?
-    */
-
-    if (filteredProductsData) {
-      filteredProductsData.map((product) => {
-        console.log(product.id, product.name)
-        product.prices = {
-          year: getPricePerProduct(product.id, plans, "year"),
-          month: getPricePerProduct(product.id, plans, "month"),
-        };
-
-        /*
-          TODO
-          prevent hardcoded multiplier value. defer value to Stripe 
-
-          add metadata:
-            multiplier | 2
-
-          then, 
-            set multipler = product.metatadata.multiplier || 1 (fallback to 1 if no multiplier found)
-            multiply product.prices.month.amount by multipler
-            multiply product.prices.year.amount by multiplier
-
-          Make sure Ruchy sets this up
-        */
-
-        if (product.name === "Team") {
-          product.prices.month.amount *= 2; // Minimum of 2 agents
-          product.prices.year.amount *= 2; // Minimum of 2 agents
-        }
-      });
-
-      filteredProductsData.sort((a, b) => {
-        return a.prices.month.amount - b.prices.month.amount;
-      });
-
-      return ({
-        ...products,
-        data: filteredProductsData
-      });
-    }
-  } catch (error) {
-    // DO SOME PROPER ERROR HANDLING!
-  }
-}

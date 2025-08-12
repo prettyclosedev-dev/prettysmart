@@ -402,12 +402,4 @@
     <% renderBanner("Get agency level posts<br>Let them think you have an<br>in-house social media genius.", "img-5", "/site_static/images/landing/5.png") %>
     <%- include('partials/footer', {async: true, authenticated}); %>
   </body>
-
-  <script>
-    $(document).ready(function () {
-      // add static $45 per agent
-      $(".price-item-title")[0].innerHTML += ("<br/><span>&nbsp;</span> ")
-      $(".price-item-title")[1].innerHTML += ("<br/>$45 per agent")
-    })
-  </script>
 </html>
