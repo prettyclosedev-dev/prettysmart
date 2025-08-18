@@ -52,6 +52,7 @@ async function setupDefaults(req) {
   // await setupDefaultColors(req);
   await setDefaultFonts(req, user_path);
   // await setDefaultAssets(req, user_path);
+  await setDefaultLogos(req, user_path);
   await setDefaultAvatar(req, user_path);
 }
 
@@ -355,6 +356,43 @@ async function setDefaultAvatar(req) {
   });
 }
 
+async function setDefaultLogos(req) {
+  const logos_path = path.join(
+      __dirname,
+      "../files/" + req.user.account._id + "/logos/"
+  );
+
+  if(!fs.existsSync(logos_path))
+    fs.mkdirSync(logos_path, { recursive: true });
+
+  const filenames = ["logo.svg", "icon.svg", "watermark.svg"];
+
+  filenames.forEach((filename) => {
+    if (fs.existsSync(logos_path + "/" + filename)) return
+
+    fs.copyFileSync(
+      path.join(__dirname, "../defaults/logos/" + filename),
+      logos_path + "/" + filename
+    );
+  });
+
+  await Account.findOneAndUpdate(
+    {
+      _id: req.user.account._id,
+    },
+    {
+      $set: {
+        "brand.logos.logo": "logo.svg",
+        "brand.logos.icon": "icon.svg",
+        "brand.logos.watermark": "watermark.svg",
+      },
+    },
+    {
+      new: true,
+    }
+  )
+}
+
 
 function copyFile(from, to) {
   fs.copyFile(from, to, (err) => {
@@ -604,7 +642,7 @@ module.exports = () => {
       if (!cleanFile.includes("path") || cleanFile.includes("image")) {
         let exText = "";
         if (!cleanFile.includes("path")) {
-          exText = "No path attributes found.";
+          exText = "Please upload jpeg or png";
         } else if (cleanFile.includes("image")) {
           exText = "Image based svg's are not allowed.";
         }
