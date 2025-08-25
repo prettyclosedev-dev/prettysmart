@@ -447,8 +447,12 @@ module.exports = () => {
   router.get("/", async (req, res) => {
     await setupDefaults(req);
 
+    const user = await User.findById(req.user.id)
+                        .populate("account")
+                        .populate("multiAccounts")
+
     try {
-      await handleBrandChange(req.user);
+      await handleBrandChange(user);
     } catch (e) {
       console.log(e);
     }
@@ -456,10 +460,10 @@ module.exports = () => {
     let paymentMethods = [];
     let paymentMethodsList = {};
 
-    if (req.user.account.stripe_session_id) {
+    if (user.account.stripe_session_id) {
       try {
         const checkoutsession = await stripe.checkout.sessions.retrieve(
-          req.user.account.stripe_session_id
+          user.account.stripe_session_id
         );
 
         const customer = await stripe.customers.retrieve(
@@ -478,7 +482,7 @@ module.exports = () => {
     }
 
     res.render("brand", {
-      user: req.user,
+      user: user,
       templates: [],
       brand: {
         ...(await Huddle.getBrandObject(req.user.account).catch(console.log)),
