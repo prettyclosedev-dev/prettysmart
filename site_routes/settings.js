@@ -583,7 +583,7 @@ module.exports = () => {
   });
 
   router.post("/account/upload-avatar/:userId", async (req, res) => {
-    let fileName = req.files[req.body.name].name;
+    let fileName = "avatar.jpg";
 
     let avatar_path = path.join(
       __dirname,
