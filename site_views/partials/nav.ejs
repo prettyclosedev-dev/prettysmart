@@ -78,6 +78,12 @@
               console.error("no phone number setup!")
               return true;
             }
+
+             if(!user.account.name) {
+              console.error("no company name setup!")
+              return true;
+            }
+            
             
             if(!user.account.brand) {
               console.error("no account brand setup!")
