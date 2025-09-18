@@ -192,7 +192,7 @@ module.exports = () => {
           
           await req.user.save();
 
-          return res.redirect("/brand/build?url=/templates?ob=1");
+          return res.redirect("/brand/build?url=/brand?ob=1");
         } catch (error) {
           return await goToSubscribe(req, res, error);
         }
