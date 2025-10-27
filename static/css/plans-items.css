@@ -39,6 +39,15 @@
   width: 100%;
   margin-top: 1.5rem;
 }
+
+.price-button .plan-title {
+    font-size: 20px;
+}
+
+.price-button .plan-subtitle {
+    font-size: 13px;
+}
+
 @media only screen and (max-width: 768px) {
   .price-item .price-button {
     padding-top: 0.3rem;
