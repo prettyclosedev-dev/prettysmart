@@ -87,7 +87,7 @@
 
         function getPreText(product) {
             if (typeof current === "undefined") {
-                return product.name === "Free" ? "" : "<span class='plan-title'>7 Days Free Trial</span><br><span class='plan-subtitle'>Try it free for 7 days — no commitment, just results.</span>";
+                return product.name === "Free" ? "" : "7 Days Free Trial";
             }
 
             let isCurrentPrice = product.prices[interval].id === current;
@@ -100,8 +100,8 @@
                         return prod.prices[price].id === current
                     })
                 })
-                
-                return currentProd ? currentProd.prices[interval].amount > product.prices[interval].amount ? "Change Plan" : "<span class='plan-title'>7 Days Free Trial</span><br><span class='plan-subtitle'>Try it free for 7 days — no commitment, just results.</span>" : product.name !== "Free" ? "<span class='plan-title'>7 Days Free Trial</span><br><span class='plan-subtitle'>Try it free for 7 days — no commitment, just results.</span>" : "Change Plan";
+
+                return currentProd ? currentProd.prices[interval].amount > product.prices[interval].amount ? "Change Plan" : "7 Days Free Trial" : product.name !== "Free" ? "7 Days Free Trial" : "Change Plan";
             }
         }
 
