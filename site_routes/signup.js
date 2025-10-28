@@ -7,7 +7,7 @@ const User = require("../schemas/user");
 const { body, validationResult } = require("express-validator");
 const openAi = require("../openAi");
 const { firebaseConfig } = require('../firebase')
-const { sendWelcomeEmail } = require("../lib/mail");
+const { sendSignupEmail } = require("../lib/mail"); // <-- add this
 
 module.exports = () => {
   router.get("/", async (req, res) => {
@@ -156,12 +156,12 @@ module.exports = () => {
                   }
                 )
                   .then(async (updatedAccount) => {
-                    /*try {
-                      await sendWelcomeEmail(user.email);
+                    try {
+                      await sendSignupEmail(user.email);
                     } catch (emailError) {
-                      console.error("Failed to send welcome email:", emailError);
+                      console.error("Failed to send signup email:", emailError);
                       // Don't block signup if email fails
-                    }*/
+                    }
 
                     // Account updated successfully, proceed with login
                     req.logIn(user._id, (err, u) => {

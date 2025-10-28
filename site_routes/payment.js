@@ -160,6 +160,7 @@ module.exports = () => {
 
       try {
           await sendWelcomeEmail(req.user.email);
+          console.log("Welcome email sent successfully.");
         } catch (emailError) {
           console.error("Failed to send welcome email:", emailError);
           // Don't block signup if email fails
