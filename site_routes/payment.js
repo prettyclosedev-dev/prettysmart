@@ -3,12 +3,14 @@ const router = express.Router();
 const Account = require("../schemas/account");
 const User = require("../schemas/user");
 const config = require("../config");
+const {sendWelcomeEmail} = require("../lib/mail");
+
 const {
   getHardcodedCurrentPlan,
   getCurrentPrice,
   getCurrentInterval,
 } = require("./utils");
-const stripe = require("stripe")(config.stripe.prod.secret);
+const stripe = require("stripe")(config.stripe.test.secret);
 const { searchContactByEmail, updateContact } = require("../hubspot");
 const TEAM_PRICES = [
   config.stripe.plans.team.year,
@@ -69,7 +71,7 @@ module.exports = () => {
 
           return res.render("payment", {
             sessionId: newSession.id,
-            stripe_pub_key: config.stripe.prod.pub,
+            stripe_pub_key: config.stripe.test.pub,
             plan_name: getHardcodedCurrentPlan(req.params.plan_id),
             plan_price: plan_price,
             plan_interval: plan_interval,
@@ -127,7 +129,7 @@ module.exports = () => {
 
         res.render("payment", {
           sessionId: session.id,
-          stripe_pub_key: config.stripe.prod.pub,
+          stripe_pub_key: config.stripe.test.pub,
           plan_name: getHardcodedCurrentPlan(req.params.plan_id),
           plan_price: plan_price,
           plan_interval: plan_interval,
@@ -155,6 +157,13 @@ module.exports = () => {
 
       req.user.account.plan_id = subscription.plan.id;
       res.locals.plan_name = getHardcodedCurrentPlan(req.user.account.plan_id);
+
+      try {
+          await sendWelcomeEmail(req.user.email);
+        } catch (emailError) {
+          console.error("Failed to send welcome email:", emailError);
+          // Don't block signup if email fails
+        }
 
       try {
         const contactID = await searchContactByEmail(req.user.email);
