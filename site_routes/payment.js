@@ -10,7 +10,7 @@ const {
   getCurrentPrice,
   getCurrentInterval,
 } = require("./utils");
-const stripe = require("stripe")(config.stripe.test.secret);
+const stripe = require("stripe")(config.stripe.prod.secret);
 const { searchContactByEmail, updateContact } = require("../hubspot");
 const TEAM_PRICES = [
   config.stripe.plans.team.year,
@@ -71,7 +71,7 @@ module.exports = () => {
 
           return res.render("payment", {
             sessionId: newSession.id,
-            stripe_pub_key: config.stripe.test.pub,
+            stripe_pub_key: config.stripe.prod.pub,
             plan_name: getHardcodedCurrentPlan(req.params.plan_id),
             plan_price: plan_price,
             plan_interval: plan_interval,
@@ -129,7 +129,7 @@ module.exports = () => {
 
         res.render("payment", {
           sessionId: session.id,
-          stripe_pub_key: config.stripe.test.pub,
+          stripe_pub_key: config.stripe.prod.pub,
           plan_name: getHardcodedCurrentPlan(req.params.plan_id),
           plan_price: plan_price,
           plan_interval: plan_interval,

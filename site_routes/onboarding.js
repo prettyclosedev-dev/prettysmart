@@ -5,7 +5,7 @@ const config = require("../config.json");
 const Huddle = require("../huddle");
 const Account = require("../schemas/account");
 const vectorExpress = require("@smidyo/vectorexpress-nodejs");
-const stripe = require("stripe")(config.stripe.test.secret);
+const stripe = require("stripe")(config.stripe.prod.secret);
 const mailchimp = require("@mailchimp/mailchimp_transactional")(
   config.mandrill.apiKey
 );
