@@ -472,7 +472,7 @@ async function syncFontsWithAccount(req, fontFamilies) {
 module.exports = () => {
   router.get("/", async (req, res) => {
     res.render("setup", {
-      stripe_pub_key: config.stripe.prod.pub,
+      stripe_pub_key: config.stripe.test.pub,
       brand: await Huddle.getBrandObject(req.user.account).catch(console.log),
     });
   });

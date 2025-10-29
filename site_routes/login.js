@@ -7,7 +7,7 @@ const { searchContactByEmail, updateContact } = require("../hubspot");
 const { getHardcodedCurrentPlan } = require("./utils");
 const fs = require("fs");
 const config = require("../config");
-const stripe = require("stripe")(config.stripe.prod.secret, {
+const stripe = require("stripe")(config.stripe.test.secret, {
   telemetry: false,
 });
 

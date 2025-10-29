@@ -9,7 +9,11 @@
 <% const renderPriceItem = (id, primeColor, secondColor, title, subtitle, button1, button2, children, darkText, price, canceled) => { %>
 <div class="price-item" style="background-color: <%= primeColor %>; color: <%= darkText || secondColor %>;">
   <div style="margin-bottom: 1.5rem;">
-    <p id="<%= title %>" class="price-item-title" style="color: <%= darkText || secondColor %>;"><%= title %><% if (canceled) { %> <span style="margin-left: 10px; color: 'gray'; font-size: 9px;">Canceled</span> <% } %> <%= subtitle %></p>
+    <p id="<%= title %>" class="price-item-title" style="color: <%= darkText || secondColor %>;">
+      <%= title %>
+      <% if (canceled) { %> <span style="margin-left: 10px; color: 'gray'; font-size: 9px;">Canceled</span> <% } %> 
+      <%= subtitle %>
+    </p>
     <div style="background-color: <%= darkText || secondColor %>; height: 1px; width: 100%; opacity: 0.3;"></div>
     <div class="stats-container">
       <% children.forEach(function(child) { %>
@@ -45,23 +49,17 @@
   <%
         function getFirstColor(index) {
             switch(index) {
-                case 0:
-                    return onGray ? "white" : "#f5f5f5";
-                case 1:
-                    return "#FFEAF0";
-                case 2:
-                    return "#DB3965";
+                case 0: return onGray ? "white" : "#f5f5f5";
+                case 1: return "#FFEAF0";
+                default: return "#DB3965";
             }
         }
 
         function getSecondColor(index) {
             switch(index) {
-                case 0:
-                    return "#D7D7D7";
-                case 1:
-                    return "#DB3965";
-                case 2:
-                    return "#FFFFFF";
+                case 0: return "#D7D7D7";
+                case 1: return "#DB3965";
+                default: return "#FFFFFF";
             }
         }
 
@@ -77,69 +75,63 @@
 
         function getIntervalAbbrev() {
             return "mo";
-            switch(interval) {
-                case "month":
-                    return "mo";
-                case "year":
-                    return "yr";
-            }
         }
 
         function getPreText(product) {
             if (typeof current === "undefined") {
-                return product.name === "Free" ? "" : "7 Days Free Trial";
+                return product.name === "Free Plan" ? "" : "7 Days Free Trial";
             }
-
             let isCurrentPrice = product.prices[interval].id === current;
-
-            if (isCurrentPrice || (!current && product.name === "Free") || (plan_name === "Basic" && product.name === "Pro")) {
-                return getCanceledStatus(product) ? "Renew Plan" : "Current Plan"
+            if (isCurrentPrice || (!current && product.name === "Free Plan")) {
+                return getCanceledStatus(product) ? "Renew Plan" : "Current Plan";
             } else {
                 const currentProd = products.find(prod => {
-                    return Object.keys(prod.prices).find(price => {
-                        return prod.prices[price].id === current
-                    })
-                })
-
-                return currentProd ? currentProd.prices[interval].amount > product.prices[interval].amount ? "Change Plan" : "7 Days Free Trial" : product.name !== "Free" ? "7 Days Free Trial" : "Change Plan";
+                    return Object.keys(prod.prices).find(price => prod.prices[price].id === current);
+                });
+                return currentProd 
+                    ? currentProd.prices[interval].amount > product.prices[interval].amount 
+                        ? "Change Plan" 
+                        : "7 Days Free Trial" 
+                    : product.name !== "Free Plan" 
+                        ? "7 Days Free Trial" 
+                        : "Change Plan";
             }
         }
 
         function getCanceledStatus(product) {
-            if (typeof current === "undefined") {
-                return false;
-            }
-
+            if (typeof current === "undefined") return false;
             let isCurrentPrice = product.prices[interval].id === current;
-            return (isCurrentPrice || (!current && product.name === "Free") || (plan_name === "Basic" && product.name === "Pro")) && typeof status != "undefined" && status === "canceled"
+            return (isCurrentPrice || (!current && product.name === "Free Plan")) && typeof status != "undefined" && status === "canceled";
         }
 
         if (typeof products != "undefined" && products && products.length) {
-            products.map((product, index) => {
-                var {name, metadata, prices} = product;
-                var price = getPrice(prices);
-                if (price) {
-                    var icons;
-                    if (metadata && Object.keys(metadata).length) {
-                        icons = Object.keys(metadata).map((md) => {
-                            return {icon: md, text: metadata[md]};
-                        });
-
+            products
+                .filter(product => ["Basic Plan", "Team Plan"].includes(product.name)) // exact names
+                .forEach((product, idx) => {
+                    var {name, metadata, prices} = product;
+                    var price = getPrice(prices);
+                    if (price) {
+                        var icons = [];
+                        if (metadata && Object.keys(metadata).length) {
+                            icons = Object.keys(metadata).map(md => ({ icon: md, text: metadata[md] }));
+                        }
                         if (product.prices[interval] && product.prices[interval].id) {
                             renderPriceItem(
                                 product.prices[interval].id, 
-                                getFirstColor(index),
-                                getSecondColor(index),
+                                getFirstColor(idx),
+                                getSecondColor(idx),
                                 "PrettyClose " + name,
                                 product.metadata?.subtitle,
                                 getPreText(product),
-                                (price ? "US$" + price + "/" + getIntervalAbbrev() : "Free Forever" ),
-                                icons, index === 0 ? "black" : undefined, price, getCanceledStatus(product)
+                                (price ? "US$" + price + "/" + getIntervalAbbrev() : "Free Forever"),
+                                icons,
+                                idx === 0 ? "black" : undefined,
+                                price,
+                                getCanceledStatus(product)
                             )
                         }
                     }
-                }
-            })
+                });
         }
     %>
 </div>

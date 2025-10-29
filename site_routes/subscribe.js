@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require("../schemas/user");
 const Account = require("../schemas/account");
 const config = require("../config");
-const stripe = require("stripe")(config.stripe.prod.secret);
+const stripe = require("stripe")(config.stripe.test.secret);
 const { getPlans } = require("../lib/stripe");
 
 module.exports = () => {
