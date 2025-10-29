@@ -56,10 +56,7 @@
       </div>
 
       <% if (typeof error != "undefined") { %>
-        <div style="color:red; margin-top:20px;">
-          An error occurred:
-          <pre><%= JSON.stringify(error, null, 2) %></pre>
-        </div>
+        <div>An error occurred: <%= error %></div>
       <% } %>
 
       <%- include('partials/footer', {async: true, authenticated: false}); %>
