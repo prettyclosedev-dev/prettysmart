@@ -729,6 +729,34 @@
   }
 }
 
+.color-tooltip {
+  position: absolute;
+  background: #222;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  max-width: 400px;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* Right-side arrow */
+.color-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -8px; /* place it just outside the right edge */
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 8px solid #222; /* points RIGHT */
+}
+
 @media screen and (max-width: 1334px) {
   .new-brand-page {
     .inner-content-wrapper.reg {

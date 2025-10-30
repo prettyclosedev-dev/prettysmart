@@ -299,23 +299,38 @@
                                 </div>
 
                                 <div class="tab-content colors d-none" data-tab-content="colors">
-                                    <div>
-                                    <div class="df colors-wrapper  p-4">
+
+                                <% if(brand && brand.logos && brand.logos.logo){ %>
+                                <div class="df line mb-4">
+                                    <div class="sec" id="logo">
+                                        <!--<div class="onboarding-label mt-1 mb-20 fs12">Choose from Logo</div>-->
+                                        <label class="onboarding-logo-inner">
+                                            <p></p>
+                                            <span class="onboarding-logo-preview">
+                                                <%- brand.logos.logo %>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <% } %>
+
+                                <div>
+                                    <div class="df colors-wrapper p-4">
                                         <div class="color-wrapper">
-                                            <div class="label ffp brand-label ">DARK COLOR</div>
+                                            <div class="label ffp brand-label">DARK COLOR</div>
                                             <input 
                                                 style="background-color: <%= user.account.brand.colors.primary || '#D5BA8C' %>"
                                                 type="color" 
                                                 id="primary"
-                                                class="color " 
+                                                class="color" 
                                                 value="<%= user.account.brand.colors.primary || '#1A428A' %>"   
                                                 name="primary"  
                                                 data-primary-color="<%= user.account.brand_primary || '#1A428A' %>"
                                             />
                                         </div>
-                                    
+
                                         <div class="color-wrapper">
-                                            <div class="label ffp brand-label ">LIGHT COLOR</div>
+                                            <div class="label ffp brand-label">LIGHT COLOR</div>
                                             <input
                                                 style="background-color: <%= user.account.brand.colors.secondary || '#D5BA8C' %>"
                                                 class="color" 
@@ -328,21 +343,8 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                <% if(brand && brand.logos && brand.logos.logo){ %>
-                                <div class="df line mt-4">
-                                    <div class="sec" id="logo">
-                                        <!--<div class="onboarding-label mt-1 mb-20  fs12">Choose from Logo</div>-->
-                                        <label class="onboarding-logo-inner">
-                                            <p></p>
-                                            <span class="onboarding-logo-preview">
-                                                <%- brand.logos.logo %>
-                                            </span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <% } %>
-                                </div>
 
                                 <div class="tab-content info d-none" data-tab-content="info">
                                     <form data-hs-cf-bound="true">
@@ -474,6 +476,7 @@
      </script>
 
     <!-- <script src="/static/js/jquery.js"></script> -->
+
     <script src="/static/js/loader.js"></script>
     <script src="https://unpkg.com/vue@^3.4.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/svg-drag-select@0.4.2"></script>
@@ -815,6 +818,39 @@
         $(`[data-help-tab=info]`).removeClass('d-none');
         $(`.save-brand`).removeClass('d-none')
     }
+
+    document.querySelectorAll('.color').forEach(input => {
+    input.addEventListener('click', (e) => {
+        // Remove existing tooltip if any
+        document.querySelectorAll('.color-tooltip').forEach(t => t.remove());
+
+        // Create tooltip
+        const tooltip = document.createElement('div');
+        tooltip.className = 'color-tooltip';
+        tooltip.textContent = 'Use the eyedropper tool to pick a color — hover over the part of your logo you want to pick a color from.';
+        document.body.appendChild(tooltip);
+
+        // Position beside the input
+        const rect = e.target.getBoundingClientRect();
+        tooltip.style.left = `${rect.left - tooltip.offsetWidth - 10}px`; // 10px gap on the left
+        tooltip.style.top = `${rect.bottom + 135}px`;
+
+        // Fade in
+        requestAnimationFrame(() => tooltip.style.opacity = '1');
+
+        // Remove tooltip when color picker closes (on blur)
+        input.addEventListener('blur', () => {
+        tooltip.style.opacity = '0';
+        setTimeout(() => tooltip.remove(), 200);
+        }, { once: true }); // ensures event fires only once
+
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+        tooltip.style.opacity = '0';
+        setTimeout(() => tooltip.remove(), 300);
+        }, 5000);
+    });
+    });
 </script>
 
 <script>
