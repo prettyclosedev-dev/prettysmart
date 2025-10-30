@@ -149,9 +149,13 @@ $(document)
     $this.addClass("touched");
     addTabState("info", "draft");
   })
-  .on("click", "[data-save-brand]", function () {
+  .on("click", "[data-save-brand]", function (e) {
     if ($(this).hasClass("save-brand-active")) {
       console.log("UPDATING ");
+      
+      // Store if this is an auto-save
+      var isAutoSave = $(e.target).closest('[data-save-brand]').data('auto-save');
+      
       updateLogos();
       updateColors();
       updateFonts();
@@ -160,7 +164,18 @@ $(document)
       uploadAvatar();
       // Clear session storage after successful save
       clearSessionStorage();
-      window.location.reload();
+      
+      // For auto-save, clear touched files so they don't get re-uploaded
+      if (isAutoSave) {
+        setTimeout(function() {
+          $('[type="file"]').removeClass("touched");
+          $(".save-brand").removeClass("save-brand-active");
+          $('[data-save-brand]').data('auto-save', false);
+        }, 800);
+      } else {
+        // For manual save, reload the page
+        window.location.reload();
+      }
     } else {
       console.log("Nothing changed");
     }
@@ -319,14 +334,17 @@ function uploadFile($this, type, draft, data, name) {
         if (!draft) {
           $this.find('[type="file"]').removeClass("touched");
 
-          $(`[data-tab-content="colors"]`)
-            .find(".onboarding-logo-preview")
-            .children("svg")
-            .remove();
-          var newSvg = trimmedSvg.clone();
-          $(`[data-tab-content="colors"]`)
-            .find(".onboarding-logo-preview")
-            .prepend(newSvg);
+          // Only update colors tab if this is the logo (not icon or watermark)
+          if (name === 'logo') {
+            $(`[data-tab-content="colors"]`)
+              .find(".onboarding-logo-preview")
+              .children("svg")
+              .remove();
+            var newSvg = trimmedSvg.clone();
+            $(`[data-tab-content="colors"]`)
+              .find(".onboarding-logo-preview")
+              .prepend(newSvg);
+          }
         } else {
           // draft_brand.logos[name] = res.brand.logos[name];
           // displayBrand(draft_brand);

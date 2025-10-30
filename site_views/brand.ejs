@@ -522,10 +522,31 @@
         })
 
         $(document).on('click', '[data-tab]', function(e){
-            $target = $(event.target);   
-            $target.addClass('selected').siblings().removeClass("selected");
+            var $target = $(event.target);
             var tab = $(this).data('tab');
-            $('[data-tab-content="'+tab+'"]').removeClass('d-none').siblings().addClass('d-none')
+            
+            // Check if there are unsaved changes
+            if ($('.save-brand').hasClass('save-brand-active')) {
+                // Prevent default tab switch
+                e.preventDefault();
+                
+                // Mark the button as auto-save and store the tab to switch to
+                $('[data-save-brand]').data('auto-save', true).data('next-tab', tab);
+                
+                // Trigger the save
+                $('[data-save-brand]').click();
+                
+                // After save completes, switch tabs
+                // Wait a bit for uploads to complete
+                setTimeout(function() {
+                    $target.addClass('selected').siblings().removeClass("selected");
+                    $('[data-tab-content="'+tab+'"]').removeClass('d-none').siblings().addClass('d-none');
+                }, 500);
+            } else {
+                // No unsaved changes, just switch tabs normally
+                $target.addClass('selected').siblings().removeClass("selected");
+                $('[data-tab-content="'+tab+'"]').removeClass('d-none').siblings().addClass('d-none');
+            }
         })
     </script>
 
