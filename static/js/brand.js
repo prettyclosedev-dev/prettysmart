@@ -4,6 +4,77 @@ if (window.location.pathname.includes("brand")) {
   // TextType.start();
 }
 
+// ===== SESSION STORAGE FOR UPLOADED FILES =====
+// Store uploaded SVGs in session storage so they persist during the tab session
+function saveUploadedFileToSession(name, svgHtml) {
+  if (!sessionStorage) return;
+  const storageKey = `brand_upload_${name}`;
+  console.log(`Saving to session: ${storageKey}`);
+  sessionStorage.setItem(storageKey, svgHtml);
+}
+
+function getUploadedFileFromSession(name) {
+  if (!sessionStorage) return null;
+  const storageKey = `brand_upload_${name}`;
+  const saved = sessionStorage.getItem(storageKey);
+  console.log(`Retrieved from session ${storageKey}:`, saved ? 'Found' : 'Not found');
+  return saved;
+}
+
+function restoreUploadedFilesFromSession() {
+  if (!sessionStorage) return;
+  
+  console.log('Attempting to restore uploaded files from session...');
+  // Map storage keys to preview element IDs (they might have different names)
+  const typeMap = {
+    'logo': 'logo-preview',
+    'icon': 'icon-preview',
+    'watermark': 'wordmark-preview'  // Note: storage key is "watermark" but preview ID is "wordmark-preview"
+  };
+  
+  Object.entries(typeMap).forEach(([storageType, previewId]) => {
+    const saved = getUploadedFileFromSession(storageType);
+    if (saved) {
+      console.log(`Restoring ${storageType} from session storage to #${previewId}`);
+      const previewElement = $(`#${previewId}`);
+      if (previewElement.length) {
+        // Remove any existing SVG first
+        previewElement.find('svg').remove();
+        // Restore from session storage
+        previewElement.prepend(saved);
+        previewElement.siblings('input').addClass('touched svg-string');
+        previewElement.find('.logo-select-wrapper').addClass('floating');
+        console.log(`Successfully restored ${storageType}`);
+      }
+    }
+  });
+}
+
+function clearSessionStorage() {
+  if (!sessionStorage) return;
+  const types = ['logo', 'icon', 'watermark'];
+  types.forEach(type => {
+    const storageKey = `brand_upload_${type}`;
+    sessionStorage.removeItem(storageKey);
+    console.log(`Cleared session storage for ${type}`);
+  });
+}
+
+// Restore files on page load - with multiple timing attempts
+$(document).ready(function() {
+  restoreUploadedFilesFromSession();
+  setTimeout(restoreUploadedFilesFromSession, 300);
+  setTimeout(restoreUploadedFilesFromSession, 800);
+});
+
+// Also restore when the page becomes visible (tab switch)
+$(document).on('visibilitychange', function() {
+  if (!document.hidden) {
+    restoreUploadedFilesFromSession();
+  }
+});
+// ===== END SESSION STORAGE =====
+
 $(".google_font")
   .fontpicker({
     lang: "en",
@@ -87,6 +158,8 @@ $(document)
       updateGoogleFonts();
       updateInfo();
       uploadAvatar();
+      // Clear session storage after successful save
+      clearSessionStorage();
       window.location.reload();
     } else {
       console.log("Nothing changed");
@@ -238,6 +311,10 @@ function uploadFile($this, type, draft, data, name) {
           $this.find(".onboarding-logo-preview").prepend(trimmedSvg);
 
           $this.find('[type="file"].touched').addClass("svg-string");
+          
+          // Save to session storage
+          const svgHtml = trimmedSvg.prop("outerHTML");
+          saveUploadedFileToSession(name, svgHtml);
         }
         if (!draft) {
           $this.find('[type="file"]').removeClass("touched");
