@@ -127,6 +127,44 @@ $(document)
       $(".upload-assets-btn").removeClass("upload-assets-btn-active");
     }
   })
+  
+  // Drag and drop for Logo, Icon, and Wordmark
+  .on("dragenter", ".onboarding-logo-preview", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $(this).closest(".onboarding-logo-inner").addClass("drag-over");
+  })
+  .on("dragover", ".onboarding-logo-preview", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  })
+  .on("dragleave", ".onboarding-logo-preview", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $(this).closest(".onboarding-logo-inner").removeClass("drag-over");
+  })
+  .on("drop", ".onboarding-logo-preview", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    var $this = $(this);
+    var $container = $this.closest(".onboarding-logo-inner");
+    $container.removeClass("drag-over");
+    
+    // Get the dropped files
+    var files = e.originalEvent.dataTransfer.files;
+    if (files && files.length > 0) {
+      // Get the corresponding file input for this section
+      var $input = $container.find('[type="file"]');
+      
+      // Set the files to the input
+      $input[0].files = files;
+      
+      // Trigger change event to handle the upload
+      $input.trigger("change");
+    }
+  })
+  
   .on("input", '[type="color"]', function () {
     var $this = $(this),
       name = $(this).attr("name"),
@@ -219,8 +257,14 @@ $(".onboarding-logo-inner").bind("drop", function (e) {
   var file = e.originalEvent.dataTransfer.files[0];
   var { type, name } = file;
 
-  const allowedTypes = ["image/svg+xml", "application/pdf"];
-  if (allowedTypes.includes(type)) {
+  // Check by file extension as well as MIME type (browsers don't always report correct MIME types)
+  const allowedMimeTypes = ["image/svg+xml", "application/pdf", "image/jpeg", "image/png"];
+  const allowedExtensions = [".svg", ".pdf", ".ai", ".jpg", ".jpeg", ".png"];
+  const fileExtension = name.substring(name.lastIndexOf(".")).toLowerCase();
+  
+  const isAllowedType = allowedMimeTypes.includes(type) || allowedExtensions.includes(fileExtension);
+  
+  if (isAllowedType) {
     var $input = $(this).find('[type="file"]');
     $input.addClass("touched");
     $input[0].files = e.originalEvent.dataTransfer.files;
@@ -233,7 +277,7 @@ $(".onboarding-logo-inner").bind("drop", function (e) {
     uploadLogo($(this), true);
     addTabState("logo", "draft");
   } else {
-    alert("Unsupported file type. Please upload a .pdf, .ai or .svg");
+    alert("Unsupported file type. Please upload a .pdf, .ai, .svg, .jpg, .jpeg or .png");
   }
 });
 // Drag font
