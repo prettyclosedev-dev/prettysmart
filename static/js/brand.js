@@ -150,34 +150,46 @@ $(document)
     addTabState("info", "draft");
   })
   .on("click", "[data-save-brand]", function (e) {
-    if ($(this).hasClass("save-brand-active")) {
-      console.log("UPDATING ");
-      
-      // Store if this is an auto-save
-      var isAutoSave = $(e.target).closest('[data-save-brand]').data('auto-save');
-      
-      updateLogos();
-      updateColors();
-      updateFonts();
-      updateGoogleFonts();
-      updateInfo();
-      uploadAvatar();
-      // Clear session storage after successful save
-      clearSessionStorage();
-      
-      // For auto-save, clear touched files so they don't get re-uploaded
-      if (isAutoSave) {
-        setTimeout(function() {
-          $('[type="file"]').removeClass("touched");
-          $(".save-brand").removeClass("save-brand-active");
-          $('[data-save-brand]').data('auto-save', false);
-        }, 800);
-      } else {
-        // For manual save, reload the page
-        window.location.reload();
-      }
+    // Check if there are any changes to save
+    var hasChanges = $(".save-brand").hasClass("save-brand-active") || 
+                     $('[type="file"].touched').length > 0 ||
+                     $('[type="text"].touched').length > 0 ||
+                     $('[type="color"].touched').length > 0 ||
+                     $('[type="input"].touched').length > 0 ||
+                     $("#avatar-input")[0]?.files?.length > 0;
+    
+    if (!hasChanges) {
+      console.log("No changes to save, redirecting to templates");
+      window.location.href = '/templates';
+      return;
+    }
+    
+    console.log("UPDATING ");
+    
+    // Store if this is an auto-save
+    var isAutoSave = $(e.target).closest('[data-save-brand]').data('auto-save');
+    
+    updateLogos();
+    updateColors();
+    updateFonts();
+    updateGoogleFonts();
+    updateInfo(false, isAutoSave);
+    uploadAvatar(isAutoSave);
+    // Clear session storage after successful save
+    clearSessionStorage();
+    
+    // For auto-save, clear touched files so they don't get re-uploaded
+    if (isAutoSave) {
+      setTimeout(function() {
+        $('[type="file"]').removeClass("touched");
+        $(".save-brand").removeClass("save-brand-active");
+        $('[data-save-brand]').data('auto-save', false);
+      }, 800);
     } else {
-      console.log("Nothing changed");
+      // For manual save, redirect to templates
+      setTimeout(function() {
+        window.location.href = '/templates';
+      }, 1000);
     }
   });
 
@@ -361,6 +373,14 @@ function uploadFile($this, type, draft, data, name) {
       }
 
       addTabState("logo", draft ? "draft" : "success");
+      
+      // Auto-save after draft upload completes and tab state is updated
+      if (draft && $(".save-brand").hasClass("save-brand-active")) {
+        setTimeout(function() {
+          // Mark button with auto-save flag and trigger save
+          $('[data-save-brand]').data('auto-save', true).click();
+        }, 300);
+      }
     },
     error: function (err) {
       $this.stopLoading();
@@ -653,7 +673,7 @@ function updateFontCSS(ff, res) {
   );
 }
 
-function updateInfo(draft) {
+function updateInfo(draft, isAutoSave) {
   var data = {};
 
   $('[type="text"].touched').each(function () {
@@ -703,7 +723,10 @@ function updateInfo(draft) {
 
         addTabState("info", draft ? "draft" : "success");
 
-        window.location.reload();
+        // Only reload if not auto-save
+        if (!isAutoSave) {
+          window.location.reload();
+        }
       }
     })
     .catch(function (err) {
@@ -718,7 +741,7 @@ function updateInfo(draft) {
     });
 }
 
-function uploadAvatar() {
+function uploadAvatar(isAutoSave) {
   var $file = $("#avatar-input");
   if ($file.length && $file[0].files.length) {
       var type = $file.data("file-type"),
@@ -737,7 +760,10 @@ function uploadAvatar() {
           processData: false,
           success: function (res) {
               if (res.success) {
-                window.location.reload();
+                // Only reload if not auto-save
+                if (!isAutoSave) {
+                  window.location.reload();
+                }
                 addTabState("profile", "success");
               }
               else {
