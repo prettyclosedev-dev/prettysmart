@@ -14,7 +14,7 @@ const openAi = require("../openAi");
 const _ = require("lodash");
 const { handleBrandChange } = require("../clyps_brand_update");
 const user = require("../schemas/user");
-const stripe = require("stripe")(config.stripe.prod.secret);
+const stripe = require("stripe")(config.stripe.test.secret);
 const mailchimp = require("@mailchimp/mailchimp_transactional")(
   config.mandrill.apiKey
 );
@@ -489,7 +489,7 @@ module.exports = () => {
         brand_phone: "1",
       },
       paymentMethods,
-      stripe_pub_key: config.stripe.prod.pub,
+      stripe_pub_key: config.stripe.test.pub,
       cache: true,
       filename: "brand",
     });
