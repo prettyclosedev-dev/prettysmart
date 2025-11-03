@@ -859,16 +859,34 @@
         // Fade in
         requestAnimationFrame(() => tooltip.style.opacity = '1');
 
+        // Function to close tooltip and remove all listeners
+        const closeTooltip = () => {
+            if (tooltip && tooltip.parentNode) {
+                tooltip.style.opacity = '0';
+                setTimeout(() => {
+                    if (tooltip && tooltip.parentNode) {
+                        tooltip.remove();
+                    }
+                }, 200);
+            }
+            // Remove all event listeners
+            input.removeEventListener('blur', closeTooltip);
+            window.removeEventListener('scroll', closeTooltip);
+            document.removeEventListener('scroll', closeTooltip);
+        };
+
         // Remove tooltip when color picker closes (on blur)
-        input.addEventListener('blur', () => {
-        tooltip.style.opacity = '0';
-        setTimeout(() => tooltip.remove(), 200);
-        }, { once: true }); // ensures event fires only once
+        input.addEventListener('blur', closeTooltip);
+
+        // Remove tooltip on window scroll
+        window.addEventListener('scroll', closeTooltip, true);
+        
+        // Also listen for scroll on document (for capturing phase)
+        document.addEventListener('scroll', closeTooltip, true);
 
         // Auto-hide after 3 seconds
         setTimeout(() => {
-        tooltip.style.opacity = '0';
-        setTimeout(() => tooltip.remove(), 300);
+            closeTooltip();
         }, 5000);
     });
     });
