@@ -522,7 +522,7 @@
         })
 
         $(document).on('click', '[data-tab]', function(e){
-            var $target = $(event.target);
+            var $target = $(this);
             var tab = $(this).data('tab');
             
             // Check if there are unsaved changes
