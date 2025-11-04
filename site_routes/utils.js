@@ -28,14 +28,28 @@ function amountOfCredits(planName) {
 
 function getHardcodedCurrentPlan(plan_id) {
   if (plan_id) {
-    var name = "Free";
-    Object.keys(config.stripe.plans).map((plan) => {
-      Object.keys(config.stripe.plans[plan]).map((interval) => {
+    let name = "Free";
+    let found = false;
+
+    // Try to map against configured plan price IDs
+    Object.keys(config.stripe.plans).forEach((plan) => {
+      Object.keys(config.stripe.plans[plan]).forEach((interval) => {
         if (config.stripe.plans[plan][interval] === plan_id) {
           name = plan.charAt(0).toUpperCase() + plan.slice(1);
+          found = true;
         }
       });
     });
+
+    // Fallback: if we didn't find a match but the plan_id is set and is not one of the Free price IDs,
+    // treat it as a paid plan (default to "Pro"). This makes the app resilient to mismatched price IDs
+    // between environments while still keeping Free correctly identified.
+    if (!found) {
+      const freeIds = Object.values(config.stripe.plans?.free || {});
+      if (!freeIds.includes(plan_id)) {
+        name = "Pro";
+      }
+    }
 
     return name;
   }

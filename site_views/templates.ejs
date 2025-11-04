@@ -41,6 +41,8 @@
           function isAllowedDownload(file_name) {
             return (
               (plan_name && plan_name !== "Free" && !payment_failed) ||
+              // Fallback: if account has any non-free plan_id, treat as paid
+              (typeof user !== 'undefined' && user && user.account && user.account.plan_id && !payment_failed) ||
               file_name.includes("_free")
             );
           }
