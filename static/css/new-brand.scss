@@ -520,17 +520,20 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  overflow: visible; // allow selection frame to render beyond bounds
 
   #svg-editor-app {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    overflow: visible; // prevent horizontal clipping
 
     .original-container {
       margin: 0;
       // padding-top: 20px;
       padding-bottom: 25px;
+      overflow: visible; // prevent dashed frame from being cut off
 
       svg {
         max-width: calc(100% - 30px);
@@ -542,6 +545,7 @@
         border-radius: 26px;
         height: 400px;
         width: 400px;
+        overflow: visible; // outermost svg defaults to hidden
       }
     }
   }
@@ -675,6 +679,7 @@
     text-align: center;
     align-items: center;
     justify-content: center;
+    overflow: visible; // ensure no clipping at container level
     // margin-top: 100px;
   }
 
