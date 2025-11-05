@@ -21,13 +21,69 @@
     </div>
   </div>
   <script>
+    // Clear any stale editor cache that might persist across logins
+    (function clearEditorCache() {
+      try {
+        const prefixes = ["polotno", "editor", "PrettySmartEditor"]; // conservative clear
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          const key = localStorage.key(i);
+          if (!key) continue;
+          if (prefixes.some((p) => key.toLowerCase().includes(p.toLowerCase()))) {
+            localStorage.removeItem(key);
+          }
+        }
+        // Also clear any session-stored editor data
+        for (let i = sessionStorage.length - 1; i >= 0; i--) {
+          const key = sessionStorage.key(i);
+          if (!key) continue;
+          if (prefixes.some((p) => key.toLowerCase().includes(p.toLowerCase()))) {
+            sessionStorage.removeItem(key);
+          }
+        }
+      } catch (e) {
+        // ignore storage errors
+      }
+    })();
+
+    // Ensure GraphQL/API requests are never served from a previous user's cache
+    (function patchFetchForNoCache() {
+      const originalFetch = window.fetch;
+      window.fetch = function(input, init) {
+        try {
+          let url = typeof input === 'string' ? input : (input && input.url) || '';
+          const isGraphQL = /\/graphql(\?.*)?$/i.test(url) || url.includes('http://localhost:4000/graphql');
+          if (isGraphQL) {
+            // Route GraphQL calls through same-origin proxy to avoid CORS and to inject scoping
+            const proxyUrl = '/editor/graphql-proxy';
+            const nextInit = Object.assign({ method: 'POST' }, init || {});
+            nextInit.cache = 'no-store';
+            // Ensure JSON body is preserved as-is
+            if (!nextInit.headers) nextInit.headers = {};
+            if (nextInit.headers instanceof Headers) {
+              if (!nextInit.headers.get('content-type')) nextInit.headers.set('content-type', 'application/json');
+            } else {
+              if (!nextInit.headers['content-type']) nextInit.headers['content-type'] = 'application/json';
+            }
+            console.debug('[fetch patched] GraphQL request ->', proxyUrl);
+            return originalFetch(proxyUrl, nextInit);
+          }
+        } catch (e) {
+          // fall through to original fetch if anything fails
+        }
+        return originalFetch(input, init);
+      };
+    })();
+
+    // Make additional data available as a JSON object
+    const __ADDITIONAL__ = <%- additional %>;
+
     window.onload = () => {
       PrettySmartEditor.mountEditor(document.getElementById("editor"), {
         mode: "standalone",
         email: "<%= user.email %>",
         designId: "<%= templateId %>",
-        additional: JSON.parse(<%- JSON.stringify(additional) %>),
-      })
-    }
+        additional: __ADDITIONAL__,
+      });
+    };
   </script>
 </div>
