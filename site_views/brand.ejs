@@ -913,7 +913,7 @@
                     halo.setAttribute('fill', 'none');
                     halo.setAttribute('stroke', '#FFFFFF');
                     halo.setAttribute('stroke-width', '10');
-                    halo.style.strokeWidth = '2px';
+                    halo.style.strokeWidth = '5px';
                     halo.setAttribute('stroke-linejoin', 'round');
                     halo.setAttribute('vector-effect', 'non-scaling-stroke');
                     halo.setAttribute('opacity', '0.95');
@@ -929,10 +929,10 @@
                     rect.setAttribute('rx', 10);
                     rect.setAttribute('ry', 10);
                     rect.setAttribute('fill', 'none');
-                    rect.setAttribute('stroke', '#db3965');
+                    rect.setAttribute('stroke', '#672a41');
                     rect.setAttribute('vector-effect', 'non-scaling-stroke');
                     // Use CSS px units so thickness and dash length are fixed regardless of SVG scaling
-                    rect.style.strokeWidth = '2px';
+                    rect.style.strokeWidth = '3px';
                     rect.style.strokeDasharray = '20px 10px';
                     rect.style.strokeDashoffset = '0px';
                     rect.style.animation = 'psDash 1.2s linear infinite';
@@ -940,29 +940,7 @@
                     rect.setAttribute('filter', 'url(#ps-selection-shadow)');
                     overlay.appendChild(rect);
 
-                    // Corner handles
-                    const corners = [
-                        { cx: x,             cy: y             },
-                        { cx: x + width,     cy: y             },
-                        { cx: x,             cy: y + height    },
-                        { cx: x + width,     cy: y + height    },
-                    ];
-                    for (const c of corners) {
-                        const outer = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                        outer.setAttribute('cx', c.cx);
-                        outer.setAttribute('cy', c.cy);
-                        outer.setAttribute('r', '5.5');
-                        outer.setAttribute('fill', '#FFFFFF');
-                        outer.setAttribute('filter', 'url(#ps-selection-shadow)');
-                        overlay.appendChild(outer);
-
-                        const inner = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                        inner.setAttribute('cx', c.cx);
-                        inner.setAttribute('cy', c.cy);
-                        inner.setAttribute('r', '3.2');
-                        inner.setAttribute('fill', '#db3965');
-                        overlay.appendChild(inner);
-                    }
+                    // Removed corner handles (circles) for a cleaner selection frame
                 }
 
                 function getUnionBBoxInRoot(svg, elements) {
