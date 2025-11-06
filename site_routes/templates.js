@@ -6,6 +6,7 @@ const config = require("../config.json");
 const serverUrl = config.BASE_URL;
 const path = require("path");
 const User = require("../schemas/user");
+const Project = require("../schemas/project");
 const {
   getBrandedDesigns,
   getDesignsCount,
@@ -241,12 +242,21 @@ module.exports = () => {
   });
 
   router.get("/preview/:id", async (req, res) => {
+    // Use user-specific copy if it exists, otherwise use base template id
+    const mapping = await Project.findOne({
+      user: req.user._id,
+      template_id: String(parseInt(req.params.id)),
+    }).lean();
+
+    const effectiveId = mapping && mapping.project_id ? parseInt(mapping.project_id) : parseInt(req.params.id);
+
     const variables = {
       user: req.user,
       where: {
-        id: parseInt(req.params.id),
+        id: effectiveId,
       },
-      brandWhere: {
+      // Only apply brandWhere when generating from base template (not from user copy)
+      brandWhere: mapping && mapping.project_id ? undefined : {
         prettySmartId: req.user.account._id.toString(),
       },
       previewOptions: {
@@ -286,16 +296,24 @@ module.exports = () => {
     const { file_type, file_name } = req.query;
 
     try {
+      // Use user-specific copy if it exists, otherwise use base template id
+      const mapping = await Project.findOne({
+        user: req.user._id,
+        template_id: String(parseInt(templateId)),
+      }).lean();
+      const effectiveId = mapping && mapping.project_id ? parseInt(mapping.project_id) : parseInt(templateId);
+
       // Prepare variables for export
       const variables = {
         user: req.user,
-        where: { id: parseInt(templateId) },
+        where: { id: effectiveId },
         previewOptions: {
           mimeType:
             file_type === "pdf" ? "application/pdf" : `image/${file_type}`,
           pixelRatio: 2, // TODO: - allow user to choose quality?
         },
-        brandWhere: {
+        // Only apply brandWhere when exporting base template (not from user copy)
+        brandWhere: mapping && mapping.project_id ? undefined : {
           prettySmartId: req.user.account._id.toString(),
         },
       };
