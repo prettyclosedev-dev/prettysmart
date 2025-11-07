@@ -187,7 +187,8 @@ $(document)
     $this.addClass("touched");
     addTabState("info", "draft");
   })
-  .on("click", "[data-save-brand]", function (e) {
+  // Enhanced save handler: waits for color persistence before navigating
+  .on("click", "[data-save-brand]", async function (e) {
     // Check if there are any changes to save
     var hasChanges = $(".save-brand").hasClass("save-brand-active") || 
                      $('[type="file"].touched').length > 0 ||
@@ -207,8 +208,9 @@ $(document)
     // Store if this is an auto-save
     var isAutoSave = $(e.target).closest('[data-save-brand]').data('auto-save');
     
-    updateLogos();
-    updateColors();
+  updateLogos();
+  // capture a promise for color updates so we can await them reliably
+  const colorUpdates = updateColors();
     updateFonts();
     updateGoogleFonts();
     updateInfo(false, isAutoSave);
@@ -224,10 +226,14 @@ $(document)
         $('[data-save-brand]').data('auto-save', false);
       }, 800);
     } else {
-      // For manual save, redirect to templates
-      setTimeout(function() {
-        window.location.href = '/templates';
-      }, 1000);
+      // Manual save: wait for color persistence, then force a brand build before landing on templates.
+      try {
+        await colorUpdates; // ensure POST /brand/color finished
+      } catch(err) {
+        console.warn('Color update encountered an error, continuing redirect:', err);
+      }
+      // Use build route so server regenerates brand artifacts before templates render
+      window.location.href = '/brand/build?url=/templates';
     }
   });
 
@@ -435,6 +441,7 @@ function uploadFile($this, type, draft, data, name) {
 }
 
 function updateColors(noreload, cb) {
+  const promises = [];
   $('[type="color"]').each(function () {
     var $this = $(this),
       name = $this.attr("name"),
@@ -443,55 +450,35 @@ function updateColors(noreload, cb) {
     if ($this.hasClass("touched")) {
       window.UPDATE_COUNTER++;
       $this.closest(".onboarding-color-outer").loading();
-      $.post("/brand/color", {
-        name: name,
-        color: val,
-      })
+      const p = $.post('/brand/color', { name, color: val })
         .then(function (res) {
-          $this.closest(".onboarding-color-outer").stopLoading();
+          $this.closest('.onboarding-color-outer').stopLoading();
           if (res.success) {
-            $this.removeClass("touched");
-
-            $(name === "primary" ? ".color-primary" : ".color-secondary").css(
-              "background-color",
-              val
-            );
-            $(name === "primary" ? "#primary" : "#secondary").css(
-              "background-color",
-              val
-            );
-
-            $(name === "primary" ? "#primary" : "#secondary").attr(
-              "value",
-              val
-            );
-            $(name === "primary" ? "#primary" : "#secondary").attr(
-              "data-secondary-color",
-              val
-            );
+            $this.removeClass('touched');
+            $(name === 'primary' ? '.color-primary' : '.color-secondary').css('background-color', val);
+            $(name === 'primary' ? '#primary' : '#secondary').css('background-color', val)
+              .attr('value', val)
+              .attr(name === 'primary' ? 'data-primary-color' : 'data-secondary-color', val);
           }
           window.UPDATE_COUNTER--;
           if (window.UPDATE_COUNTER === 1) {
             displayBrand();
           }
-
-          addTabState("colors", "success");
-
-          if (!noreload) {
-            // window.location.reload(); // to refresh logo colors
-          }
-
-          if (cb) {
-            cb();
-          }
+          addTabState('colors', 'success');
+          return res;
         })
-        .catch((err) => {
-          $this.closest(".onboarding-color-outer").stopLoading();
-          addTabState("colors", "failed");
-          console.log(err);
+        .catch(function (err) {
+          $this.closest('.onboarding-color-outer').stopLoading();
+          addTabState('colors', 'failed');
+          console.error('Color update failed', err);
+          window.UPDATE_COUNTER--;
         });
+      promises.push(p);
     }
   });
+  const all = promises.length ? Promise.all(promises) : Promise.resolve();
+  if (cb) all.finally(cb);
+  return all;
 }
 
 function processBrandAssetPayment(dirPM, skipPayment) {
