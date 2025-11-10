@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require("../schemas/user");
 const Account = require("../schemas/account");
 const config = require("../config");
-const stripe = require("stripe")(config.stripe.prod.secret);
+const stripe = require("stripe")(config.stripe.test.secret);
 const { body, validationResult } = require("express-validator");
 const bCrypt = require("bcrypt-nodejs");
 const serverUrl = config.BASE_URL;
@@ -50,7 +50,7 @@ module.exports = () => {
             filename: "settings-account",
             reachedUsersLimit,
             paymentMethods: await getPaymentMethods(req),
-            stripe_pub_key: config.stripe.prod.pub,
+            stripe_pub_key: config.stripe.test.pub,
           });
         } else if (req.params.userid === "new-account") {
           res.render("settings-account", {
@@ -62,7 +62,7 @@ module.exports = () => {
             filename: "settings-account",
             reachedUsersLimit,
             paymentMethods: await getPaymentMethods(req),
-            stripe_pub_key: config.stripe.prod.pub,
+            stripe_pub_key: config.stripe.test.pub,
           });
         } else {
           // need path to render account edit info?
@@ -268,7 +268,7 @@ module.exports = () => {
       res.render("settings-plan", {
         users: users,
         paymentMethods,
-        stripe_pub_key: config.stripe.prod.pub,
+        stripe_pub_key: config.stripe.test.pub,
         showAddCard: req.query["add-card"] === "true" ? true : false,
         subscription: { plan: { amount: 0, interval: "" }, ...subscription },
         currentPlan,
