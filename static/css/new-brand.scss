@@ -178,6 +178,11 @@
               align-items: center;
               justify-content: center;
               box-sizing: border-box;
+
+              &.drag-over {
+                border: 2px solid #db3965;
+                background-color: rgba(219, 57, 101, 0.05);
+              }
             }
 
             .onboarding-logo-preview {
@@ -377,8 +382,8 @@
           }
 
           .color {
-            width: 164px;
-            height: 164px;
+            width: 140px;
+            height: 140px;
             max-width: 180px;
             display: block;
             // padding: 3px;
@@ -515,17 +520,20 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  overflow: visible; // allow selection frame to render beyond bounds
 
   #svg-editor-app {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    overflow: visible; // prevent horizontal clipping
 
     .original-container {
       margin: 0;
       // padding-top: 20px;
       padding-bottom: 25px;
+      overflow: visible; // prevent dashed frame from being cut off
 
       svg {
         max-width: calc(100% - 30px);
@@ -537,6 +545,7 @@
         border-radius: 26px;
         height: 400px;
         width: 400px;
+        overflow: visible; // outermost svg defaults to hidden
       }
     }
   }
@@ -596,8 +605,8 @@
 
 .save-brand {
   margin-top: 26px;
-  opacity: 0.3;
-  pointer-events: none;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .save-brand-active {
@@ -670,6 +679,7 @@
     text-align: center;
     align-items: center;
     justify-content: center;
+    overflow: visible; // ensure no clipping at container level
     // margin-top: 100px;
   }
 
@@ -727,6 +737,34 @@
   .template-loader-new {
     display: block;
   }
+}
+
+.color-tooltip {
+  position: absolute;
+  background: #222;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  max-width: 400px;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* Right-side arrow */
+.color-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -8px; /* place it just outside the right edge */
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 8px solid #222; /* points RIGHT */
 }
 
 @media screen and (max-width: 1334px) {

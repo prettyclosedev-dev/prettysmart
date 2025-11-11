@@ -13,7 +13,7 @@
             <div class="page-content-wrapper">
                 <div class="page-title-container">
                     <h2 class="page-title">My brand<span class="text-primary">.</span></h2>
-                    <button class="save-brand fs14" data-save-brand><i class="fa-solid fa-check" ></i>Save Changes</button>
+                    <button class="save-brand fs14" data-save-brand><i class="fa-solid fa-check" ></i>All Done</button>
                 </div>
                 <div class="inner-content-wrapper help d-none" data-content="ask-help-sec">
                     <div class="df tab-content">
@@ -181,7 +181,7 @@
                             %>
                             <div class="tabs-content-wrapper">
                                 <div class="tab-content logo" data-tab-content="logo">  
-                                    <div class="df aic ffp fs12 need-help"><p>Don't have your logo files as an jpeg, png or svg?</p><button class="mla" onclick="openMiniHelp();">Ask for help </button></div>
+                                    <!--<div class="df aic ffp fs12 need-help"><p>Don't have your logo files as an jpeg, png or svg?</p><button class="mla" onclick="openMiniHelp();">Ask for help </button></div> -->
                                     <div class="df line">
                                         <div class="sec" id="logo">
                                             <div class="onboarding-label mt-1 mb-20  fs12">LOGO</div>
@@ -299,23 +299,38 @@
                                 </div>
 
                                 <div class="tab-content colors d-none" data-tab-content="colors">
-                                    <div>
-                                    <div class="df colors-wrapper  p-4">
+
+                                <% if(brand && brand.logos && brand.logos.logo){ %>
+                                <div class="df line">
+                                    <div class="sec" id="logo">
+                                        <!--<div class="onboarding-label mt-1 mb-20 fs12">Choose from Logo</div>-->
+                                        <label class="onboarding-logo-inner">
+                                            <p></p>
+                                            <span class="onboarding-logo-preview">
+                                                <%- brand.logos.logo %>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <% } %>
+
+                                <div>
+                                    <div class="df colors-wrapper p-4">
                                         <div class="color-wrapper">
-                                            <div class="label ffp brand-label ">DARK COLOR</div>
+                                            <div class="label ffp brand-label">DARK COLOR</div>
                                             <input 
                                                 style="background-color: <%= user.account.brand.colors.primary || '#D5BA8C' %>"
                                                 type="color" 
                                                 id="primary"
-                                                class="color " 
+                                                class="color" 
                                                 value="<%= user.account.brand.colors.primary || '#1A428A' %>"   
                                                 name="primary"  
                                                 data-primary-color="<%= user.account.brand_primary || '#1A428A' %>"
                                             />
                                         </div>
-                                    
+
                                         <div class="color-wrapper">
-                                            <div class="label ffp brand-label ">LIGHT COLOR</div>
+                                            <div class="label ffp brand-label">LIGHT COLOR</div>
                                             <input
                                                 style="background-color: <%= user.account.brand.colors.secondary || '#D5BA8C' %>"
                                                 class="color" 
@@ -328,21 +343,8 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                <% if(brand && brand.logos && brand.logos.logo){ %>
-                                <div class="df line mt-4">
-                                    <div class="sec" id="logo">
-                                        <div class="onboarding-label mt-1 mb-20  fs12">Choose from Logo</div>
-                                        <label class="onboarding-logo-inner">
-                                            <p></p>
-                                            <span class="onboarding-logo-preview">
-                                                <%- brand.logos.logo %>
-                                            </span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <% } %>
-                                </div>
 
                                 <div class="tab-content info d-none" data-tab-content="info">
                                     <form data-hs-cf-bound="true">
@@ -474,6 +476,7 @@
      </script>
 
     <!-- <script src="/static/js/jquery.js"></script> -->
+
     <script src="/static/js/loader.js"></script>
     <script src="https://unpkg.com/vue@^3.4.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/svg-drag-select@0.4.2"></script>
@@ -494,6 +497,22 @@
 
             $('#svg-editor-popup-wrpr').removeClass("d-none").attr("data-type", type)
             
+            // Reset any previous selection/overlay from other types
+            try {
+                const svg = $("#svg-editor-popup-wrpr svg")[0];
+                if (svg) {
+                    const overlay = svg.querySelector('#selection-overlay');
+                    if (overlay) overlay.remove();
+                    const selected = svg.querySelectorAll('[data-selected]');
+                    selected.forEach(el => el.removeAttribute('data-selected'));
+                }
+                if (window.app) {
+                    window.app.selectedElements = [];
+                    window.app.modified_svg = '';
+                    window.app.original_svg = '';
+                }
+            } catch(_) {}
+
             $("#editor-desc").find('span').remove();
             $("#editor-desc").append(`<span>${type}</span>`);
             $("#editor-generate").find('span').remove();
@@ -519,10 +538,31 @@
         })
 
         $(document).on('click', '[data-tab]', function(e){
-            $target = $(event.target);   
-            $target.addClass('selected').siblings().removeClass("selected");
+            var $target = $(this);
             var tab = $(this).data('tab');
-            $('[data-tab-content="'+tab+'"]').removeClass('d-none').siblings().addClass('d-none')
+            
+            // Check if there are unsaved changes
+            if ($('.save-brand').hasClass('save-brand-active')) {
+                // Prevent default tab switch
+                e.preventDefault();
+                
+                // Mark the button as auto-save and store the tab to switch to
+                $('[data-save-brand]').data('auto-save', true).data('next-tab', tab);
+                
+                // Trigger the save
+                $('[data-save-brand]').click();
+                
+                // After save completes, switch tabs
+                // Wait a bit for uploads to complete
+                setTimeout(function() {
+                    $target.addClass('selected').siblings().removeClass("selected");
+                    $('[data-tab-content="'+tab+'"]').removeClass('d-none').siblings().addClass('d-none');
+                }, 500);
+            } else {
+                // No unsaved changes, just switch tabs normally
+                $target.addClass('selected').siblings().removeClass("selected");
+                $('[data-tab-content="'+tab+'"]').removeClass('d-none').siblings().addClass('d-none');
+            }
         })
     </script>
 
@@ -570,8 +610,21 @@
         methods: {
 
             init(){
-                const logo = $("#logo-preview svg")[0];
-                this.original_svg = logo?.outerHTML;
+                // Always use the main logo as the source for selection.
+                // If no logo exists, fall back to the current target (icon/wordmark) so the editor still opens.
+                const type = $("#svg-editor-popup-wrpr").attr("data-type");
+                let source = $("#logo-preview svg")[0];
+                if (!source) {
+                    if (type === 'icon') {
+                        source = $("#icon-preview svg")[0];
+                    } else if (type === 'wordmark') {
+                        source = $("#wordmark-preview svg")[0];
+                    }
+                }
+                this.original_svg = source?.outerHTML || '';
+                if (!this.original_svg) {
+                    try { alert('Please upload your Logo first to select from it.'); } catch(_) {}
+                }
             //call API
             //Setup game
             },
@@ -716,6 +769,11 @@
                             selectedElements[i].removeAttribute('data-selected')
                         }
                         self.floatingElements = [];
+
+                        // Clear selection overlay
+                        const svg = selectionStart.svg;
+                        let overlay = svg.querySelector('#selection-overlay');
+                        if (overlay) overlay.innerHTML = '';
                     },
                     onSelectionEnd: function (selectionEnd) {
                         if (selectionEnd.dragAreaInClientCoordinate.height<5 && selectionEnd.dragAreaInClientCoordinate.width<5) {
@@ -740,6 +798,9 @@
                                 self.selectedElements.push(element);
                             });
                         }
+
+                        // Draw/update selection frame
+                        drawSelectionFrame(selectionEnd.svg, self.selectedElements);
                     },
                     onSelectionChange: function (selectionChange) {
                         selectionChange.newlyDeselectedElements.forEach(function (element) {
@@ -751,12 +812,170 @@
                         selectionChange.newlySelectedElements.forEach(element => {
                         
                         });
+
+                        // Live-update selection frame as the selection changes
+                        const svg = $("#svg-editor-popup-wrpr svg")[0];
+                        drawSelectionFrame(svg, self.selectedElements);
                     },
                     selector: "intersection",
                 }
 
                 svgDragSelect(svgDragSelectOptions)
-               
+
+                // Helpers to render a nice-looking selection frame
+                function ensureOverlay(svg) {
+                    // Ensure defs with a subtle drop shadow
+                    let defs = svg.querySelector('defs');
+                    if (!defs) {
+                        defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                        svg.insertBefore(defs, svg.firstChild);
+                    }
+                    let shadow = svg.querySelector('#ps-selection-shadow');
+                    if (!shadow) {
+                        shadow = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+                        shadow.setAttribute('id', 'ps-selection-shadow');
+                        shadow.setAttribute('x', '-20%');
+                        shadow.setAttribute('y', '-20%');
+                        shadow.setAttribute('width', '140%');
+                        shadow.setAttribute('height', '140%');
+                        const feDrop = document.createElementNS('http://www.w3.org/2000/svg', 'feDropShadow');
+                        feDrop.setAttribute('dx', '0');
+                        feDrop.setAttribute('dy', '1');
+                        feDrop.setAttribute('stdDeviation', '1.2');
+                        feDrop.setAttribute('flood-color', '#000000');
+                        feDrop.setAttribute('flood-opacity', '0.25');
+                        shadow.appendChild(feDrop);
+                        defs.appendChild(shadow);
+                    }
+
+                    // Ensure CSS keyframes for dashed animation (works with px units)
+                    let animStyle = svg.querySelector('#ps-selection-anim-style');
+                    if (!animStyle) {
+                        animStyle = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+                        animStyle.setAttribute('id', 'ps-selection-anim-style');
+                        animStyle.textContent = `
+                            @keyframes psDash { to { stroke-dashoffset: 30px; } }
+                        `;
+                        defs.appendChild(animStyle);
+                    }
+
+                    // Ensure overlay group
+                    let overlay = svg.querySelector('#selection-overlay');
+                    if (!overlay) {
+                        overlay = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                        overlay.setAttribute('id', 'selection-overlay');
+                        overlay.setAttribute('pointer-events', 'none');
+                        svg.appendChild(overlay);
+                    }
+                    return overlay;
+                }
+
+                function drawSelectionFrame(svg, elements) {
+                    const overlay = ensureOverlay(svg);
+                    overlay.innerHTML = '';
+                    if (!elements || !elements.length) return;
+
+                    const bbox = getUnionBBoxInRoot(svg, elements);
+                    if (!bbox) return;
+                    // Apply visual padding around selection (fixed px converted to user units)
+                    let x = bbox.x, y = bbox.y, width = bbox.width, height = bbox.height;
+                    try {
+                        const m = svg.getScreenCTM();
+                        const sx = Math.hypot(m.a, m.c);
+                        const sy = Math.hypot(m.b, m.d);
+                        const s = (sx + sy) / 2 || 1;
+                        const padPx = 5; // desired padding in pixels
+                        const padUser = padPx / s;
+                        x -= padUser; y -= padUser; width += padUser * 2; height += padUser * 2;
+                        width = Math.max(0, width); height = Math.max(0, height);
+                    } catch(_) {}
+
+                    // Soft highlight inside the selection
+                    const fillRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    fillRect.setAttribute('x', x);
+                    fillRect.setAttribute('y', y);
+                    fillRect.setAttribute('width', width);
+                    fillRect.setAttribute('height', height);
+                    fillRect.setAttribute('rx', 10);
+                    fillRect.setAttribute('ry', 10);
+                    fillRect.setAttribute('fill', '#db3965');
+                    fillRect.setAttribute('fill-opacity', '0.10');
+                    overlay.appendChild(fillRect);
+
+                    // White halo behind the main stroke for contrast on busy backgrounds
+                    const halo = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    halo.setAttribute('x', x);
+                    halo.setAttribute('y', y);
+                    halo.setAttribute('width', width);
+                    halo.setAttribute('height', height);
+                    halo.setAttribute('rx', 10);
+                    halo.setAttribute('ry', 10);
+                    halo.setAttribute('fill', 'none');
+                    halo.setAttribute('stroke', '#FFFFFF');
+                    halo.setAttribute('stroke-width', '10');
+                    halo.style.strokeWidth = '5px';
+                    halo.setAttribute('stroke-linejoin', 'round');
+                    halo.setAttribute('vector-effect', 'non-scaling-stroke');
+                    halo.setAttribute('opacity', '0.95');
+                    halo.setAttribute('filter', 'url(#ps-selection-shadow)');
+                    overlay.appendChild(halo);
+
+                    // Main dashed stroke (no animation) with fixed visual thickness/length
+                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    rect.setAttribute('x', x);
+                    rect.setAttribute('y', y);
+                    rect.setAttribute('width', width);
+                    rect.setAttribute('height', height);
+                    rect.setAttribute('rx', 10);
+                    rect.setAttribute('ry', 10);
+                    rect.setAttribute('fill', 'none');
+                    rect.setAttribute('stroke', '#672a41');
+                    rect.setAttribute('vector-effect', 'non-scaling-stroke');
+                    // Use CSS px units so thickness and dash length are fixed regardless of SVG scaling
+                    rect.style.strokeWidth = '3px';
+                    rect.style.strokeDasharray = '20px 10px';
+                    rect.style.strokeDashoffset = '0px';
+                    rect.style.animation = 'psDash 1.2s linear infinite';
+                    rect.setAttribute('stroke-linecap', 'round');
+                    rect.setAttribute('filter', 'url(#ps-selection-shadow)');
+                    overlay.appendChild(rect);
+
+                    // Removed corner handles (circles) for a cleaner selection frame
+                }
+
+                function getUnionBBoxInRoot(svg, elements) {
+                    try {
+                        const rootCTM = svg.getScreenCTM();
+                        if (!rootCTM) return null;
+                        const invRoot = rootCTM.inverse();
+                        const toRoot = (pt, mat) => pt.matrixTransform(mat).matrixTransform(invRoot);
+
+                        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                        for (const el of elements) {
+                            const b = el.getBBox();
+                            const m = el.getScreenCTM();
+                            if (!b || !m) continue;
+
+                            const p1 = svg.createSVGPoint(); p1.x = b.x;           p1.y = b.y;
+                            const p2 = svg.createSVGPoint(); p2.x = b.x + b.width; p2.y = b.y;
+                            const p3 = svg.createSVGPoint(); p3.x = b.x;           p3.y = b.y + b.height;
+                            const p4 = svg.createSVGPoint(); p4.x = b.x + b.width; p4.y = b.y + b.height;
+
+                            const r1 = toRoot(p1, m); const r2 = toRoot(p2, m);
+                            const r3 = toRoot(p3, m); const r4 = toRoot(p4, m);
+
+                            minX = Math.min(minX, r1.x, r2.x, r3.x, r4.x);
+                            minY = Math.min(minY, r1.y, r2.y, r3.y, r4.y);
+                            maxX = Math.max(maxX, r1.x, r2.x, r3.x, r4.x);
+                            maxY = Math.max(maxY, r1.y, r2.y, r3.y, r4.y);
+                        }
+
+                        if (!isFinite(minX) || !isFinite(minY) || !isFinite(maxX) || !isFinite(maxY)) return null;
+                        return { x: minX, y: minY, width: Math.max(0, maxX - minX), height: Math.max(0, maxY - minY) };
+                    } catch (_) {
+                        return null;
+                    }
+                }
 
             }
             catch (e) {
@@ -815,6 +1034,57 @@
         $(`[data-help-tab=info]`).removeClass('d-none');
         $(`.save-brand`).removeClass('d-none')
     }
+
+    document.querySelectorAll('.color').forEach(input => {
+    input.addEventListener('click', (e) => {
+        // Remove existing tooltip if any
+        document.querySelectorAll('.color-tooltip').forEach(t => t.remove());
+
+        // Create tooltip
+        const tooltip = document.createElement('div');
+        tooltip.className = 'color-tooltip';
+        tooltip.textContent = 'Use the eyedropper tool to pick a color — hover over the part of your logo you want to pick a color from.';
+        document.body.appendChild(tooltip);
+
+        // Position beside the input
+        const rect = e.target.getBoundingClientRect();
+        tooltip.style.left = `${rect.left - tooltip.offsetWidth - 10}px`; // 10px gap on the left
+        tooltip.style.top = `${rect.bottom + 135}px`;
+
+        // Fade in
+        requestAnimationFrame(() => tooltip.style.opacity = '1');
+
+        // Function to close tooltip and remove all listeners
+        const closeTooltip = () => {
+            if (tooltip && tooltip.parentNode) {
+                tooltip.style.opacity = '0';
+                setTimeout(() => {
+                    if (tooltip && tooltip.parentNode) {
+                        tooltip.remove();
+                    }
+                }, 200);
+            }
+            // Remove all event listeners
+            input.removeEventListener('blur', closeTooltip);
+            window.removeEventListener('scroll', closeTooltip);
+            document.removeEventListener('scroll', closeTooltip);
+        };
+
+        // Remove tooltip when color picker closes (on blur)
+        input.addEventListener('blur', closeTooltip);
+
+        // Remove tooltip on window scroll
+        window.addEventListener('scroll', closeTooltip, true);
+        
+        // Also listen for scroll on document (for capturing phase)
+        document.addEventListener('scroll', closeTooltip, true);
+
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+            closeTooltip();
+        }, 5000);
+    });
+    });
 </script>
 
 <script>

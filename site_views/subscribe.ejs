@@ -1,5 +1,20 @@
 <%- include('partials/header', {async: true}); %>
 <link rel="stylesheet" href="/static/css/plans.css?<%=Date.now()%>">
+
+<!-- Welcome Modal
+<div id="welcome-modal" class="welcome-modal">
+  <div class="welcome-modal-content">
+    <span class="close-modal">&times;</span>
+    <div class="modal-text">
+      <h1>Welcome!</h1>
+      <p>
+        Discover the features designed to make your experience smooth and enjoyable. Start exploring and make the most out of your plans.
+      </p>
+      <a href="#plans-seg" class="btn-primary">Get Started</a>
+    </div>
+  </div>
+</div> -->
+
 <div class="df page-wrapper df ffp">
   <div class="page-content">
 
@@ -7,8 +22,15 @@
       <div class="page-content-wrapper">
         <div class="page-title-container d-flex justify-content-center mb-5">
           <a href='<%= affiliate ? "/landing?affiliate=true" : "/landing" %>'>
-            <img id="logo-img" src="/site_static/images/logo.svg" alt="Prettyclose" class="object-contain" style="object-fit: cover; width: 20vw;" />
+            <img id="logo-img" src="/site_static/images/logo.svg" alt="Prettyclose" class="object-contain" style="object-fit: cover; width: 10vw; margin-top: 50px;" />
           </a>
+        </div>
+
+        <div id="welcome-box">
+          <h1>Your marketing toolkit is just a moment away.</h1>
+          <p>
+            Try it free for 7 days — no commitment, just results.
+          </p>
         </div>
         <div class="df inner-content-wrapper">
           <div class="plans-wrapper">
@@ -43,6 +65,33 @@
 
   </div>
 </div>
+
+<!-- Welcome Modal Script -->
+<script>
+  $(document).ready(function() {
+    const $modal = $('#welcome-modal');
+
+    // Show modal with animation
+    $modal.addClass('show');
+
+    // Close modal when × is clicked
+    $modal.find('.close-modal').on('click', function() {
+      $modal.removeClass('show');
+    });
+
+    // Close when clicking outside the content
+    $modal.on('click', function(e) {
+      if ($(e.target).is($modal)) {
+        $modal.removeClass('show');
+      }
+    });
+
+    $modal.find('.btn-primary').on('click', function() {
+      $modal.removeClass('show');
+    });
+  });
+</script>
+
 </body>
 
 </html>

@@ -199,7 +199,7 @@ app.use((req, res, next) => {
 
     let brand = req.user.account.brand;
     let user = req.user;
-
+    
     if (
       !url.startsWith("settings") &&
       !url.startsWith("subscribe") &&
@@ -207,7 +207,7 @@ app.use((req, res, next) => {
       !url.startsWith("brand/brand-assets-payment") &&
       !url.startsWith("brand/logo") &&
       (!brand || !brand.logos || !brand.logos.logo) &&
-      (!user.phone && !user.account.name && !user.account.brand_phone) &&
+      (!user.phone && !user.account.brand_phone) &&
       (!url.startsWith("brand") ||
         (req.user.master && !url.startsWith("setup")))
     ) {

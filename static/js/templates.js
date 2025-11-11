@@ -152,7 +152,8 @@ $(document)
 
     console.log("imgSrc", imgSrc);
 
-    if (imgSrc) window.location.href = "/editor/branded-design/" + template_id;
+    // Open editor via resolver route that ensures a per-user/brand design copy
+    if (imgSrc) window.location.href = "/editor/open/" + template_id;
 
     return false;
   })

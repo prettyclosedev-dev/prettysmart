@@ -527,7 +527,7 @@ async function graphqlRequest(query, variables) {
       Authorization: `Bearer ${config.CLYPS_API_KEY}`, //"c819f484-71e7-4514-b5ab-98d980f48442",
     },
     method: "POST",
-    uri: "https://clyps.io/graphql",
+    uri: `${config.CLYPS_BASE_URL}/graphql`,
     body: { query, variables },
     json: true,
   };

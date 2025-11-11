@@ -3,6 +3,8 @@ const router = express.Router();
 const Account = require("../schemas/account");
 const User = require("../schemas/user");
 const config = require("../config");
+const {sendWelcomeEmail} = require("../lib/mail");
+
 const {
   getHardcodedCurrentPlan,
   getCurrentPrice,
@@ -155,6 +157,14 @@ module.exports = () => {
 
       req.user.account.plan_id = subscription.plan.id;
       res.locals.plan_name = getHardcodedCurrentPlan(req.user.account.plan_id);
+
+      try {
+          await sendWelcomeEmail(req.user.email);
+          console.log("Welcome email sent successfully.");
+        } catch (emailError) {
+          console.error("Failed to send welcome email:", emailError);
+          // Don't block signup if email fails
+        }
 
       try {
         const contactID = await searchContactByEmail(req.user.email);

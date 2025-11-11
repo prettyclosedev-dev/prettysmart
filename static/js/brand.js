@@ -4,6 +4,77 @@ if (window.location.pathname.includes("brand")) {
   // TextType.start();
 }
 
+// ===== SESSION STORAGE FOR UPLOADED FILES =====
+// Store uploaded SVGs in session storage so they persist during the tab session
+function saveUploadedFileToSession(name, svgHtml) {
+  if (!sessionStorage) return;
+  const storageKey = `brand_upload_${name}`;
+  console.log(`Saving to session: ${storageKey}`);
+  sessionStorage.setItem(storageKey, svgHtml);
+}
+
+function getUploadedFileFromSession(name) {
+  if (!sessionStorage) return null;
+  const storageKey = `brand_upload_${name}`;
+  const saved = sessionStorage.getItem(storageKey);
+  console.log(`Retrieved from session ${storageKey}:`, saved ? 'Found' : 'Not found');
+  return saved;
+}
+
+function restoreUploadedFilesFromSession() {
+  if (!sessionStorage) return;
+  
+  console.log('Attempting to restore uploaded files from session...');
+  // Map storage keys to preview element IDs (they might have different names)
+  const typeMap = {
+    'logo': 'logo-preview',
+    'icon': 'icon-preview',
+    'watermark': 'wordmark-preview'  // Note: storage key is "watermark" but preview ID is "wordmark-preview"
+  };
+  
+  Object.entries(typeMap).forEach(([storageType, previewId]) => {
+    const saved = getUploadedFileFromSession(storageType);
+    if (saved) {
+      console.log(`Restoring ${storageType} from session storage to #${previewId}`);
+      const previewElement = $(`#${previewId}`);
+      if (previewElement.length) {
+        // Remove any existing SVG first
+        previewElement.find('svg').remove();
+        // Restore from session storage
+        previewElement.prepend(saved);
+        previewElement.siblings('input').addClass('touched svg-string');
+        previewElement.find('.logo-select-wrapper').addClass('floating');
+        console.log(`Successfully restored ${storageType}`);
+      }
+    }
+  });
+}
+
+function clearSessionStorage() {
+  if (!sessionStorage) return;
+  const types = ['logo', 'icon', 'watermark'];
+  types.forEach(type => {
+    const storageKey = `brand_upload_${type}`;
+    sessionStorage.removeItem(storageKey);
+    console.log(`Cleared session storage for ${type}`);
+  });
+}
+
+// Restore files on page load - with multiple timing attempts
+$(document).ready(function() {
+  restoreUploadedFilesFromSession();
+  setTimeout(restoreUploadedFilesFromSession, 300);
+  setTimeout(restoreUploadedFilesFromSession, 800);
+});
+
+// Also restore when the page becomes visible (tab switch)
+$(document).on('visibilitychange', function() {
+  if (!document.hidden) {
+    restoreUploadedFilesFromSession();
+  }
+});
+// ===== END SESSION STORAGE =====
+
 $(".google_font")
   .fontpicker({
     lang: "en",
@@ -56,6 +127,44 @@ $(document)
       $(".upload-assets-btn").removeClass("upload-assets-btn-active");
     }
   })
+  
+  // Drag and drop for Logo, Icon, and Wordmark
+  .on("dragenter", ".onboarding-logo-preview", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $(this).closest(".onboarding-logo-inner").addClass("drag-over");
+  })
+  .on("dragover", ".onboarding-logo-preview", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  })
+  .on("dragleave", ".onboarding-logo-preview", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $(this).closest(".onboarding-logo-inner").removeClass("drag-over");
+  })
+  .on("drop", ".onboarding-logo-preview", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    var $this = $(this);
+    var $container = $this.closest(".onboarding-logo-inner");
+    $container.removeClass("drag-over");
+    
+    // Get the dropped files
+    var files = e.originalEvent.dataTransfer.files;
+    if (files && files.length > 0) {
+      // Get the corresponding file input for this section
+      var $input = $container.find('[type="file"]');
+      
+      // Set the files to the input
+      $input[0].files = files;
+      
+      // Trigger change event to handle the upload
+      $input.trigger("change");
+    }
+  })
+  
   .on("input", '[type="color"]', function () {
     var $this = $(this),
       name = $(this).attr("name"),
@@ -78,18 +187,53 @@ $(document)
     $this.addClass("touched");
     addTabState("info", "draft");
   })
-  .on("click", "[data-save-brand]", function () {
-    if ($(this).hasClass("save-brand-active")) {
-      console.log("UPDATING ");
-      updateLogos();
-      updateColors();
-      updateFonts();
-      updateGoogleFonts();
-      updateInfo();
-      uploadAvatar();
-      window.location.reload();
+  // Enhanced save handler: waits for color persistence before navigating
+  .on("click", "[data-save-brand]", async function (e) {
+    // Check if there are any changes to save
+    var hasChanges = $(".save-brand").hasClass("save-brand-active") || 
+                     $('[type="file"].touched').length > 0 ||
+                     $('[type="text"].touched').length > 0 ||
+                     $('[type="color"].touched').length > 0 ||
+                     $('[type="input"].touched').length > 0 ||
+                     $("#avatar-input")[0]?.files?.length > 0;
+    
+    if (!hasChanges) {
+      console.log("No changes to save, redirecting to templates");
+      window.location.href = '/templates';
+      return;
+    }
+    
+    console.log("UPDATING ");
+    
+    // Store if this is an auto-save
+    var isAutoSave = $(e.target).closest('[data-save-brand]').data('auto-save');
+    
+  updateLogos();
+  // capture a promise for color updates so we can await them reliably
+  const colorUpdates = updateColors();
+    updateFonts();
+    updateGoogleFonts();
+    updateInfo(false, isAutoSave);
+    uploadAvatar(isAutoSave);
+    // Clear session storage after successful save
+    clearSessionStorage();
+    
+    // For auto-save, clear touched files so they don't get re-uploaded
+    if (isAutoSave) {
+      setTimeout(function() {
+        $('[type="file"]').removeClass("touched");
+        $(".save-brand").removeClass("save-brand-active");
+        $('[data-save-brand]').data('auto-save', false);
+      }, 800);
     } else {
-      console.log("Nothing changed");
+      // Manual save: wait for color persistence, then force a brand build before landing on templates.
+      try {
+        await colorUpdates; // ensure POST /brand/color finished
+      } catch(err) {
+        console.warn('Color update encountered an error, continuing redirect:', err);
+      }
+      // Use build route so server regenerates brand artifacts before templates render
+      window.location.href = '/brand/build?url=/templates';
     }
   });
 
@@ -119,8 +263,14 @@ $(".onboarding-logo-inner").bind("drop", function (e) {
   var file = e.originalEvent.dataTransfer.files[0];
   var { type, name } = file;
 
-  const allowedTypes = ["image/svg+xml", "application/pdf"];
-  if (allowedTypes.includes(type)) {
+  // Check by file extension as well as MIME type (browsers don't always report correct MIME types)
+  const allowedMimeTypes = ["image/svg+xml", "application/pdf", "image/jpeg", "image/png"];
+  const allowedExtensions = [".svg", ".pdf", ".ai", ".jpg", ".jpeg", ".png"];
+  const fileExtension = name.substring(name.lastIndexOf(".")).toLowerCase();
+  
+  const isAllowedType = allowedMimeTypes.includes(type) || allowedExtensions.includes(fileExtension);
+  
+  if (isAllowedType) {
     var $input = $(this).find('[type="file"]');
     $input.addClass("touched");
     $input[0].files = e.originalEvent.dataTransfer.files;
@@ -133,7 +283,7 @@ $(".onboarding-logo-inner").bind("drop", function (e) {
     uploadLogo($(this), true);
     addTabState("logo", "draft");
   } else {
-    alert("Unsupported file type. Please upload a .pdf, .ai or .svg");
+    alert("Unsupported file type. Please upload a .pdf, .ai, .svg, .jpg, .jpeg or .png");
   }
 });
 // Drag font
@@ -238,18 +388,25 @@ function uploadFile($this, type, draft, data, name) {
           $this.find(".onboarding-logo-preview").prepend(trimmedSvg);
 
           $this.find('[type="file"].touched').addClass("svg-string");
+          
+          // Save to session storage
+          const svgHtml = trimmedSvg.prop("outerHTML");
+          saveUploadedFileToSession(name, svgHtml);
         }
         if (!draft) {
           $this.find('[type="file"]').removeClass("touched");
 
-          $(`[data-tab-content="colors"]`)
-            .find(".onboarding-logo-preview")
-            .children("svg")
-            .remove();
-          var newSvg = trimmedSvg.clone();
-          $(`[data-tab-content="colors"]`)
-            .find(".onboarding-logo-preview")
-            .prepend(newSvg);
+          // Only update colors tab if this is the logo (not icon or watermark)
+          if (name === 'logo') {
+            $(`[data-tab-content="colors"]`)
+              .find(".onboarding-logo-preview")
+              .children("svg")
+              .remove();
+            var newSvg = trimmedSvg.clone();
+            $(`[data-tab-content="colors"]`)
+              .find(".onboarding-logo-preview")
+              .prepend(newSvg);
+          }
         } else {
           // draft_brand.logos[name] = res.brand.logos[name];
           // displayBrand(draft_brand);
@@ -266,6 +423,14 @@ function uploadFile($this, type, draft, data, name) {
       }
 
       addTabState("logo", draft ? "draft" : "success");
+      
+      // Auto-save after draft upload completes and tab state is updated
+      if (draft && $(".save-brand").hasClass("save-brand-active")) {
+        setTimeout(function() {
+          // Mark button with auto-save flag and trigger save
+          $('[data-save-brand]').data('auto-save', true).click();
+        }, 300);
+      }
     },
     error: function (err) {
       $this.stopLoading();
@@ -276,6 +441,7 @@ function uploadFile($this, type, draft, data, name) {
 }
 
 function updateColors(noreload, cb) {
+  const promises = [];
   $('[type="color"]').each(function () {
     var $this = $(this),
       name = $this.attr("name"),
@@ -284,55 +450,35 @@ function updateColors(noreload, cb) {
     if ($this.hasClass("touched")) {
       window.UPDATE_COUNTER++;
       $this.closest(".onboarding-color-outer").loading();
-      $.post("/brand/color", {
-        name: name,
-        color: val,
-      })
+      const p = $.post('/brand/color', { name, color: val })
         .then(function (res) {
-          $this.closest(".onboarding-color-outer").stopLoading();
+          $this.closest('.onboarding-color-outer').stopLoading();
           if (res.success) {
-            $this.removeClass("touched");
-
-            $(name === "primary" ? ".color-primary" : ".color-secondary").css(
-              "background-color",
-              val
-            );
-            $(name === "primary" ? "#primary" : "#secondary").css(
-              "background-color",
-              val
-            );
-
-            $(name === "primary" ? "#primary" : "#secondary").attr(
-              "value",
-              val
-            );
-            $(name === "primary" ? "#primary" : "#secondary").attr(
-              "data-secondary-color",
-              val
-            );
+            $this.removeClass('touched');
+            $(name === 'primary' ? '.color-primary' : '.color-secondary').css('background-color', val);
+            $(name === 'primary' ? '#primary' : '#secondary').css('background-color', val)
+              .attr('value', val)
+              .attr(name === 'primary' ? 'data-primary-color' : 'data-secondary-color', val);
           }
           window.UPDATE_COUNTER--;
           if (window.UPDATE_COUNTER === 1) {
             displayBrand();
           }
-
-          addTabState("colors", "success");
-
-          if (!noreload) {
-            // window.location.reload(); // to refresh logo colors
-          }
-
-          if (cb) {
-            cb();
-          }
+          addTabState('colors', 'success');
+          return res;
         })
-        .catch((err) => {
-          $this.closest(".onboarding-color-outer").stopLoading();
-          addTabState("colors", "failed");
-          console.log(err);
+        .catch(function (err) {
+          $this.closest('.onboarding-color-outer').stopLoading();
+          addTabState('colors', 'failed');
+          console.error('Color update failed', err);
+          window.UPDATE_COUNTER--;
         });
+      promises.push(p);
     }
   });
+  const all = promises.length ? Promise.all(promises) : Promise.resolve();
+  if (cb) all.finally(cb);
+  return all;
 }
 
 function processBrandAssetPayment(dirPM, skipPayment) {
@@ -558,7 +704,7 @@ function updateFontCSS(ff, res) {
   );
 }
 
-function updateInfo(draft) {
+function updateInfo(draft, isAutoSave) {
   var data = {};
 
   $('[type="text"].touched').each(function () {
@@ -608,7 +754,10 @@ function updateInfo(draft) {
 
         addTabState("info", draft ? "draft" : "success");
 
-        window.location.reload();
+        // Only reload if not auto-save
+        if (!isAutoSave) {
+          window.location.reload();
+        }
       }
     })
     .catch(function (err) {
@@ -623,7 +772,7 @@ function updateInfo(draft) {
     });
 }
 
-function uploadAvatar() {
+function uploadAvatar(isAutoSave) {
   var $file = $("#avatar-input");
   if ($file.length && $file[0].files.length) {
       var type = $file.data("file-type"),
@@ -642,7 +791,10 @@ function uploadAvatar() {
           processData: false,
           success: function (res) {
               if (res.success) {
-                window.location.reload();
+                // Only reload if not auto-save
+                if (!isAutoSave) {
+                  window.location.reload();
+                }
                 addTabState("profile", "success");
               }
               else {
