@@ -25,7 +25,9 @@ module.exports = () => {
       const plans = await getPlans(req.user.id);
     
       if (plans && plans.data && plans.data.length) {
+        // let currentInterval = getCurrentInterval(plans, subscription, req);
         let currentInterval = "year";
+
 
         res.render("subscribe", {
           products: plans,
