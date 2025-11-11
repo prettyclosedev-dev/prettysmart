@@ -1,5 +1,5 @@
 const config = require("../config");
-const stripe = require("stripe")(config.stripe.test.secret);
+const stripe = require("stripe")(config.stripe.prod.secret);
 const Usage = require("../schemas/usage");
 
 function getPricePerProduct(product_id, plans, interval_type) {

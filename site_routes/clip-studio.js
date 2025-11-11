@@ -13,7 +13,7 @@ const { body, validationResult } = require("express-validator");
 const openAi = require("../openAi");
 const { searchContactByEmail, updateContact } = require("../hubspot");
 const { getCurrentInterval, getPricePerProduct } = require("./utils");
-const stripe = require("stripe")(config.stripe.test.secret);
+const stripe = require("stripe")(config.stripe.prod.secret);
 
 module.exports = () => {
   router.get("/", async (req, res) => {

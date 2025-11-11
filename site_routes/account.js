@@ -5,7 +5,7 @@ const Account = require("../schemas/account");
 const User = require("../schemas/user");
 const config = require("../config");
 const openAi = require("../openAi");
-const stripe = require("stripe")(config.stripe.test.secret);
+const stripe = require("stripe")(config.stripe.prod.secret);
 const { body, validationResult } = require("express-validator");
 const TEAM_PRICES = [config.stripe.plans.team.year, config.stripe.plans.team.month];
 
