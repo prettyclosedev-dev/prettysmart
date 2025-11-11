@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const rp = require("request-promise");
 const config = require("../config");
-const stripe = require("stripe")(config.stripe.prod.secret);
+const stripe = require("stripe")(config.stripe.test.secret);
 const { getPricePerProduct, getCurrentInterval } = require("./utils");
 const User = require("../schemas/user");
 const Account = require("../schemas/account");
@@ -11,6 +11,7 @@ const { setupDefaults } = require("./brand");
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
+const { getPlans } = require("../lib/stripe");
 
 const OLD_DOMAIN = "https://prettysmart.co";
 const NEW_DOMAIN = "https://prettyclose.co";
@@ -25,7 +26,7 @@ module.exports = () => {
     // }
 
     req.session.affiliate = req.query.affiliate;
-    const plans = await getPlans();
+    const plans = await getPlans("no user")
     let currentInterval = getCurrentInterval(plans, null, req);
     res.render("landing", {
       signup_root: "/landing",
@@ -41,7 +42,7 @@ module.exports = () => {
 
   router.get("/landing", async (req, res) => {
     req.session.affiliate = req.query.affiliate;
-    const plans = await getPlans(req.query.affiliate);
+    const plans = await getPlans("no user")
     let currentInterval = getCurrentInterval(plans, null, req);
     res.render("landing", {
       signup_root: "/landing",
@@ -59,7 +60,7 @@ module.exports = () => {
     const interval = req.params.interval;
 
     try {
-      const plans = await getPlans();
+      const plans = await getPlans("no user");
       if (plans && plans.data && plans.data.length) {
         res.render("landing", {
           products: plans,
@@ -95,7 +96,7 @@ module.exports = () => {
     const interval = req.params.interval;
 
     try {
-      const plans = await getPlans();
+      const plans = await getPlans("no user");
       if (plans && plans.data && plans.data.length) {
         res.render("landing", {
           products: plans,
@@ -129,87 +130,6 @@ module.exports = () => {
 
   return router;
 };
-
-async function getPlans() {
-  try {
-    const plans = await stripe.plans.list({ active: true, limit: 40 });
-    const products = await stripe.products.list({ active: true });
-
-    const indexOfBasic = products.data
-      .map((prod) => prod.name)
-      .indexOf("Basic");
-    if (indexOfBasic > -1) {
-      products.data.splice(indexOfBasic, 1);
-    }
-
-    const indexOfBrandHelpProd = products.data
-      .map((prod) => prod.id)
-      .indexOf("prod_LFnXWepOlSCWVD");
-    if (indexOfBrandHelpProd > -1) {
-      products.data.splice(indexOfBrandHelpProd, 1);
-    }
-
-    const indexOfFree = products.data.map((p) => p.name).indexOf("Free");
-    if (indexOfFree > -1) {
-      products.data.splice(indexOfFree, 1);
-    }
-
-    const indexOfStarter = products.data.map((p) => p.name).indexOf("Starter");
-    if (indexOfStarter > -1) {
-      products.data.splice(indexOfStarter, 1);
-    }
-
-    const indexOfUnlimited = products.data
-      .map((p) => p.name)
-      .indexOf("Unlimited");
-    if (indexOfUnlimited > -1) {
-      products.data.splice(indexOfUnlimited, 1);
-    }
-
-    const indexOfPro = products.data.map((p) => p.name).indexOf("Pro");
-    if (indexOfPro > -1) {
-      products.data.splice(indexOfPro, 1);
-    }
-
-    const indexOfBusiness = products.data
-      .map((p) => p.name)
-      .indexOf("Business");
-    if (indexOfBusiness > -1) {
-      products.data.splice(indexOfBusiness, 1);
-    }
-
-    const indexOfAgency = products.data.map((p) => p.name).indexOf("Agency");
-    if (indexOfAgency > -1) {
-      products.data.splice(indexOfAgency, 1);
-    }
-
-    if (products && products.data) {
-      products.data.map((product) => {
-        product.prices = {
-          year: getPricePerProduct(product.id, plans, "year"),
-          month: getPricePerProduct(product.id, plans, "month"),
-        };
-
-        if (product.name === "Team") {
-          product.prices.month.amount *= 2; // Minimum of 2 agents
-          product.prices.year.amount *= 2; // Minimum of 2 agents
-        }
-      });
-
-      products.data.sort((a, b) => {
-        return a.prices.month.amount - b.prices.month.amount;
-      });
-
-
-      console.log({
-        plans: JSON.stringify(plans),
-        // products: JSON.stringify(products),
-      })
-      
-      return products;
-    }
-  } catch (error) { }
-}
 
 async function downloadFile(url, dest) {
   try {

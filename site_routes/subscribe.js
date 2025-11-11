@@ -3,8 +3,8 @@ const router = express.Router();
 const User = require("../schemas/user");
 const Account = require("../schemas/account");
 const config = require("../config");
-const stripe = require("stripe")(config.stripe.prod.secret);
-const { getPricePerProduct, getCurrentInterval } = require("./utils");
+const stripe = require("stripe")(config.stripe.test.secret);
+const { getPlans } = require("../lib/stripe");
 
 module.exports = () => {
   router.get("/", async (req, res) => {
@@ -22,7 +22,8 @@ module.exports = () => {
         );
       }
 
-      const plans = await getPlans(req.session.affiliate);
+      const plans = await getPlans(req.user.id);
+    
       if (plans && plans.data && plans.data.length) {
         // let currentInterval = getCurrentInterval(plans, subscription, req);
         let currentInterval = "year";
@@ -116,7 +117,7 @@ module.exports = () => {
         );
       }
 
-      const plans = await getPlans(req.session.affiliate);
+      const plans = await getPlans(req.user.id);
       if (plans && plans.data && plans.data.length) {
         res.render("subscribe", {
           products: plans,
@@ -151,78 +152,3 @@ module.exports = () => {
 
   return router;
 };
-
-async function getPlans() {
-  try {
-    const plans = await stripe.plans.list({ active: true, limit: 40 });
-    const products = await stripe.products.list({ active: true });
-
-    const indexOfBasic = products.data
-      .map((prod) => prod.name)
-      .indexOf("Basic");
-    if (indexOfBasic > -1) {
-      products.data.splice(indexOfBasic, 1);
-    }
-
-    const indexOfBrandHelpProd = products.data
-      .map((prod) => prod.id)
-      .indexOf("prod_LFnXWepOlSCWVD");
-    if (indexOfBrandHelpProd > -1) {
-      products.data.splice(indexOfBrandHelpProd, 1);
-    }
-
-    const indexOfFree = products.data.map((p) => p.name).indexOf("Free");
-    if (indexOfFree > -1) {
-      products.data.splice(indexOfFree, 1);
-    }
-
-    const indexOfStarter = products.data.map((p) => p.name).indexOf("Starter");
-    if (indexOfStarter > -1) {
-      products.data.splice(indexOfStarter, 1);
-    }
-
-    const indexOfUnlimited = products.data
-      .map((p) => p.name)
-      .indexOf("Unlimited");
-    if (indexOfUnlimited > -1) {
-      products.data.splice(indexOfUnlimited, 1);
-    }
-
-    const indexOfPro = products.data.map((p) => p.name).indexOf("Pro");
-    if (indexOfPro > -1) {
-      products.data.splice(indexOfPro, 1);
-    }
-
-    const indexOfBusiness = products.data
-      .map((p) => p.name)
-      .indexOf("Business");
-    if (indexOfBusiness > -1) {
-      products.data.splice(indexOfBusiness, 1);
-    }
-
-    const indexOfAgency = products.data.map((p) => p.name).indexOf("Agency");
-    if (indexOfAgency > -1) {
-      products.data.splice(indexOfAgency, 1);
-    }
-
-    if (products && products.data) {
-      products.data.map((product) => {
-        product.prices = {
-          year: getPricePerProduct(product.id, plans, "year"),
-          month: getPricePerProduct(product.id, plans, "month"),
-        };
-
-        if (product.name === "Team") {
-          product.prices.month.amount *= 2; // Minimum of 2 agents
-          product.prices.year.amount *= 2; // Minimum of 2 agents
-        }
-      });
-
-      products.data.sort((a, b) => {
-        return a.prices.month.amount - b.prices.month.amount;
-      });
-
-      return products;
-    }
-  } catch (error) {}
-}

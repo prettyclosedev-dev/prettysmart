@@ -4,13 +4,13 @@ const Account = require("../schemas/account");
 const User = require("../schemas/user");
 const config = require("../config");
 const { unarchiveUser, archiveUser } = require("../admin_huddle");
-const stripe = require("stripe")(config.stripe.prod.secret);
+const stripe = require("stripe")(config.stripe.test.secret);
 
 module.exports = () => {
   router.post("/", async (req, res) => {
     let data;
     let eventType;
-    const webhookSecret = config.stripe.prod.webhook;
+    const webhookSecret = config.stripe.test.webhook;
 
     if (webhookSecret) {
       // Retrieve the event by verifying the signature using the raw body and secret.

@@ -28,6 +28,11 @@ module.exports = function (passport) {
       .populate("account")
       .populate("multiAccounts")
       .then((db_user) => {
+        if (!db_user) {
+          console.warn("⚠️ User not found during deserializeUser");
+          return done(null, false);
+        }
+
         done(
           null,
           Object.assign(db_user, {

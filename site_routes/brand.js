@@ -14,7 +14,7 @@ const openAi = require("../openAi");
 const _ = require("lodash");
 const { handleBrandChange } = require("../clyps_brand_update");
 const user = require("../schemas/user");
-const stripe = require("stripe")(config.stripe.prod.secret);
+const stripe = require("stripe")(config.stripe.test.secret);
 const mailchimp = require("@mailchimp/mailchimp_transactional")(
   config.mandrill.apiKey
 );
@@ -52,6 +52,8 @@ async function setupDefaults(req) {
   // await setupDefaultColors(req);
   await setDefaultFonts(req, user_path);
   // await setDefaultAssets(req, user_path);
+  await setDefaultLogos(req, user_path);
+  await setDefaultAvatar(req, user_path);
 }
 
 async function setDefaultInformation(req) {
@@ -308,6 +310,90 @@ async function setupDefaultColors(req) {
   }
 }
 
+async function setDefaultAvatar(req) {
+  const avatars_path = path.join(
+      __dirname,
+      "../files/" + req.user.account._id + "/avatars/" + req.user.id
+  );
+
+  if(!fs.existsSync(avatars_path))
+    fs.mkdirSync(avatars_path, { recursive: true });
+    
+  const hasAvatarInDB = req.user.avatar
+  const hasAvatarInFiles = fs.existsSync(avatars_path + "/avatar.jpg")
+
+  console.log("hasAvatarInDB", hasAvatarInDB);
+  console.log("hasAvatarInFiles", hasAvatarInFiles);
+
+  if (hasAvatarInDB && hasAvatarInFiles) return;  
+
+  const filename = "avatar.jpg"; 
+
+  fs.copyFileSync(
+    path.join(__dirname, "../defaults/avatars/" + filename),
+    avatars_path + "/" + filename
+  );
+
+  console.log("filename", filename);
+  console.log("_id", req.user.id);
+
+  await User.findOneAndUpdate(
+    {
+      _id: req.user.id,
+    },
+    {
+      $set: {
+        avatar: filename,
+      },
+    },
+    {
+      new: true,
+    }
+  ).then(async (user) => {
+    console.log("Added default avatar to user:", user);
+  }).catch((error) => {
+    console.log("Error adding default avatar to user:", error);
+  });
+}
+
+async function setDefaultLogos(req) {
+  const logos_path = path.join(
+      __dirname,
+      "../files/" + req.user.account._id + "/logos/"
+  );
+
+  if(!fs.existsSync(logos_path))
+    fs.mkdirSync(logos_path, { recursive: true });
+
+  const filenames = ["logo.svg", "icon.svg", "watermark.svg"];
+
+  filenames.forEach((filename) => {
+    if (fs.existsSync(logos_path + "/" + filename)) return
+
+    fs.copyFileSync(
+      path.join(__dirname, "../defaults/logos/" + filename),
+      logos_path + "/" + filename
+    );
+  });
+
+  await Account.findOneAndUpdate(
+    {
+      _id: req.user.account._id,
+    },
+    {
+      $set: {
+        "brand.logos.logo": "logo.svg",
+        "brand.logos.icon": "icon.svg",
+        "brand.logos.watermark": "watermark.svg",
+      },
+    },
+    {
+      new: true,
+    }
+  )
+}
+
+
 function copyFile(from, to) {
   fs.copyFile(from, to, (err) => {
     if (err) throw err;
@@ -361,8 +447,12 @@ module.exports = () => {
   router.get("/", async (req, res) => {
     await setupDefaults(req);
 
+    const user = await User.findById(req.user.id)
+                        .populate("account")
+                        .populate("multiAccounts")
+
     try {
-      await handleBrandChange(req.user);
+      await handleBrandChange(user);
     } catch (e) {
       console.log(e);
     }
@@ -370,10 +460,10 @@ module.exports = () => {
     let paymentMethods = [];
     let paymentMethodsList = {};
 
-    if (req.user.account.stripe_session_id) {
+    if (user.account.stripe_session_id) {
       try {
         const checkoutsession = await stripe.checkout.sessions.retrieve(
-          req.user.account.stripe_session_id
+          user.account.stripe_session_id
         );
 
         const customer = await stripe.customers.retrieve(
@@ -392,14 +482,14 @@ module.exports = () => {
     }
 
     res.render("brand", {
-      user: req.user,
+      user: user,
       templates: [],
       brand: {
         ...(await Huddle.getBrandObject(req.user.account).catch(console.log)),
         brand_phone: "1",
       },
       paymentMethods,
-      stripe_pub_key: config.stripe.prod.pub,
+      stripe_pub_key: config.stripe.test.pub,
       cache: true,
       filename: "brand",
     });
@@ -556,7 +646,7 @@ module.exports = () => {
       if (!cleanFile.includes("path") || cleanFile.includes("image")) {
         let exText = "";
         if (!cleanFile.includes("path")) {
-          exText = "No path attributes found.";
+          exText = "Please upload jpeg or png";
         } else if (cleanFile.includes("image")) {
           exText = "Image based svg's are not allowed.";
         }
