@@ -100,7 +100,7 @@ async function getCategories(variables) {
       Authorization: `Bearer ${config.CLYPS_API_KEY}`,
     },
     method: "POST",
-    uri: "http://localhost:4000/graphql",
+    uri: `${config.CLYPS_BASE_URL}/graphql`,
     body: {
       query: getCategoriesQuery,
       variables,
@@ -150,7 +150,7 @@ async function getCategoriesWithDesigns(variables) {
       Authorization: `Bearer ${config.CLYPS_API_KEY}`,
     },
     method: "POST",
-    uri: "http://localhost:4000/graphql",
+    uri: `${config.CLYPS_BASE_URL}/graphql`,
     body: {
       query: getCategoriesWithDesignsQuery,
       variables,
@@ -193,7 +193,7 @@ async function getFullCategories(variables) {
       Authorization: `Bearer ${config.CLYPS_API_KEY}`,
     },
     method: "POST",
-    uri: "http://localhost:4000/graphql",
+    uri: `${config.CLYPS_BASE_URL}/graphql`,
     body: {
       query: getFullCategoriesQuery,
       variables,
@@ -221,7 +221,7 @@ async function graphqlRequest(query, variables) {
       Authorization: `Bearer ${config.CLYPS_API_KEY}`, //"c819f484-71e7-4514-b5ab-98d980f48442",
     },
     method: "POST",
-    uri: "http://localhost:4000/graphql",
+    uri: `${config.CLYPS_BASE_URL}/graphql`,
     body: { query, variables },
     json: true,
   };
