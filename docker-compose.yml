@@ -5,7 +5,7 @@ services:
       dockerfile: dockerfile
     container_name: prettyclose-prod
     ports:
-      - "11000:3000"
+      - "18000:3000"
     restart: unless-stopped
     volumes:
       - ./volumes/app:/app
