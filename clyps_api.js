@@ -98,6 +98,7 @@ async function getCategories(variables) {
   const options = {
     headers: {
       Authorization: `Bearer ${config.CLYPS_API_KEY}`,
+      "Content-Type": "application/json"
     },
     method: "POST",
     uri: `${config.CLYPS_BASE_URL}/graphql`,
@@ -148,6 +149,7 @@ async function getCategoriesWithDesigns(variables) {
   const options = {
     headers: {
       Authorization: `Bearer ${config.CLYPS_API_KEY}`,
+      "Content-Type": "application/json"
     },
     method: "POST",
     uri: `${config.CLYPS_BASE_URL}/graphql`,
@@ -218,7 +220,8 @@ async function getFullCategories(variables) {
 async function graphqlRequest(query, variables) {
   const options = {
     headers: {
-      Authorization: `Bearer ${config.CLYPS_API_KEY}`, //"c819f484-71e7-4514-b5ab-98d980f48442",
+      Authorization: `Bearer ${config.CLYPS_API_KEY}`,
+      "Content-Type": "application/json"
     },
     method: "POST",
     uri: `${config.CLYPS_BASE_URL}/graphql`,
