@@ -147,7 +147,7 @@ module.exports = () => {
           Authorization: `Bearer ${config.CLYPS_API_KEY}`,
         },
         method: "POST",
-        uri: "http://localhost:4000/graphql",
+        uri: config.prettyclose_apps.api.localUrl + "/graphql",
         body: { query: createMutation, variables: createVariables },
         json: true,
       };
@@ -224,7 +224,7 @@ module.exports = () => {
           Authorization: `Bearer ${config.CLYPS_API_KEY}`,
         },
         method: "POST",
-        uri: "http://localhost:4000/graphql",
+        uri: config.prettyclose_apps.api.localUrl + "/graphql",
         body: { query, variables: patchedVars, operationName },
         json: true,
       };

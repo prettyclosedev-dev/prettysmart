@@ -51,7 +51,7 @@
       window.fetch = function(input, init) {
         try {
           let url = typeof input === 'string' ? input : (input && input.url) || '';
-          const isGraphQL = /\/graphql(\?.*)?$/i.test(url) || url.includes('http://localhost:4000/graphql');
+          const isGraphQL = /\/graphql(\?.*)?$/i.test(url) || url.includes('pretty-smart-editor-api-prod:4000/graphql');
           if (isGraphQL) {
             // Route GraphQL calls through same-origin proxy to avoid CORS and to inject scoping
             const proxyUrl = '/editor/graphql-proxy';
