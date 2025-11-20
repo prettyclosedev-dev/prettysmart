@@ -18,6 +18,7 @@ const stripe = require("stripe")(config.stripe.prod.secret);
 const mailchimp = require("@mailchimp/mailchimp_transactional")(
   config.mandrill.apiKey
 );
+const { trace } = require("potrace");
 
 var attributes = {
   fill: "#1A428A",
@@ -596,6 +597,17 @@ module.exports = () => {
   });
 
   router.post("/logo", async (req, res) => {
+    // Basic validation of incoming file field
+    if (!req.body.name) {
+      return res.status(400).send({ success: false, error: "Missing file field name." });
+    }
+    if (!req.files || !req.files[req.body.name]) {
+      return res.status(400).send({
+        success: false,
+        error: `No file uploaded for field '${req.body.name}'.`
+      });
+    }
+
     let fileName = req.files[req.body.name].name;
     let fileExt = fileName.split(".").pop();
     let logo_path = path.join(__dirname, "../files/" + req.user.account._id);
@@ -640,21 +652,38 @@ module.exports = () => {
         }
       }
 
-      var cleanFile = fs.readFileSync(upload_path.replace(fileExt, "svg"));
+      let svgPath = upload_path.replace(fileExt, "svg");
+      var cleanFile = fs.readFileSync(svgPath);
       cleanFile = cleanFile.toString();
 
-      if (!cleanFile.includes("path") || cleanFile.includes("image")) {
-        let exText = "";
-        if (!cleanFile.includes("path")) {
-          exText = "Please upload jpeg or png";
-        } else if (cleanFile.includes("image")) {
-          exText = "Image based svg's are not allowed.";
+      // Validate resulting SVG: must contain at least one vector shape element and not rely on <image>
+      let hasVectorElement = /(path|rect|circle|polygon|polyline|line|ellipse)\b/.test(cleanFile);
+      let hasEmbeddedRasterImage = /<image\b/.test(cleanFile);
+
+      // Fallback: if no usable vector content or embedded raster, try Potrace to vectorize the original raster
+      if ((!hasVectorElement || hasEmbeddedRasterImage) && fileExt !== "svg") {
+        try {
+          const traced = await new Promise((resolve, reject) =>
+            trace(upload_path, { threshold: 180, turdSize: 2, turnPolicy: "minority" }, (err, svg) =>
+              err ? reject(err) : resolve(svg)
+            )
+          );
+          fs.writeFileSync(svgPath, traced);
+          cleanFile = traced.toString();
+          hasVectorElement = /(path|rect|circle|polygon|polyline|line|ellipse)\b/.test(cleanFile);
+          hasEmbeddedRasterImage = /<image\b/.test(cleanFile);
+        } catch (fallbackErr) {
+          console.log("Potrace fallback failed", fallbackErr);
         }
-        // check if is true svg
+      }
+
+      if (!hasVectorElement || hasEmbeddedRasterImage) {
+        let exText = !hasVectorElement
+          ? "Please upload a jpeg or png (conversion produced no usable vector paths)."
+          : "Image-based SVGs are not allowed.";
         return res.send({
           success: false,
-          error:
-            "Wrong file format, incorrect svg!" + exText ? " " + exText : "",
+          error: "Wrong file format, incorrect svg! " + exText,
         });
       }
 
@@ -666,6 +695,11 @@ module.exports = () => {
 
       if (req.query.draft) {
         let account = req.user.account;
+        // Ensure nested objects exist before mutation (avoids TypeError when logos is null)
+        if (!account.brand) account.brand = {};
+        if (!account.brand.logos || typeof account.brand.logos !== "object") {
+          account.brand.logos = {};
+        }
         account.brand.logos[`${req.body.name}`] = fileName;
 
         const brand = await Huddle.getBrandObject(account);
