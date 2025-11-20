@@ -9,32 +9,6 @@ const mongoose = require("mongoose");
 const MongoStore = require("connect-mongo");
 const db = require("./db");
 const fileUpload = require("express-fileupload");
-// Lightweight CORS middleware to allow local editor access
-app.use(function (req, res, next) {
-  const origin = req.headers.origin;
-  const allowed = [
-    "http://localhost:18001",
-    "http://127.0.0.1:18001",
-  ];
-  if (origin && allowed.includes(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
-    res.header("Vary", "Origin");
-  }
-  // Allow all for non-browser/testing contexts
-  if (!origin) {
-    res.header("Access-Control-Allow-Origin", "*");
-  }
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, PATCH, DELETE, OPTIONS"
-  );
-  if (req.method === "OPTIONS") return res.sendStatus(200);
-  next();
-});
 const {
   amountOfCredits,
   getHardcodedCurrentPlan,
@@ -372,8 +346,9 @@ mongoose.connection.once("open", () => {
   console.log("DB Connected!!!");
 });
 
-app.listen(config.SITE_PORT, '0.0.0.0', function () {
-  console.log(`Application is running on http://0.0.0.0:${config.SITE_PORT}`);
+app.listen(config.SITE_PORT, function () {
+  console.log("Application is running on: http://localhost:" + config.SITE_PORT);
+  console.log("Environment: " + app.settings.env);
 });
 
 exports.app = frontEndApp;
