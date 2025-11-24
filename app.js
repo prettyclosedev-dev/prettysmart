@@ -19,21 +19,24 @@ app.use(function (req, res, next) {
   ]);
 
   if (origin && allowed.has(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
+    // Access-Control-Allow-Origin handled by Nginx; avoid duplicate value
+    // res.header("Access-Control-Allow-Origin", origin);
     res.header("Access-Control-Allow-Credentials", "true");
   }
 
   // Always vary on Origin so proxies don't cache incorrectly
   res.header("Vary", "Origin");
 
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, PATCH, DELETE, OPTIONS"
-  );
+  // Access-Control-Allow-Headers handled by Nginx
+  // res.header(
+  //   "Access-Control-Allow-Headers",
+  //   "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  // );
+  // Access-Control-Allow-Methods handled by Nginx
+  // res.header(
+  //   "Access-Control-Allow-Methods",
+  //   "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+  // );
 
   if (req.method === "OPTIONS") return res.sendStatus(200);
   next();
