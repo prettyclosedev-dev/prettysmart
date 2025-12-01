@@ -19,6 +19,11 @@ const mailchimp = require("@mailchimp/mailchimp_transactional")(
   config.mandrill.apiKey
 );
 const { trace } = require("potrace");
+const {
+  getCategories,
+  getDesigns,
+  getBrandedDesign,
+} = require("../clyps_api");
 
 var attributes = {
   fill: "#1A428A",
@@ -444,6 +449,118 @@ async function syncFontsWithAccount(req, fontFamilies) {
   );
 }
 
+async function generateAndStoreTemplates(req, opts = {}, logger = (msg) => console.log(msg)) {
+  const userId = req.user && (req.user._id || req.user.id);
+  if (!userId) throw new Error("Missing user");
+  logger(`[TemplatesCache] START user=${userId}`);
+
+  // Fetch categories available on Templates page
+  logger(`[TemplatesCache] Fetching categories (availableOnPages contains 'Templates')...`);
+  const categories = await getCategories({
+    where: { availableOnPages: { has: "Templates" } },
+    orderBy: [{ priority: { sort: "asc" } }],
+  });
+  logger(`[TemplatesCache] Retrieved ${categories.length} categories`);
+
+  // Sub-categories (orientations)
+  const orientations = ["square", "vertical", "horizontal"];
+  logger(`[TemplatesCache] Using orientations: ${orientations.join(", ")}`);
+
+  // Base output dir
+  const baseOutDir = path.join(__dirname, "../site_static/templates", String(userId));
+  // Always start with a clean slate: remove existing folder if present for faster overwrite
+  if (fs.existsSync(baseOutDir)) {
+    logger(`[TemplatesCache] Removing existing base directory ${baseOutDir}`);
+    try {
+      fs.rmSync(baseOutDir, { recursive: true, force: true });
+    } catch (e) {
+      logger(`[TemplatesCache] Failed to remove existing directory: ${e.message || e}`);
+    }
+  }
+  fs.mkdirSync(baseOutDir, { recursive: true });
+  logger(`[TemplatesCache] Created fresh base directory ${baseOutDir}`);
+
+  let processed = 0;
+  let saved = 0;
+  let errors = 0;
+
+  const pageSize = opts.pageSize || 10;
+  logger(`[TemplatesCache] Page size per orientation/category set to ${pageSize}`);
+
+  for (const cat of categories) {
+    const safeCat = (cat.name || `cat-${cat.id}`).replace(/[^a-z0-9\-\s_]/gi, "").trim().replace(/\s+/g, "-");
+    logger(`[TemplatesCache] Processing category '${cat.name}' (id=${cat.id}) -> folder '${safeCat}'`);
+    for (const orient of orientations) {
+      const safeOrient = orient.replace(/[^a-z0-9\-\s_]/gi, "").trim().replace(/\s+/g, "-");
+      logger(`[TemplatesCache]   Orientation '${orient}' -> folder '${safeOrient}'`);
+
+      const outDir = path.join(baseOutDir, safeCat, safeOrient);
+      if (!fs.existsSync(outDir)) {
+        fs.mkdirSync(outDir, { recursive: true });
+        logger(`[TemplatesCache]   Created directory ${outDir}`);
+      } else {
+        logger(`[TemplatesCache]   Directory exists ${outDir}`);
+      }
+
+      logger(`[TemplatesCache]   Fetching designs for category='${cat.name}' orientation='${orient}' ...`);
+      const designsData = await getDesigns({
+        take: pageSize,
+        skip: 0,
+        where: {
+          AND: [
+            { categories: { some: { id: { equals: parseInt(cat.id) } } } },
+            { categories: { some: { name: { contains: orient, mode: "insensitive" } } } },
+          ],
+        },
+      });
+
+      const designs = (designsData && designsData.designs) || [];
+      logger(`[TemplatesCache]   Retrieved ${designs.length} designs for category='${cat.name}' orientation='${orient}'`);
+
+      for (const d of designs) {
+        processed++;
+        logger(`[TemplatesCache]     Generating preview designId=${d.id} category='${cat.name}' orientation='${orient}'`);
+        try {
+          const variables = {
+            user: req.user,
+            where: { id: parseInt(d.id) },
+            previewOptions: { mimeType: "image/jpeg", pixelRatio: 1 },
+            // Apply brandWhere to personalize
+            brandWhere: { prettySmartId: req.user.account._id.toString() },
+          };
+
+          const branded = await getBrandedDesign(variables);
+          const b64 = branded && branded.brandedDesign && branded.brandedDesign.preview;
+          if (!b64) {
+            errors++;
+            logger(`[TemplatesCache]     WARNING: Missing preview for designId=${d.id}`);
+            continue;
+          }
+          const buf = Buffer.from(b64, "base64");
+          // New naming convention: <templateID>_<templateName>.jpg (sanitized templateName)
+          const safeDesignName = (d.name || `design-${parseInt(d.id)}`)
+            .replace(/[^a-z0-9\-\s_]/gi, "")
+            .trim()
+            .replace(/\s+/g, "-");
+          const fileName = `${parseInt(d.id)}_${safeDesignName}.jpg`;
+          const fullPath = path.join(outDir, fileName);
+          fs.writeFileSync(fullPath, buf);
+          saved++;
+          logger(`[TemplatesCache]     Saved preview -> ${fullPath}`);
+        } catch (e) {
+          errors++;
+          logger(`[TemplatesCache]     ERROR generating preview designId=${d.id}: ${e.message || e}`);
+        }
+      }
+      logger(`[TemplatesCache]   Finished orientation '${orient}' for category='${cat.name}' (processed=${processed}, saved=${saved}, errors=${errors})`);
+    }
+  }
+
+  logger(`[TemplatesCache] COMPLETE user=${userId} processed=${processed} saved=${saved} errors=${errors}`);
+  logger(`[TemplatesCache] STREAM_DONE`);
+  return { processed, saved, errors };
+}
+
 module.exports = () => {
   router.get("/", async (req, res) => {
     await setupDefaults(req);
@@ -496,11 +613,61 @@ module.exports = () => {
     });
   });
 
+  // Generate and cache branded template previews grouped by category and orientation
+  router.post("/generate-templates-cache", async (req, res) => {
+    try {
+      const result = await generateAndStoreTemplates(req, { pageSize: 10 });
+      return res.json({ success: true, ...result });
+    } catch (e) {
+      console.error("/generate-templates-cache error:", e);
+      return res.status(500).json({ success: false, error: "Generation failed" });
+    }
+  });
+
+  // SSE streaming route for real-time template generation logs
+  router.get("/generate-templates-sse", async (req, res) => {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.flushHeaders && res.flushHeaders();
+
+    const send = (obj) => {
+      res.write(`data: ${JSON.stringify({ timestamp: Date.now(), ...obj })}\n\n`);
+    };
+
+    const logger = (line) => {
+      // Mirror to container logs for Docker visibility
+      console.log(line);
+      if (line === "[TemplatesCache] STREAM_DONE") {
+        res.write("event: done\n");
+        res.write('data: {"status":"complete"}\n\n');
+        setTimeout(() => res.end(), 200);
+      } else {
+        send({ line });
+      }
+    };
+
+    try {
+      await generateAndStoreTemplates(req, { pageSize: 10 }, logger);
+    } catch (e) {
+      send({ error: e.message || String(e) });
+      res.write("event: done\n");
+      res.write('data: {"status":"error"}\n\n');
+      res.end();
+    }
+  });
+
   router.get("/build", async (req, res) => {
     console.log("building brand...");
     try {
       await setupDefaults(req);
       await handleBrandChange(req.user);
+      // Also pre-generate categorized branded previews so Templates page has cached assets
+      try {
+        await generateAndStoreTemplates(req, { pageSize: 10 });
+      } catch (genErr) {
+        console.log("generateAndStoreTemplates error (continuing redirect):", genErr);
+      }
     } catch (e) {
       console.log(e);
     }

@@ -1,16 +1,23 @@
 <div
-  data-template="<%=template.id%>"
+  data-template="<%= template.id %>"
   data-export
+  data-local="<%= template.preview && template.preview.indexOf('/site_static/templates/') === 0 ? 'true' : 'false' %>"
   class="template d-block rounded"
   original_title="<%= template.name %>"
-  title="<%=template.name ? template.name.replace('_free','') : '';%>"
+  title="<%= template.name ? template.name.replace(/-/g, ' ').replace('_free','') : '' %>"
 >
   <img
     src="<%=template.preview%>"
     alt=""
     class="rounded LoNotSensitive"
+    loading="lazy"
+    onload="if(this.closest('[data-local=true]')){ hideLoader(this.closest('.template')); }"
   />
-  <% if (typeof showNewLoader != "undefined" && showNewLoader === true) { %> <%-
-  include('./template-loader-new', {async: true}); %> <% } else { %> <%-
-  include('./template-loader', {async:true}); %> <% } %>
+  <% if (!(template.preview && template.preview.indexOf('/site_static/templates/') === 0)) { %>
+    <% if (typeof showNewLoader != "undefined" && showNewLoader === true) { %>
+      <%- include('./template-loader-new', {async: true}); %>
+    <% } else { %>
+      <%- include('./template-loader', {async:true}); %>
+    <% } %>
+  <% } %>
 </div>

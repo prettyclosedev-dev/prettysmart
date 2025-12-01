@@ -75,6 +75,54 @@ $(document).on('visibilitychange', function() {
 });
 // ===== END SESSION STORAGE =====
 
+// ===== TEMPLATE GENERATION STREAM (SSE) =====
+function startTemplateBuildStream() {
+  var $toast = $('#template-build-toast');
+  if (!$toast.length) {
+    console.warn('Template build toast container missing');
+    return window.location.href = '/brand/build?url=/templates'; // fallback
+  }
+  $toast.removeClass('d-none');
+  $('#template-build-status').text('Generating previews...');
+  $('#template-build-spinner').show();
+  var $log = $('#template-build-log');
+  $log.text('Starting template cache build...\n');
+  try {
+    var es = new EventSource('/brand/generate-templates-sse');
+    es.onmessage = function(ev) {
+      try {
+        var data = JSON.parse(ev.data);
+        if (data.line) {
+          $log.append(data.line + '\n');
+        } else if (data.error) {
+          $log.append('ERROR: ' + data.error + '\n');
+        }
+        $log.scrollTop($log[0].scrollHeight);
+      } catch (e) {
+        $log.append('Parse error: ' + e + '\n');
+      }
+    };
+    es.addEventListener('done', function(ev) {
+      $('#template-build-spinner').hide();
+      $('#template-build-status').text('Completed');
+      setTimeout(function(){
+        es.close();
+        window.location.href = '/templates';
+      }, 800);
+    });
+    es.onerror = function() {
+      $log.append('Connection lost. Falling back...\n');
+      $('#template-build-spinner').hide();
+      setTimeout(function(){ window.location.href = '/templates'; }, 1200);
+    };
+  } catch (err) {
+    $log.append('Failed to start stream: ' + err + '\n');
+    $('#template-build-spinner').hide();
+    setTimeout(function(){ window.location.href = '/templates'; }, 1200);
+  }
+}
+// ===== END TEMPLATE GENERATION STREAM =====
+
 $(".google_font")
   .fontpicker({
     lang: "en",
@@ -198,8 +246,8 @@ $(document)
                      $("#avatar-input")[0]?.files?.length > 0;
     
     if (!hasChanges) {
-      console.log("No changes to save, redirecting to templates");
-      window.location.href = '/templates';
+      console.log("No changes detected. Building branded previews before redirect (stream)...");
+      startTemplateBuildStream();
       return;
     }
     
@@ -232,8 +280,8 @@ $(document)
       } catch(err) {
         console.warn('Color update encountered an error, continuing redirect:', err);
       }
-      // Use build route so server regenerates brand artifacts before templates render
-      window.location.href = '/brand/build?url=/templates';
+      // Stream build & redirect after completion
+      startTemplateBuildStream();
     }
   });
 

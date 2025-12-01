@@ -145,8 +145,13 @@
             prevEl: '.swiper-button-prev',
           },
         });
-
-        getCustomization({});
+        // Only run customization if remote templates present
+        if ($('[data-template]').length) {
+          getCustomization({});
+        } else {
+          // Hide any loaders left erroneously
+          $('.template[data-local="true"]').each(function(){ hideLoader(this); });
+        }
       },
       error: function (err) {
         topbar.hide();

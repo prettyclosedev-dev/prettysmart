@@ -235,21 +235,27 @@ $(document)
             var newTemplates = [];
 
             response.forEach(function (template) {
+              var displayName = template.name.replace(/-/g, ' ');
+              var isLocal = template.preview.indexOf('/site_static/templates/') === 0;
               var templateHtml = `
                 <div class="swiper-slide">
                   <div class="template">
                     <div
                       data-template="${template.id}"
                       data-export
+                      data-local="${isLocal ? 'true' : 'false'}"
                       class="template d-block rounded"
                       original_title="${template.name.replace("_free", "")}"
-                      title="${template.name.replace("_free", "")}"
+                      title="${displayName.replace("_free", "")}"
                     >
                       <img
                         src="${template.preview}"
                         alt=""
                         class="rounded LoNotSensitive"
+                        loading="lazy"
+                        onload="if(this.closest('[data-local=true]')){ hideLoader(this.closest('.template')); }"
                       />
+                      ${!isLocal ? `
                       <div class="template-loader">
                         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                           viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
@@ -262,7 +268,7 @@ $(document)
                               fill="freeze" begin="0s;strokeBox.end" />
                           </rect>
                         </svg>
-                      </div>
+                      </div>` : ''}
                     </div>
                     <div class="favorite-wrapper ${
                       template.isFavorite ? "liked" : ""
@@ -313,8 +319,8 @@ $(document)
               var $templateElement = $(templateHtml);
               $templatesContainer.append($templateElement);
 
-              // Push only the .template div to the newTemplates array
-              newTemplates.push($templateElement.find(".template")[1]);
+              // Push only the first .template div to the newTemplates array (local or remote)
+              newTemplates.push($templateElement.find(".template").get(0));
             });
 
             $templatesContainer.append($loadMoreSlide);
@@ -402,6 +408,19 @@ function getCustomization(options, cb, icb) {
     $templates = $(options.templates); // Use the provided templates
   } else {
     $templates = $(".template"); // Fallback to all elements with class .template
+  }
+
+  // Immediately hide loaders for locally provided static image templates
+  // Optimization: On /templates page all previews are served from local static files.
+  // Skip any remote preview fetching & observer setup entirely.
+  if (window.location.pathname === '/templates') {
+    const localTemplates = options && options.templates && options.templates.length > 0
+      ? $(options.templates)
+      : $('.template');
+    localTemplates.each(function(){ hideLoader(this); });
+    if (cb) cb({ success: true, skippedRemote: true });
+    if (icb) icb();
+    return; // Abort further processing to avoid API calls (/templates/preview/*)
   }
 
   // Create an IntersectionObserver instance
@@ -514,10 +533,8 @@ function getCustomization(options, cb, icb) {
     });
   });
 
-  // Observe each template
-  $templates.each(function () {
-    observer.observe(this); // Start observing the template
-  });
+  // Observe each template (only runs for non /templates routes)
+  $templates.each(function () { observer.observe(this); });
 }
 
 function initTemplates(opts, cb) {

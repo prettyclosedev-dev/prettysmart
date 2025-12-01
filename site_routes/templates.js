@@ -43,198 +43,140 @@ module.exports = () => {
   });
 
   router.get("/get-templates", async (req, res) => {
-    const sizes = req.session.sizes;
+    const sizes = req.session.sizes || [];
+    const userEmail = req.user.email;
+    const userId = req.user && (req.user._id?.toString?.() || String(req.user._id || ""));
+    // Real static folder location (images): site_static/templates/{userId}
+    const baseDir = path.join(__dirname, "../site_static/templates", userId);
+    const pageSize = 10;
 
     let categorizedDesigns = [];
-    const userEmail = req.user.email;
-    const pageSize = 10; // Number of designs to fetch per category per page
 
     try {
-      // Fetch content categories available on the "Templates" page
-      const categories = await getCategories({
-        where: {
-          availableOnPages: {
-            has: "Templates",
-          },
-        },
-        orderBy: [{ priority: { sort: "asc" } }],
-      });
-
-      const favoritesData = await getUserFavorites(userEmail);
-      const favoriteIds = favoritesData
+      const favoritesData = await getUserFavorites(userEmail).catch(() => []);
+      const favoriteIds = Array.isArray(favoritesData)
         ? favoritesData.map((fav) => fav.id)
         : [];
 
-      // Loop through each category to fetch its designs
-      categorizedDesigns = await Promise.all(
-        categories.map(async (category) => {
-          let categorizedCategory = {
-            id: category.id,
-            name: category.name,
-            creatorId: category.creatorId,
-            public: category.public,
-            tags: category.tags,
-            templates: [],
-            sizes: [],
-            default_size: category.size || 40,
-            currentPage: 1,
-            totalPages: 1,
-          };
+      const dirExists = fs.existsSync(baseDir) && fs.lstatSync(baseDir).isDirectory();
+      if (dirExists) {
+        const catDirents = fs.readdirSync(baseDir, { withFileTypes: true }).filter((d) => d.isDirectory());
+        let categoryMap = [];
 
-          // Fetch designs and total design count concurrently
-          const [designsData, totalDesigns] = await Promise.all([
-            getDesigns({
-              take: pageSize,
-              skip: 0,
-              where: {
-                AND: [
-                  {
-                    categories: { some: { id: { equals: category.id } } },
-                  },
-                  {
-                    categories: {
-                      some: {
-                        name: { contains: "square", mode: "insensitive" },
-                      },
-                    },
-                  },
-                ],
-              },
-            }),
-            getDesignsCount({
-              where: {
-                AND: [
-                  { categories: { some: { id: { equals: category.id } } } },
-                  {
-                    categories: {
-                      some: {
-                        name: { contains: "square", mode: "insensitive" },
-                      },
-                    },
-                  },
-                ],
-              },
-            }),
-          ]);
+        categorizedDesigns = catDirents.map((catDir, idx) => {
+          const categoryName = catDir.name;
+          const categoryPath = path.join(baseDir, categoryName);
+          const subDirents = fs.readdirSync(categoryPath, { withFileTypes: true }).filter((d) => d.isDirectory());
+          const availableSizeNames = subDirents.map((s) => s.name.toLowerCase());
+          const matchedSizes = sizes.filter((s) => availableSizeNames.includes(s.name.toLowerCase()));
+          const squareSize = matchedSizes.find((s) => s.name.toLowerCase() === "square");
+          const defaultSizeId = (squareSize || matchedSizes[0])?.id;
+          const defaultSizeName = (sizes.find((s) => s.id === defaultSizeId) || {}).name;
+          const defaultSubName = defaultSizeName ? defaultSizeName.toLowerCase() : null;
+          const defaultSubPath = defaultSubName ? path.join(categoryPath, defaultSubName) : null;
 
-          if (designsData?.designs) {
-            categorizedCategory.templates = designsData.designs.map(
-              (design) => ({
-                ...design,
-                isFavorite: favoriteIds.includes(design.id),
-              })
-            );
-            categorizedCategory.totalPages = Math.ceil(
-              totalDesigns.designsCount / pageSize
-            );
-
-            if (totalDesigns.designsCount > 0) {
-              const squareSize = sizes.find(
-                (size) => size.name.toLowerCase() === "square"
-              );
-              if (squareSize) categorizedCategory.sizes.push(squareSize);
+          let templates = [];
+          let totalPages = 1;
+          if (defaultSubPath && fs.existsSync(defaultSubPath) && fs.lstatSync(defaultSubPath).isDirectory()) {
+            const files = fs
+              .readdirSync(defaultSubPath, { withFileTypes: true })
+              .filter((f) => f.isFile() && /(\.jpg|\.jpeg|\.png)$/i.test(f.name));
+            totalPages = Math.ceil(files.length / pageSize) || 1;
+            const pageFiles = files.slice(0, pageSize);
+            for (const f of pageFiles) {
+              const fileName = f.name;
+              const base = fileName.replace(/\.(jpg|jpeg|png)$/i, "");
+              const parts = base.split("_");
+              const idToken = parts.shift();
+              const tmplId = parseInt(idToken);
+              const displayName = parts.join("_") || idToken;
+              const previewPath = `/site_static/templates/${userId}/${encodeURIComponent(categoryName)}/${defaultSubName}/${encodeURIComponent(fileName)}`;
+              const tmpl = {
+                id: tmplId,
+                name: displayName,
+                file_name: fileName,
+                preview: previewPath,
+                isFavorite: favoriteIds.includes(tmplId),
+              };
+              templates.push(tmpl);
             }
           }
 
-          // Populate sizes with Promise.all for concurrent size checks
-          const sizesWithCounts = await Promise.all(
-            sizes.map(async (size) => {
-              if (size.name.toLowerCase() === "square") {
-                categorizedCategory.default_size = size.id;
-                return size; // Return square size to keep it in sizes array
-              }
+          const cat = {
+            id: idx + 1,
+            name: categoryName,
+            creatorId: null,
+            public: true,
+            tags: [],
+            templates,
+            sizes: matchedSizes,
+            default_size: defaultSizeId || (matchedSizes[0] && matchedSizes[0].id) || null,
+            currentPage: 1,
+            totalPages,
+          };
 
-              const designsCountData = await getDesignsCount({
-                where: {
-                  AND: [
-                    { categories: { some: { id: { equals: category.id } } } },
-                    {
-                      categories: {
-                        some: {
-                          name: { contains: size.name, mode: "insensitive" },
-                        },
-                      },
-                    },
-                  ],
-                },
-              });
+            categoryMap.push({ id: cat.id, name: categoryName, sizes: matchedSizes.map((s) => s.name) });
+          return cat;
+        });
 
-              if (designsCountData.designsCount > 0) {
-                return size;
-              }
-
-              return null;
-            })
-          );
-
-          // Filter out null sizes and set default size if not already set
-          categorizedCategory.sizes = sizesWithCounts.filter(Boolean);
-          if (
-            !categorizedCategory.default_size &&
-            categorizedCategory.sizes.length > 0
-          ) {
-            categorizedCategory.default_size = categorizedCategory.sizes[0].id;
-          }
-
-          return categorizedCategory;
-        })
-      );
+        req.session.templateCategoryMap = categoryMap;
+      }
     } catch (error) {
       console.log(error);
     }
 
-    return res.render("partials/templates-content", {
-      sizes,
-      templates: categorizedDesigns,
-      row: { templates: [] },
-      cache: true,
-      filename: "templates",
-      loading: false,
-    });
+    const hasAnyTemplates = Array.isArray(categorizedDesigns) && categorizedDesigns.some((c) => c.templates && c.templates.length);
+    if (!hasAnyTemplates) {
+      return res.status(200).send('<div class="empty-state" style="padding: 24px; text-align:center;">set up your brand in the My Brand page</div>');
+    }
+
+    return res.render("partials/templates-content", { sizes, templates: categorizedDesigns, row: { templates: [] }, cache: true, filename: "templates", loading: false });
   });
 
   // Route to load more designs for a specific category
   router.get("/load-more/:categoryId", async (req, res) => {
     const { categoryId } = req.params;
-    const { page = 1, sizeName = "square" } = req.query; // Default to 'square' if sizeName is not provided
-    const pageSize = 10; // Number of designs to fetch per page
+    const { page = 1, sizeName = "square" } = req.query;
+    const pageSize = 10;
     const offset = (page - 1) * pageSize;
 
     try {
-      // Fetch the designs for the given category, page, and size
-      const designsData = await getDesigns({
-        take: pageSize,
-        skip: offset,
-        where: {
-          AND: [
-            {
-              categories: {
-                some: {
-                  id: {
-                    equals: parseInt(categoryId),
-                  },
-                },
-              },
-            },
-            {
-              categories: {
-                some: {
-                  name: {
-                    contains: sizeName, // Filter by the selected size
-                    mode: "insensitive",
-                  },
-                },
-              },
-            },
-          ],
-        },
-      });
+      const userId = req.user && (req.user._id?.toString?.() || String(req.user._id || ""));
+      const baseDir = path.join(__dirname, "../site_static/templates", userId);
+      const catMap = req.session.templateCategoryMap || [];
+      const cat = catMap.find((c) => String(c.id) === String(categoryId));
+      if (!cat) return res.status(200).json([]);
 
-      if (designsData && designsData.designs) {
-        return res.status(200).json(designsData.designs);
-      } else {
-        return res.status(500).json({ error: "No designs found." });
+      const categoryPath = path.join(baseDir, cat.name);
+      const subPath = path.join(categoryPath, String(sizeName).toLowerCase());
+      if (!fs.existsSync(subPath) || !fs.lstatSync(subPath).isDirectory()) {
+        return res.status(200).json([]);
       }
+
+      const userEmail = req.user.email;
+      const favoritesData = await getUserFavorites(userEmail).catch(() => []);
+      const favoriteIds = Array.isArray(favoritesData)
+        ? favoritesData.map((fav) => fav.id)
+        : [];
+
+      const files = fs
+        .readdirSync(subPath, { withFileTypes: true })
+        .filter((f) => f.isFile() && /(\.jpg|\.jpeg|\.png)$/i.test(f.name));
+
+      const slice = files.slice(offset, offset + pageSize);
+      const designs = [];
+      for (const f of slice) {
+        const fileName = f.name;
+        const base = fileName.replace(/\.(jpg|jpeg|png)$/i, "");
+        const parts = base.split("_");
+        const idToken = parts.shift();
+        const tmplId = parseInt(idToken);
+        const displayName = parts.join("_") || idToken;
+        const previewPath = `/site_static/templates/${userId}/${encodeURIComponent(cat.name)}/${String(sizeName).toLowerCase()}/${encodeURIComponent(fileName)}`;
+        designs.push({ id: tmplId, name: displayName, file_name: fileName, preview: previewPath, isFavorite: favoriteIds.includes(tmplId) });
+      }
+
+      return res.status(200).json(designs);
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: "Failed to load more designs." });
@@ -510,114 +452,58 @@ module.exports = () => {
 };
 
 async function handleResize(req, res) {
-  const sizes = req.session.sizes;
-  const { row, size } = req.query; // 'row' is the category ID, 'size' is the desired size ID
+  const sizes = req.session.sizes || [];
+  const { row, size } = req.query;
   let newRow = {};
 
   try {
-    // First, find the name of the size the user wants to switch to
-    const newSize = sizes.find((s) => s.id.toString() === size)?.name;
-    if (!newSize) {
-      return res.status(400).send("Invalid size specified.");
+    const sizeName = sizes.find((s) => s.id.toString() === String(size))?.name;
+    if (!sizeName) return res.status(400).send("Invalid size specified.");
+
+    const userId = req.user && (req.user._id?.toString?.() || String(req.user._id || ""));
+    const baseDir = path.join(__dirname, "../site_static/templates", userId);
+    const catMap = req.session.templateCategoryMap || [];
+    const cat = catMap.find((c) => String(c.id) === String(row));
+    if (!cat) return res.status(400).send("Invalid category specified.");
+
+    const categoryPath = path.join(baseDir, cat.name);
+    const subPath = path.join(categoryPath, sizeName.toLowerCase());
+
+    let templates = [];
+    if (fs.existsSync(subPath) && fs.lstatSync(subPath).isDirectory()) {
+      const userEmail = req.user.email;
+      const favoritesData = await getUserFavorites(userEmail).catch(() => []);
+      const favoriteIds = Array.isArray(favoritesData)
+        ? favoritesData.map((fav) => fav.id)
+        : [];
+
+      const files = fs
+        .readdirSync(subPath, { withFileTypes: true })
+        .filter((f) => f.isFile() && /(\.jpg|\.jpeg|\.png)$/i.test(f.name));
+
+      for (const f of files) {
+        const fileName = f.name;
+        const base = fileName.replace(/\.(jpg|jpeg|png)$/i, "");
+        const parts = base.split("_");
+        const idToken = parts.shift();
+        const tmplId = parseInt(idToken);
+        const displayName = parts.join("_") || idToken;
+        const previewPath = `/site_static/templates/${userId}/${encodeURIComponent(cat.name)}/${sizeName.toLowerCase()}/${encodeURIComponent(fileName)}`;
+        templates.push({ id: tmplId, name: displayName, file_name: fileName, preview: previewPath, isFavorite: favoriteIds.includes(tmplId) });
+      }
     }
 
-    // Fetch designs in the specified category and for the new size
-    const designsData = await getDesigns({
-      where: {
-        AND: [
-          {
-            categories: {
-              some: {
-                id: {
-                  equals: parseInt(row),
-                },
-              },
-            },
-          },
-          {
-            categories: {
-              some: {
-                name: { contains: newSize, mode: "insensitive" },
-              },
-            },
-          },
-          // {
-          //   categories: {
-          //     some: {
-          //       availableOnPages: {
-          //         has: "Templates",
-          //       },
-          //     }
-          //   },
-          // },
-        ],
-      },
-    });
+    const subDirents = fs
+      .readdirSync(categoryPath, { withFileTypes: true })
+      .filter((d) => d.isDirectory())
+      .map((d) => d.name.toLowerCase());
+    const matchedSizes = sizes.filter((s) => subDirents.includes(s.name.toLowerCase()));
 
-    // Assuming 'getBrandedDesigns' returns an array of designs
-    const designsInNewSize = designsData.designs;
-
-    newRow = {
-      templates: designsInNewSize,
-      sizes: [], // needs to be fetched again for category
-    };
-
-    // Prepare newRow with the fetched designs and initialize sizeOptions
-    const sizesWithCounts = await Promise.all(
-      sizes.map(async (size) => {
-        try {
-          const designsCountData = await getDesignsCount({
-            where: {
-              AND: [
-                {
-                  categories: {
-                    some: {
-                      id: { equals: parseInt(row) },
-                    },
-                  },
-                },
-                {
-                  categories: {
-                    some: {
-                      name: { contains: size.name, mode: "insensitive" },
-                    },
-                  },
-                },
-                {
-                  categories: {
-                    some: {
-                      availableOnPages: { has: "Templates" },
-                    },
-                  },
-                },
-              ],
-            },
-          });
-
-          if (designsCountData.designsCount > 0) {
-            return size; // Return the size if there's a match
-          }
-        } catch (error) {
-          console.log(error);
-          return null; // Return null in case of error
-        }
-        return null; // Return null if no designs are found
-      })
-    );
-
-    // Filter out null values and populate newRow.sizes
-    newRow.sizes = sizesWithCounts.filter(Boolean);
+    newRow = { templates, sizes: matchedSizes };
   } catch (error) {
     console.error("Error fetching designs for new size:", error);
     return res.status(500).send("An error occurred while resizing.");
   }
 
-  res.render("templates", {
-    sizes, // Pass the size array for the frontend to use
-    row: newRow, // Pass the newRow object containing designs in the new size and size options
-    templates: [],
-    cache: true,
-    filename: "templates",
-    loading: false,
-  });
+  res.render("templates", { sizes, row: newRow, templates: [], cache: true, filename: "templates", loading: false });
 }
