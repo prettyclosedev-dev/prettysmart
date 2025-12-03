@@ -56,6 +56,10 @@
             .logo{
                 width: 184px;
                 margin-bottom: 41px;
+                img{
+                    max-width: 100%;
+                    height: auto;
+                }
                 @media (max-width:$sm-max) {
                     width: calc(184px - 184px * .3);
                     margin-bottom: 20px;

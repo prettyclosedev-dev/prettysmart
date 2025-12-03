@@ -1173,6 +1173,10 @@ header + div, header + section {
   width: 184px;
   margin-bottom: 41px;
 }
+.footer .container .logo-left .logo img {
+  max-width: 100%;
+  height: auto;
+}
 @media (max-width: 575.98px) {
   .footer .container .logo-left .logo {
     width: 128.8px;
