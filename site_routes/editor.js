@@ -38,6 +38,44 @@ module.exports = () => {
       if (Number.isNaN(baseId)) {
         return renderEditor(req, res, req.params.templateId);
       }
+      // Remember the last opened base template id for save interception
+      try {
+        req.session = req.session || {};
+        req.session.lastBaseTemplateId = baseId;
+        // Also resolve and stash the exact file path to overwrite later
+        const pathLib = require("path");
+        const fsLib = require("fs");
+        const userId = req.user && (req.user._id?.toString?.() || String(req.user._id || ""));
+        const baseDir = pathLib.join(__dirname, "../site_static/templates", userId);
+        let foundPath = null;
+        function walk(dir) {
+          let entries;
+          try {
+            entries = fsLib.readdirSync(dir, { withFileTypes: true });
+          } catch (e) {
+            return;
+          }
+          for (const ent of entries) {
+            const full = pathLib.join(dir, ent.name);
+            if (ent.isDirectory()) {
+              walk(full);
+              if (foundPath) return; // early exit if found
+            } else if (ent.isFile()) {
+              if (/\.(jpg|jpeg|png)$/i.test(ent.name)) {
+                const baseName = ent.name.replace(/\.(jpg|jpeg|png)$/i, "");
+                const idToken = baseName.split("_")[0];
+                if (String(idToken) === String(baseId)) {
+                  foundPath = full;
+                  return;
+                }
+              }
+            }
+          }
+        }
+        walk(baseDir);
+        req.session.lastTemplateFilePath = foundPath || null;
+        console.log("[editor/open] stashed baseId:", baseId, "file:", foundPath || "(not found)");
+      } catch (e) {}
       return renderEditor(req, res, baseId);
     } catch (err) {
       console.error("Failed to open editor with base template id:", err);
@@ -78,6 +116,122 @@ module.exports = () => {
         patchedVars.brandWhere = brandWhere;
       }
 
+      // Intercept editor save mutations to avoid updating shared templates
+      const isMutation = typeof query === "string" && /\bmutation\b/i.test(query);
+      // Trigger regeneration on any mutation coming from the editor
+      if (isMutation) {
+        // Determine base/shared template id involved in the edit
+        let baseId = Number(
+          (patchedVars && patchedVars.where && patchedVars.where.id) || patchedVars.id || patchedVars.templateId
+        );
+        if (!baseId || Number.isNaN(baseId)) {
+          baseId = Number((req.session && req.session.lastBaseTemplateId) || 0);
+        }
+        console.log("[graphql-proxy] save intercepted; baseId:", baseId, "operation:", operationName || "unknown");
+
+        // 1) Forward the mutation so the backend applies the changes
+        let mutationResponse;
+        try {
+          const mutateOptions = {
+            headers: { Authorization: `Bearer ${config.CLYPS_API_KEY}` },
+            method: "POST",
+            uri: config.prettyclose_apps.api.localUrl + "/graphql",
+            body: { query, variables: patchedVars, operationName },
+            json: true,
+          };
+          mutationResponse = await rp(mutateOptions);
+        } catch (mutErr) {
+          console.error("[graphql-proxy] mutation forward failed:", mutErr.message || mutErr);
+        }
+
+        // 2) Regenerate a branded preview for the current user and replace local file(s)
+        try {
+          const brandWhere =
+            req.user && req.user.account && req.user.account._id
+              ? { prettySmartId: req.user.account._id.toString() }
+              : undefined;
+
+          const data = await getBrandedDesign({
+            user: req.user,
+            where: baseId ? { id: baseId } : undefined,
+            brandWhere,
+            previewOptions: { mimeType: "image/jpeg", pixelRatio: 2 },
+          });
+
+          let b64 = data && data.brandedDesign && data.brandedDesign.preview;
+          if (b64) {
+            // Strip data URL header if present
+            const dataUrlMatch = /^data:[^;]+;base64,(.+)$/.exec(b64);
+            if (dataUrlMatch) {
+              b64 = dataUrlMatch[1];
+            }
+            const pathLib = require("path");
+            const fsLib = require("fs");
+            const userId = req.user && (req.user._id?.toString?.() || String(req.user._id || ""));
+            const baseDir = pathLib.join(__dirname, "../site_static/templates", userId);
+
+            // Find any existing file(s) under the user's templates that match the base id prefix
+            let targets = [];
+            // Prefer the exact last opened file path if available
+            const preferred = req.session && req.session.lastTemplateFilePath;
+            if (preferred && preferred.startsWith(baseDir)) {
+              targets = [preferred];
+            }
+            function walk(dir) {
+              let entries;
+              try {
+                entries = fsLib.readdirSync(dir, { withFileTypes: true });
+              } catch (e) {
+                return;
+              }
+              for (const ent of entries) {
+                const full = pathLib.join(dir, ent.name);
+                if (ent.isDirectory()) {
+                  walk(full);
+                } else if (ent.isFile()) {
+                  if (/\.(jpg|jpeg|png)$/i.test(ent.name)) {
+                    const baseName = ent.name.replace(/\.(jpg|jpeg|png)$/i, "");
+                    const idToken = baseName.split("_")[0];
+                    if (String(idToken) === String(baseId)) {
+                      // Avoid duplicates if preferred set
+                      if (!targets.length || targets[0] !== full) targets.push(full);
+                    }
+                  }
+                }
+              }
+            }
+
+            if (!targets.length) {
+              walk(baseDir);
+            }
+            if (!targets.length) {
+              console.warn("[graphql-proxy] no matching files found for baseId", baseId, "under", baseDir);
+            } else {
+              console.log("[graphql-proxy] matched files for overwrite:", targets);
+            }
+
+            if (targets.length) {
+              const buffer = Buffer.from(b64, "base64");
+              for (const targetPath of targets) {
+                try {
+                  fsLib.writeFileSync(targetPath, buffer);
+                } catch (e) {
+                  console.warn("Failed to write regenerated preview:", targetPath, e.message || e);
+                }
+              }
+            }
+          }
+        } catch (regenErr) {
+          console.warn("Preview regeneration failed:", regenErr.message || regenErr);
+        }
+
+        // Return the original mutation response to the editor
+        res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
+        res.set("Vary", "Cookie");
+        return res.status(200).send(mutationResponse || { data: { ok: true } });
+      }
+
+      // Default: proxy as-is for non-edit operations
       const options = {
         headers: {
           Authorization: `Bearer ${config.CLYPS_API_KEY}`,
