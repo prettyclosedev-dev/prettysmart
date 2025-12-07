@@ -28,6 +28,115 @@ module.exports = () => {
     });
   }
 
+  // Helper to find or create a user-specific duplicate of a centralized template
+  async function findOrCreateDuplicate(user, originalId) {
+    if (!user || !user.email) return null;
+    const originalIdStr = String(originalId);
+    const tag = `original_id:${originalIdStr}`;
+    const apiUrl = config.prettyclose_apps.api.localUrl + "/graphql";
+    const headers = { Authorization: `Bearer ${config.CLYPS_API_KEY}` };
+
+    try {
+      // 1. Check if duplicate exists
+      const searchOptions = {
+        method: "POST",
+        uri: apiUrl,
+        headers,
+        body: {
+          query: `
+            query findDuplicate($email: String!, $tag: String!) {
+              designs(where: {
+                creator: { email: { equals: $email } },
+                tags: { has: $tag }
+              }) {
+                id
+              }
+            }
+          `,
+          variables: { email: user.email, tag }
+        },
+        json: true
+      };
+      const searchRes = await rp(searchOptions);
+      if (searchRes.data && searchRes.data.designs && searchRes.data.designs.length > 0) {
+        return searchRes.data.designs[0].id;
+      }
+
+      // 2. If not, fetch original design
+      const fetchOptions = {
+        method: "POST",
+        uri: apiUrl,
+        headers,
+        body: {
+          query: `
+            query getOriginal($id: Int!) {
+              design(where: { id: $id }) {
+                name
+                width
+                height
+                unit
+                dpi
+                pages
+                fonts
+                preview
+                categories { id }
+                tags
+              }
+            }
+          `,
+          variables: { id: originalId }
+        },
+        json: true
+      };
+      const fetchRes = await rp(fetchOptions);
+      const original = fetchRes.data && fetchRes.data.design;
+
+      if (!original) return null;
+
+      // 3. Create duplicate
+      const newTags = (original.tags || []).filter(t => !t.startsWith("original_id:"));
+      newTags.push(tag);
+
+      const createOptions = {
+        method: "POST",
+        uri: apiUrl,
+        headers,
+        body: {
+          query: `
+            mutation createDuplicate($data: DesignCreateInput!) {
+              createOneDesign(data: $data) {
+                id
+              }
+            }
+          `,
+          variables: {
+            data: {
+              name: original.name,
+              width: original.width,
+              height: original.height,
+              unit: original.unit,
+              dpi: original.dpi,
+              pages: { set: original.pages },
+              fonts: { set: original.fonts },
+              preview: original.preview,
+              categories: { connect: original.categories.map(c => ({ id: c.id })) },
+              tags: { set: newTags },
+              creator: { connect: { email: user.email } }
+            }
+          }
+        },
+        json: true
+      };
+      const createRes = await rp(createOptions);
+      if (createRes.data && createRes.data.createOneDesign) {
+        return createRes.data.createOneDesign.id;
+      }
+    } catch (e) {
+      console.error("Error in findOrCreateDuplicate:", e);
+    }
+    return null;
+  }
+
   // Resolve a brand-specific editable design id for the current user and render directly
   // If a user hasn't edited the template before, create a private copy for that user and use its id
   // This avoids cross-user edits on the shared template id
@@ -76,7 +185,16 @@ module.exports = () => {
         req.session.lastTemplateFilePath = foundPath || null;
         console.log("[editor/open] stashed baseId:", baseId, "file:", foundPath || "(not found)");
       } catch (e) {}
-      return renderEditor(req, res, baseId);
+
+      let renderId = baseId;
+      if (req.user && req.user.email) {
+        const duplicateId = await findOrCreateDuplicate(req.user, baseId);
+        if (duplicateId) {
+          renderId = duplicateId;
+          console.log(`[editor/open] Using duplicate design ${renderId} for user ${req.user.email} (original: ${baseId})`);
+        }
+      }
+      return renderEditor(req, res, renderId);
     } catch (err) {
       console.error("Failed to open editor with base template id:", err);
       return renderEditor(req, res, req.params.templateId);
@@ -156,7 +274,18 @@ module.exports = () => {
             where: baseId ? { id: baseId } : undefined,
             brandWhere,
             previewOptions: { mimeType: "image/jpeg", pixelRatio: 2 },
+            returnParams: ["id", "name", "preview", "tags"]
           });
+
+          let lookupId = baseId;
+          const tags = data && data.brandedDesign && data.brandedDesign.tags;
+          if (tags && Array.isArray(tags)) {
+             const originalTag = tags.find(t => t.startsWith("original_id:"));
+             if (originalTag) {
+                lookupId = originalTag.split(":")[1];
+                console.log("[graphql-proxy] Found original_id tag:", lookupId, "using for file lookup instead of", baseId);
+             }
+          }
 
           let b64 = data && data.brandedDesign && data.brandedDesign.preview;
           if (b64) {
@@ -192,7 +321,7 @@ module.exports = () => {
                   if (/\.(jpg|jpeg|png)$/i.test(ent.name)) {
                     const baseName = ent.name.replace(/\.(jpg|jpeg|png)$/i, "");
                     const idToken = baseName.split("_")[0];
-                    if (String(idToken) === String(baseId)) {
+                    if (String(idToken) === String(lookupId)) {
                       // Avoid duplicates if preferred set
                       if (!targets.length || targets[0] !== full) targets.push(full);
                     }
@@ -205,7 +334,7 @@ module.exports = () => {
               walk(baseDir);
             }
             if (!targets.length) {
-              console.warn("[graphql-proxy] no matching files found for baseId", baseId, "under", baseDir);
+              console.warn("[graphql-proxy] no matching files found for baseId", lookupId, "under", baseDir);
             } else {
               console.log("[graphql-proxy] matched files for overwrite:", targets);
             }
