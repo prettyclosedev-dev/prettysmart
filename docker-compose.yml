@@ -9,6 +9,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./files:/usr/src/app/files
+      - ./site_static/templates:/usr/src/app/site_static/templates
     networks:
       - prettyclose
 

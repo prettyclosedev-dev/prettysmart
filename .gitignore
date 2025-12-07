@@ -55,6 +55,7 @@ files/
 google-fonts/
 .vscode/
 keys/
+site_static/templates/
 
 # Other Files
 config.json
