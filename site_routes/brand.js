@@ -487,78 +487,93 @@ async function generateAndStoreTemplates(req, opts = {}, logger = (msg) => conso
   const pageSize = opts.pageSize || 10;
   logger(`[TemplatesCache] Page size per orientation/category set to ${pageSize}`);
 
-  for (const cat of categories) {
+  // 1. Gather all designs to be generated
+  const fetchDesignsForCatOrient = async (cat, orient) => {
     const safeCat = (cat.name || `cat-${cat.id}`).replace(/[^a-z0-9\-\s_]/gi, "").trim().replace(/\s+/g, "-");
-    logger(`[TemplatesCache] Processing category '${cat.name}' (id=${cat.id}) -> folder '${safeCat}'`);
+    const safeOrient = orient.replace(/[^a-z0-9\-\s_]/gi, "").trim().replace(/\s+/g, "-");
+    const outDir = path.join(baseOutDir, safeCat, safeOrient);
+
+    if (!fs.existsSync(outDir)) {
+      fs.mkdirSync(outDir, { recursive: true });
+    }
+
+    const designsData = await getDesigns({
+      take: pageSize,
+      skip: 0,
+      where: {
+        AND: [
+          { categories: { some: { id: { equals: parseInt(cat.id) } } } },
+          { categories: { some: { name: { contains: orient, mode: "insensitive" } } } },
+        ],
+      },
+    });
+
+    let designs = (designsData && designsData.designs) || [];
+    // Filter out duplicates
+    designs = designs.filter(d => !d.tags || !d.tags.some(t => t.startsWith("original_id:")));
+
+    return designs.map(d => ({ d, cat, orient, outDir }));
+  };
+
+  logger(`[TemplatesCache] Fetching design lists for all categories/orientations...`);
+  const fetchPromises = [];
+  for (const cat of categories) {
     for (const orient of orientations) {
-      const safeOrient = orient.replace(/[^a-z0-9\-\s_]/gi, "").trim().replace(/\s+/g, "-");
-      logger(`[TemplatesCache]   Orientation '${orient}' -> folder '${safeOrient}'`);
-
-      const outDir = path.join(baseOutDir, safeCat, safeOrient);
-      if (!fs.existsSync(outDir)) {
-        fs.mkdirSync(outDir, { recursive: true });
-        logger(`[TemplatesCache]   Created directory ${outDir}`);
-      } else {
-        logger(`[TemplatesCache]   Directory exists ${outDir}`);
-      }
-
-      logger(`[TemplatesCache]   Fetching designs for category='${cat.name}' orientation='${orient}' ...`);
-      const designsData = await getDesigns({
-        take: pageSize,
-        skip: 0,
-        where: {
-          AND: [
-            { categories: { some: { id: { equals: parseInt(cat.id) } } } },
-            { categories: { some: { name: { contains: orient, mode: "insensitive" } } } },
-          ],
-        },
-      });
-
-      let designs = (designsData && designsData.designs) || [];
-      
-      // Filter out duplicates (designs with original_id tag)
-      designs = designs.filter(d => !d.tags || !d.tags.some(t => t.startsWith("original_id:")));
-
-      logger(`[TemplatesCache]   Retrieved ${designs.length} designs for category='${cat.name}' orientation='${orient}'`);
-
-      for (const d of designs) {
-        processed++;
-        logger(`[TemplatesCache]     Generating preview designId=${d.id} category='${cat.name}' orientation='${orient}'`);
-        try {
-          const variables = {
-            user: req.user,
-            where: { id: parseInt(d.id) },
-            previewOptions: { mimeType: "image/jpeg", pixelRatio: 1 },
-            // Apply brandWhere to personalize
-            brandWhere: { prettySmartId: req.user.account._id.toString() },
-          };
-
-          const branded = await getBrandedDesign(variables);
-          const b64 = branded && branded.brandedDesign && branded.brandedDesign.preview;
-          if (!b64) {
-            errors++;
-            logger(`[TemplatesCache]     WARNING: Missing preview for designId=${d.id}`);
-            continue;
-          }
-          const buf = Buffer.from(b64, "base64");
-          // New naming convention: <templateID>_<templateName>.jpg (sanitized templateName)
-          const safeDesignName = (d.name || `design-${parseInt(d.id)}`)
-            .replace(/[^a-z0-9\-\s_]/gi, "")
-            .trim()
-            .replace(/\s+/g, "-");
-          const fileName = `${parseInt(d.id)}_${safeDesignName}.jpg`;
-          const fullPath = path.join(outDir, fileName);
-          fs.writeFileSync(fullPath, buf);
-          saved++;
-          logger(`[TemplatesCache]     Saved preview -> ${fullPath}`);
-        } catch (e) {
-          errors++;
-          logger(`[TemplatesCache]     ERROR generating preview designId=${d.id}: ${e.message || e}`);
-        }
-      }
-      logger(`[TemplatesCache]   Finished orientation '${orient}' for category='${cat.name}' (processed=${processed}, saved=${saved}, errors=${errors})`);
+      fetchPromises.push(fetchDesignsForCatOrient(cat, orient));
     }
   }
+
+  const results = await Promise.all(fetchPromises);
+  const flatTasks = results.flat();
+  logger(`[TemplatesCache] Total designs to generate: ${flatTasks.length}`);
+
+  // 2. Process generation with concurrency limit
+  const CONCURRENCY_LIMIT = 15; // Aggressive parallelism
+  
+  async function processTask(task) {
+    const { d, cat, orient, outDir } = task;
+    processed++;
+    
+    try {
+      const variables = {
+        user: req.user,
+        where: { id: parseInt(d.id) },
+        previewOptions: { mimeType: "image/jpeg", pixelRatio: 0.5 }, // Low res for speed
+        brandWhere: { prettySmartId: req.user.account._id.toString() },
+      };
+
+      const branded = await getBrandedDesign(variables);
+      const b64 = branded && branded.brandedDesign && branded.brandedDesign.preview;
+      
+      if (!b64) {
+        errors++;
+        return;
+      }
+      
+      const buf = Buffer.from(b64, "base64");
+      const safeDesignName = (d.name || `design-${parseInt(d.id)}`)
+        .replace(/[^a-z0-9\-\s_]/gi, "")
+        .trim()
+        .replace(/\s+/g, "-");
+      const fileName = `${parseInt(d.id)}_${safeDesignName}.jpg`;
+      const fullPath = path.join(outDir, fileName);
+      fs.writeFileSync(fullPath, buf);
+      saved++;
+    } catch (e) {
+      errors++;
+      logger(`[TemplatesCache] ERROR ${d.id}: ${e.message}`);
+    }
+  }
+
+  const executing = new Set();
+  for (const task of flatTasks) {
+    const p = processTask(task).then(() => executing.delete(p));
+    executing.add(p);
+    if (executing.size >= CONCURRENCY_LIMIT) {
+      await Promise.race(executing);
+    }
+  }
+  await Promise.all(executing);
 
   logger(`[TemplatesCache] COMPLETE user=${userId} processed=${processed} saved=${saved} errors=${errors}`);
   logger(`[TemplatesCache] STREAM_DONE`);
