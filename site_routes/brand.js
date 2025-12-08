@@ -514,7 +514,11 @@ async function generateAndStoreTemplates(req, opts = {}, logger = (msg) => conso
         },
       });
 
-      const designs = (designsData && designsData.designs) || [];
+      let designs = (designsData && designsData.designs) || [];
+      
+      // Filter out duplicates (designs with original_id tag)
+      designs = designs.filter(d => !d.tags || !d.tags.some(t => t.startsWith("original_id:")));
+
       logger(`[TemplatesCache]   Retrieved ${designs.length} designs for category='${cat.name}' orientation='${orient}'`);
 
       for (const d of designs) {

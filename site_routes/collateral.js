@@ -44,7 +44,10 @@ module.exports = () => {
       });
 
       if (designsData && designsData.designs) {
-        designsData.designs.forEach((design) => {
+        // Filter out duplicates (designs with original_id tag)
+        const filteredDesigns = designsData.designs.filter(d => !d.tags || !d.tags.some(t => t.startsWith("original_id:")));
+
+        filteredDesigns.forEach((design) => {
           design.isFavorite = favoriteIds.includes(design.id);
           design.categories.forEach((category) => {
             if (!sizeNames.includes(category.name)) {

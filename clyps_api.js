@@ -28,6 +28,7 @@ async function getDesigns({where, take, skip, orderBy, cursor}) {
       designs(where: $where, take: $take, skip: $skip, orderBy: $orderBy, cursor: $cursor) {
         id
         name
+        tags
         categories {
           id
           name
