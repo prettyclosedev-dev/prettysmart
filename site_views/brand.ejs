@@ -595,14 +595,12 @@
 </script>
 
 <!-- Template build toast -->
-<div id="template-build-toast" class="d-none" style="position:fixed;top:18px;right:18px;z-index:1500;width:340px;background:#1A1D21;color:#fff;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.35);font-family:inherit;">
-    <div style="display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.1);">
-        <div id="template-build-spinner" style="width:18px;height:18px;border:3px solid #4fa3ff;border-top-color:transparent;border-radius:50%;animation:tbspin 0.8s linear infinite;margin-right:10px;"></div>
-        <strong id="template-build-status" style="flex:1;font-size:14px;">Preparing...</strong>
-        <button onclick="$('#template-build-toast').addClass('d-none');" style="background:none;border:none;color:#ccc;cursor:pointer;font-size:14px;">×</button>
+<div id="template-build-toast" class="d-none" style="position:fixed;top:18px;right:18px;z-index:1500;width:340px;background:#fff;color:#000;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.15);font-family:inherit;border-left: 6px solid #db3965;">
+    <div style="display:flex;align-items:center;padding:12px 16px;">
+        <div id="template-build-spinner" style="width:18px;height:18px;border:3px solid #db3965;border-top-color:transparent;border-radius:50%;animation:tbspin 0.8s linear infinite;margin-right:10px;"></div>
+        <strong id="template-build-status" style="flex:1;font-size:14px;">Generating your Personalized templates...</strong>
+        <button onclick="$('#template-build-toast').addClass('d-none');" style="background:none;border:none;color:#999;cursor:pointer;font-size:14px;">×</button>
     </div>
-    <pre id="template-build-log" style="margin:0;padding:12px 16px;font-size:11px;line-height:1.4;max-height:220px;overflow:auto;background:#111519;color:#fff;font-family:monospace;white-space:pre-wrap;word-break:break-word;"></pre>
-    <div style="padding:8px 16px;font-size:10px;color:#7b8896;border-top:1px solid rgba(255,255,255,.08);">Live build logs</div>
 </div>
 <style>
 @keyframes tbspin {from{transform:rotate(0)}to{transform:rotate(360deg)}}

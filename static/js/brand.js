@@ -83,23 +83,33 @@ function startTemplateBuildStream() {
     return window.location.href = '/brand/build?url=/templates'; // fallback
   }
   $toast.removeClass('d-none');
-  $('#template-build-status').text('Generating previews...');
+
+  var category = $('[name="industry"]').val();
+  var text = 'Generating your Personalized templates...';
+  if (category) {
+    text = 'Generating your Personalized templates for ' + category + '...';
+  }
+  $('#template-build-status').text(text);
   $('#template-build-spinner').show();
-  var $log = $('#template-build-log');
-  $log.text('Starting template cache build...\n');
+  
   try {
     var es = new EventSource('/brand/generate-templates-sse');
     es.onmessage = function(ev) {
       try {
         var data = JSON.parse(ev.data);
         if (data.line) {
-          $log.append(data.line + '\n');
-        } else if (data.error) {
-          $log.append('ERROR: ' + data.error + '\n');
+          try {
+            var lineData = JSON.parse(data.line);
+            if (lineData.category) {
+               var displayCategory = lineData.category.replace(/-/g, ' ');
+               $('#template-build-status').text('Generating your Personalized templates for ' + displayCategory + '...');
+            }
+          } catch(e) {
+            // line was not JSON, ignore
+          }
         }
-        $log.scrollTop($log[0].scrollHeight);
       } catch (e) {
-        $log.append('Parse error: ' + e + '\n');
+        // ignore
       }
     };
     es.addEventListener('done', function(ev) {
@@ -111,12 +121,12 @@ function startTemplateBuildStream() {
       }, 800);
     });
     es.onerror = function() {
-      $log.append('Connection lost. Falling back...\n');
+      console.error('Connection lost. Falling back...');
       $('#template-build-spinner').hide();
       setTimeout(function(){ window.location.href = '/templates'; }, 1200);
     };
   } catch (err) {
-    $log.append('Failed to start stream: ' + err + '\n');
+    console.error('Failed to start stream: ' + err);
     $('#template-build-spinner').hide();
     setTimeout(function(){ window.location.href = '/templates'; }, 1200);
   }

@@ -60,7 +60,33 @@ module.exports = () => {
 
       const dirExists = fs.existsSync(baseDir) && fs.lstatSync(baseDir).isDirectory();
       if (dirExists) {
-        const catDirents = fs.readdirSync(baseDir, { withFileTypes: true }).filter((d) => d.isDirectory());
+        let catDirents = fs.readdirSync(baseDir, { withFileTypes: true }).filter((d) => d.isDirectory());
+
+        // Fetch categories to sort by ID (creation time)
+        try {
+          const categories = await getCategories({
+            where: { availableOnPages: { has: "Templates" } },
+            orderBy: [{ id: "desc" }],
+          });
+          
+          if (categories && categories.length) {
+             // Create a map of safeName -> index
+             const catOrder = {};
+             categories.forEach((cat, index) => {
+                const safeCat = (cat.name || `cat-${cat.id}`).replace(/[^a-z0-9\-\s_]/gi, "").trim().replace(/\s+/g, "-");
+                catOrder[safeCat] = index;
+             });
+             
+             catDirents.sort((a, b) => {
+                const idxA = catOrder[a.name] !== undefined ? catOrder[a.name] : 9999;
+                const idxB = catOrder[b.name] !== undefined ? catOrder[b.name] : 9999;
+                return idxA - idxB;
+             });
+          }
+        } catch (e) {
+          console.error("Failed to fetch categories for sorting:", e);
+        }
+
         let categoryMap = [];
 
         categorizedDesigns = catDirents.map((catDir, idx) => {
@@ -127,7 +153,7 @@ module.exports = () => {
 
     const hasAnyTemplates = Array.isArray(categorizedDesigns) && categorizedDesigns.some((c) => c.templates && c.templates.length);
     if (!hasAnyTemplates) {
-      return res.status(200).send('<div class="empty-state" style="padding: 24px; text-align:center;">set up your brand in the My Brand page</div>');
+      return res.status(200).send('<div class="empty-state" style="padding: 24px; text-align:center;">Please set up you brand in the My Brand page</div>');
     }
 
     return res.render("partials/templates-content", { sizes, templates: categorizedDesigns, row: { templates: [] }, cache: true, filename: "templates", loading: false });

@@ -512,7 +512,7 @@ async function generateAndStoreTemplates(req, opts = {}, logger = (msg) => conso
       fs.mkdirSync(outDir, { recursive: true });
     }
 
-    return designs.map(d => ({ d, cat, orient, outDir }));
+    return designs.map(d => ({ d, cat, orient, outDir, safeCat, safeOrient }));
   };
 
   logger(`[TemplatesCache] Fetching design lists for all categories/orientations...`);
@@ -531,7 +531,7 @@ async function generateAndStoreTemplates(req, opts = {}, logger = (msg) => conso
   const CONCURRENCY_LIMIT = 15; // Aggressive parallelism
   
   async function processTask(task) {
-    const { d, cat, orient, outDir } = task;
+    const { d, cat, orient, outDir, safeCat, safeOrient } = task;
     processed++;
     
     try {
@@ -559,6 +559,16 @@ async function generateAndStoreTemplates(req, opts = {}, logger = (msg) => conso
       const fullPath = path.join(outDir, fileName);
       fs.writeFileSync(fullPath, buf);
       saved++;
+
+      // Log success for frontend update
+      logger(JSON.stringify({
+        type: 'template_generated',
+        category: safeCat,
+        orientation: orient,
+        templateId: d.id,
+        templateName: d.name,
+        imageUrl: `/site_static/templates/${userId}/${safeCat}/${safeOrient}/${fileName}`
+      }));
     } catch (e) {
       errors++;
       logger(`[TemplatesCache] ERROR ${d.id}: ${e.message}`);
