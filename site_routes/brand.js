@@ -493,10 +493,6 @@ async function generateAndStoreTemplates(req, opts = {}, logger = (msg) => conso
     const safeOrient = orient.replace(/[^a-z0-9\-\s_]/gi, "").trim().replace(/\s+/g, "-");
     const outDir = path.join(baseOutDir, safeCat, safeOrient);
 
-    if (!fs.existsSync(outDir)) {
-      fs.mkdirSync(outDir, { recursive: true });
-    }
-
     const designsData = await getDesigns({
       take: pageSize,
       skip: 0,
@@ -511,6 +507,10 @@ async function generateAndStoreTemplates(req, opts = {}, logger = (msg) => conso
     let designs = (designsData && designsData.designs) || [];
     // Filter out duplicates
     designs = designs.filter(d => !d.tags || !d.tags.some(t => t.startsWith("original_id:")));
+
+    if (designs.length > 0 && !fs.existsSync(outDir)) {
+      fs.mkdirSync(outDir, { recursive: true });
+    }
 
     return designs.map(d => ({ d, cat, orient, outDir }));
   };
