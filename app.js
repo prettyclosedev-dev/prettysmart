@@ -333,6 +333,8 @@ app.use("/recents", require("./site_routes/recents")());
 app.use("/zmanim", require("./site_routes/zmanim")());
 app.use("/projects", require("./site_routes/projects")());
 app.use("/editor", require("./site_routes/editor")());
+// Shortcut top-level route to the editor branded-design path
+app.use("/branded-design", require("./site_routes/branded-design")());
 app.use("/customization", require("./site_routes/customization")());
 app.use("/unsplash", require("./site_routes/unsplash")());
 app.use("/library", require("./site_routes/library")());
