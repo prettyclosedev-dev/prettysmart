@@ -191,7 +191,7 @@ module.exports = () => {
 
     const hasAnyTemplates = Array.isArray(categorizedDesigns) && categorizedDesigns.some((c) => c.templates && c.templates.length);
     if (!hasAnyTemplates) {
-      return res.status(200).send('<div class="empty-state" style="padding: 24px; text-align:center;">Please set up you brand in the My Brand page</div>');
+      return res.status(200).send('<div class="empty-state" style="padding: 24px; text-align:center;">Please set up your brand in the My Brand page</div>');
     }
 
     return res.render("partials/templates-content", { sizes, templates: categorizedDesigns, row: { templates: [] }, cache: true, filename: "templates", loading: false });
