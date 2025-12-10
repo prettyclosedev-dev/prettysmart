@@ -42,6 +42,44 @@ module.exports = () => {
     }
   });
 
+  router.get("/status", async (req, res) => {
+    const userId = req.user && (req.user._id?.toString?.() || String(req.user._id || ""));
+    const baseDir = path.join(__dirname, "../site_static/templates", userId);
+    
+    if (!fs.existsSync(baseDir)) {
+      return res.json({ count: 0, complete: true });
+    }
+
+    // Check for completion marker
+    const statusFile = path.join(baseDir, "status.json");
+    const complete = fs.existsSync(statusFile);
+
+    // Count files (simple recursive count)
+    let count = 0;
+    const countFiles = (dir) => {
+      try {
+        const files = fs.readdirSync(dir, { withFileTypes: true });
+        for (const file of files) {
+          if (file.isDirectory()) {
+            countFiles(path.join(dir, file.name));
+          } else if (file.isFile() && file.name !== "status.json") {
+            count++;
+          }
+        }
+      } catch (e) {
+        // ignore errors (e.g. race conditions with deletion)
+      }
+    };
+    
+    try {
+      countFiles(baseDir);
+    } catch (e) {
+      console.error("Error counting template files:", e);
+    }
+
+    res.json({ count, complete });
+  });
+
   router.get("/get-templates", async (req, res) => {
     const sizes = req.session.sizes || [];
     const userEmail = req.user.email;

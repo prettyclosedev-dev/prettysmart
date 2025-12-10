@@ -508,10 +508,6 @@ async function generateAndStoreTemplates(req, opts = {}, logger = (msg) => conso
     // Filter out duplicates
     designs = designs.filter(d => !d.tags || !d.tags.some(t => t.startsWith("original_id:")));
 
-    if (designs.length > 0 && !fs.existsSync(outDir)) {
-      fs.mkdirSync(outDir, { recursive: true });
-    }
-
     return designs.map(d => ({ d, cat, orient, outDir, safeCat, safeOrient }));
   };
 
@@ -556,6 +552,11 @@ async function generateAndStoreTemplates(req, opts = {}, logger = (msg) => conso
         .trim()
         .replace(/\s+/g, "-");
       const fileName = `${parseInt(d.id)}_${safeDesignName}.jpg`;
+      
+      if (!fs.existsSync(outDir)) {
+        fs.mkdirSync(outDir, { recursive: true });
+      }
+
       const fullPath = path.join(outDir, fileName);
       fs.writeFileSync(fullPath, buf);
       saved++;
@@ -584,6 +585,13 @@ async function generateAndStoreTemplates(req, opts = {}, logger = (msg) => conso
     }
   }
   await Promise.all(executing);
+
+  // Write completion marker
+  try {
+    fs.writeFileSync(path.join(baseOutDir, "status.json"), JSON.stringify({ status: "complete", timestamp: Date.now() }));
+  } catch (e) {
+    logger(`[TemplatesCache] Failed to write status file: ${e.message}`);
+  }
 
   logger(`[TemplatesCache] COMPLETE user=${userId} processed=${processed} saved=${saved} errors=${errors}`);
   logger(`[TemplatesCache] STREAM_DONE`);

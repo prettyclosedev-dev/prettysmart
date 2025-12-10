@@ -92,6 +92,8 @@ function startTemplateBuildStream() {
   $('#template-build-status').text(text);
   $('#template-build-spinner').show();
   
+  var generatedCategories = new Set();
+
   try {
     var es = new EventSource('/brand/generate-templates-sse');
     es.onmessage = function(ev) {
@@ -101,8 +103,14 @@ function startTemplateBuildStream() {
           try {
             var lineData = JSON.parse(data.line);
             if (lineData.category) {
+               generatedCategories.add(lineData.category);
                var displayCategory = lineData.category.replace(/-/g, ' ');
                $('#template-build-status').text('Generating your Personalized templates for ' + displayCategory + '...');
+
+               if (generatedCategories.size >= 10) {
+                 es.close();
+                 window.location.href = '/templates';
+               }
             }
           } catch(e) {
             // line was not JSON, ignore

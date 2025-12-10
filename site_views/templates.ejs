@@ -109,24 +109,60 @@
     if (window.location.pathname === '/templates' && $('#loading-state').length) {
       fetchTemplates();
     }
+
+    // Poll for updates if generation is ongoing
+    if (window.location.pathname === '/templates') {
+        let lastCount = 0;
+        // Initial count check
+        $.get('/templates/status', function(data) {
+            lastCount = data.count;
+            if (!data.complete) {
+                $('#template-build-toast').removeClass('d-none');
+                startPolling(lastCount);
+            }
+        });
+    }
   });
 
-  function fetchTemplates() {
-    topbar.config({
-      barThickness: 4,
-      barColors: {
-        '0': '#db3965',
-        '1.0': '#db3965'
-      }
-    });
-    topbar.show();
+  function startPolling(initialCount) {
+      let lastCount = initialCount;
+      let pollInterval = setInterval(function() {
+          $.get('/templates/status', function(data) {
+              if (data.count > lastCount) {
+                  console.log("New templates detected (" + data.count + " > " + lastCount + "), refreshing...");
+                  lastCount = data.count;
+                  fetchTemplates(true); // silent update
+              }
+              
+              if (data.complete) {
+                  console.log("Generation complete.");
+                  clearInterval(pollInterval);
+                  $('#template-build-toast').addClass('d-none');
+                  // One final fetch to ensure we have everything
+                  fetchTemplates(true);
+              }
+          });
+      }, 3000);
+  }
+
+  function fetchTemplates(silent = false) {
+    if (!silent) {
+      topbar.config({
+        barThickness: 4,
+        barColors: {
+          '0': '#db3965',
+          '1.0': '#db3965'
+        }
+      });
+      topbar.show();
+    }
 
     $.ajax({
       url: '/templates/get-templates',
       method: 'GET',
       success: function (html) {
         // Remove the loading state
-        topbar.hide();
+        if (!silent) topbar.hide();
         $('#loading-state').remove();
 
         // Inject the fetched HTML into the templates container
@@ -154,20 +190,22 @@
         }
       },
       error: function (err) {
-        topbar.hide();
+        if (!silent) topbar.hide();
         console.error('Error fetching templates:', err);
 
         // Replace the loading state with an error message and retry button
-        $('#loading-state').html(`
-          <p>Error loading templates. Please try again.</p>
-          <button id="retry-button" class="btn btn-primary">Retry</button>
-        `);
+        if ($('#loading-state').length) {
+          $('#loading-state').html(`
+            <p>Error loading templates. Please try again.</p>
+            <button id="retry-button" class="btn btn-primary">Retry</button>
+          `);
 
-        // Add click handler for the retry button
-        $('#retry-button').on('click', function () {
-          $('#loading-state').html('<p>Loading templates, please wait... (Can take up to 30 seconds)</p>');
-          fetchTemplates();  // Retry fetching the templates
-        });
+          // Add click handler for the retry button
+          $('#retry-button').on('click', function () {
+            $('#loading-state').html('<p>Loading templates, please wait... (Can take up to 30 seconds)</p>');
+            fetchTemplates();  // Retry fetching the templates
+          });
+        }
       }
     });
   }
