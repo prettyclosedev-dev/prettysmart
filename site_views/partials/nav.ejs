@@ -194,8 +194,8 @@
             class="icon-wrapper"><i class="fa-solid fa-icons"></i></span><span class="action-icon-text">My
             brand</span></a>
 
-        <a onclick="navClicked()" class="df action-wrapper" href="/support"><span class="icon-wrapper"><i
-              class="fa-solid fa-question-circle"></i></span><span class="action-icon-text">Support</span></a>
+        <!-- <a onclick="navClicked()" class="df action-wrapper" href="/support"><span class="icon-wrapper"><i
+              class="fa-solid fa-question-circle"></i></span><span class="action-icon-text">Support</span></a> -->
         <a onclick="navClicked()" class="df action-wrapper logout" href="/logout"><span class="icon-wrapper"><i
               class="fa-solid fa-sign-out-alt"></i></span><span class="action-icon-text">Logout</span></a>
         <a onclick="navClicked()" style="margin-top: 20px;" class="df action-wrapper product-hunt"
@@ -298,3 +298,8 @@
     <div class="tooltip"></div>
   </div>
 </div>
+<style>
+/* Remove gaps between nav items */
+.links-wrapper { gap: 0 !important; }
+.links-wrapper .link-wrapper { margin: 0 !important; }
+</style>
