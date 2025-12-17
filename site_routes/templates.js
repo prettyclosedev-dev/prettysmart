@@ -19,6 +19,7 @@ const {
   addFavorite,
   removeFavorite,
 } = require("../clyps_brand_update");
+const { generateAndStoreTemplates } = require("../template_generator");
 const fetchSizesMiddleware = require("./sizes-middleware");
 
 module.exports = () => {
@@ -27,6 +28,16 @@ module.exports = () => {
   router.get("/", async (req, res) => {
     try {
       const sizes = req.session.sizes || [];
+
+      // Check if templates exist
+      const userId = req.user && (req.user._id?.toString?.() || String(req.user._id || ""));
+      const baseDir = path.join(__dirname, "../site_static/templates", userId);
+      
+      if (!fs.existsSync(baseDir)) {
+         console.log("Templates missing for user " + userId + ", triggering generation...");
+         // Trigger generation in background
+         generateAndStoreTemplates(req).catch(err => console.error("Background template generation failed:", err));
+      }
 
       return res.render("templates", {
         sizes,
