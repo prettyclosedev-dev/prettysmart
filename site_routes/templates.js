@@ -64,8 +64,6 @@ module.exports = () => {
           cache: true,
           filename: "templates",
           loading: false,
-          plan_name: req.user.account.plan_name, // Pass plan_name
-          payment_failed: req.user.account.payment_failed // Pass payment_failed
         });
       }
     } catch (error) {
@@ -225,8 +223,6 @@ module.exports = () => {
       cache: true,
       filename: "templates",
       loading: false,
-      plan_name: req.user.account.plan_name, // Pass plan_name
-      payment_failed: req.user.account.payment_failed // Pass payment_failed
     });
   });
 
@@ -468,8 +464,6 @@ module.exports = () => {
           cache: true,
           filename: "templates",
           loading: false,
-          plan_name: req.user.account.plan_name,
-          payment_failed: req.user.account.payment_failed
         });
       }
     } catch (error) {
@@ -606,8 +600,6 @@ module.exports = () => {
       cache: true,
       filename: "templates",
       loading: false,
-      plan_name: req.user.account.plan_name,
-      payment_failed: req.user.account.payment_failed
     });
   });
 

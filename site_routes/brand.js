@@ -20,6 +20,22 @@ const mailchimp = require("@mailchimp/mailchimp_transactional")(
 );
 const { trace } = require("potrace");
 
+async function clearUserCache(userId) {
+  const cacheDir = path.join(
+    __dirname,
+    "../site_static/templates",
+    userId.toString()
+  );
+  try {
+    if (fs.existsSync(cacheDir)) {
+      await fs.promises.rm(cacheDir, { recursive: true, force: true });
+      console.log(`[Cache] Cleared cache for user ${userId}`);
+    }
+  } catch (err) {
+    console.error(`[Cache] Error clearing cache for user ${userId}:`, err);
+  }
+}
+
 var attributes = {
   fill: "#1A428A",
 };
@@ -550,6 +566,7 @@ module.exports = () => {
               new: true,
             }
           );
+          await clearUserCache(req.user._id);
         }
       }
 
@@ -575,6 +592,8 @@ module.exports = () => {
           new: true,
         }
       );
+
+      await clearUserCache(req.user._id);
 
       res.send({ success: true, locked: req.params.lock });
     } catch (e) {
@@ -716,6 +735,8 @@ module.exports = () => {
         //   console.log(e)
         // }
 
+        await clearUserCache(req.user._id);
+
         return res.send({
           success: true,
           brand,
@@ -736,6 +757,7 @@ module.exports = () => {
           }
         )
           .then(async (account) => {
+            await clearUserCache(req.user._id);
             res.send({
               success: true,
               brand: await Huddle.getBrandObject(account),
@@ -779,6 +801,8 @@ module.exports = () => {
         //     account.brand.colors.secondary
         //   );
         // }
+
+        await clearUserCache(req.user._id);
 
         res.send({
           success: true,
@@ -903,6 +927,8 @@ module.exports = () => {
               google: isGoogle,
             };
 
+            await clearUserCache(req.user._id);
+
             return res.send({
               success: true,
               brand: await Huddle.getBrandObject(account).catch(console.log),
@@ -945,6 +971,8 @@ module.exports = () => {
               // if (contactID) {
               //   await updateBrandFont(contactID, publicUrl);
               // }
+
+              await clearUserCache(req.user._id);
 
               res.send({
                 success: true,
@@ -1108,6 +1136,8 @@ module.exports = () => {
         }
 
         req.user.account = account;
+
+        await clearUserCache(req.user._id);
 
         res.send({
           success: true,
