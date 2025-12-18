@@ -6,6 +6,11 @@
         );
     }
 %>
+<% if (typeof templates !== 'undefined' && templates._fromCache) { %>
+  <script>console.log("[Frontend Cache] HIT: Initial templates loaded from cache (inside partial).");</script>
+<% } else if (typeof templates !== 'undefined' && templates.length > 0) { %>
+  <script>console.log("[Frontend Cache] MISS: Initial templates loaded from server (inside partial).");</script>
+<% } %>
 <% templates.forEach((templateType, index) => { %>
     <div id="<%= templateType.id %>" class="item-wrapper" data-default-size="<%= templateType.default_size %>">
       <div class="df aic item-header">

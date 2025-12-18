@@ -218,6 +218,7 @@ $(document)
     console.log("selectedSize", selectedSize);
 
     if (currentPage < totalPages) {
+      console.log(`[Frontend Cache] Requesting load-more for category ${categoryId}, page ${currentPage + 1}, size ${selectedSize}`);
       $.ajax({
         url: `/templates/load-more/${categoryId}`,
         type: "GET",
@@ -226,7 +227,14 @@ $(document)
           sizeName: selectedSize, // Pass the selected size name
         },
         success: function (response) {
+          console.log(`[Frontend Cache] Received response for category ${categoryId}, page ${currentPage + 1}`);
           if (response.length > 0) {
+            if (response[0]._fromCache) {
+               console.log(`[Frontend Cache] HIT: Data for category ${categoryId} was served from cache.`);
+            } else {
+               console.log(`[Frontend Cache] MISS: Data for category ${categoryId} was fetched from server.`);
+            }
+
             var $templatesContainer = $(`#swiper-wrapper-${categoryId}`);
             var $loadMoreSlide = $(`#load-more-slide-${categoryId}`);
 

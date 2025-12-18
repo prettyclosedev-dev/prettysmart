@@ -50,6 +50,29 @@ module.exports = () => {
     const pageSize = 10; // Number of designs to fetch per category per page
 
     try {
+      const cachePath = await getCachePath(req.user._id, "initial.json");
+      console.log(`[Cache] Checking initial templates cache at: ${cachePath}`);
+      const cachedData = await fs.promises.readFile(cachePath, "utf8");
+      if (cachedData) {
+        console.log(`[Cache] HIT: Initial templates loaded from cache.`);
+        categorizedDesigns = JSON.parse(cachedData);
+        categorizedDesigns._fromCache = true; // Add flag to root object
+        return res.render("partials/templates-content", {
+          sizes,
+          templates: categorizedDesigns,
+          row: { templates: [] },
+          cache: true,
+          filename: "templates",
+          loading: false,
+          plan_name: req.user.account.plan_name, // Pass plan_name
+          payment_failed: req.user.account.payment_failed // Pass payment_failed
+        });
+      }
+    } catch (error) {
+      console.log(`[Cache] MISS: Initial templates cache not found or error: ${error.message}`);
+    }
+
+    try {
       // Fetch content categories available on the "Templates" page
       const categories = await getCategories({
         where: {
@@ -179,6 +202,18 @@ module.exports = () => {
           return categorizedCategory;
         })
       );
+
+      try {
+        const cachePath = await getCachePath(req.user._id, "initial.json");
+        console.log(`[Cache] Writing initial templates to cache at: ${cachePath}`);
+        await fs.promises.writeFile(
+          cachePath,
+          JSON.stringify(categorizedDesigns)
+        );
+        console.log(`[Cache] SUCCESS: Initial templates cached.`);
+      } catch (error) {
+        console.log(`[Cache] ERROR: Failed to write initial templates cache: ${error.message}`);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -190,6 +225,8 @@ module.exports = () => {
       cache: true,
       filename: "templates",
       loading: false,
+      plan_name: req.user.account.plan_name, // Pass plan_name
+      payment_failed: req.user.account.payment_failed // Pass payment_failed
     });
   });
 
@@ -199,6 +236,22 @@ module.exports = () => {
     const { page = 1, sizeName = "square" } = req.query; // Default to 'square' if sizeName is not provided
     const pageSize = 10; // Number of designs to fetch per page
     const offset = (page - 1) * pageSize;
+
+    try {
+      const cacheFilename = `cat_${categoryId}_page_${page}_size_${sizeName}.json`;
+      const cachePath = await getCachePath(req.user._id, cacheFilename);
+      console.log(`[Cache] Checking load-more cache at: ${cachePath}`);
+      const cachedData = await fs.promises.readFile(cachePath, "utf8");
+      if (cachedData) {
+        console.log(`[Cache] HIT: Load-more data loaded from cache.`);
+        const data = JSON.parse(cachedData);
+        // Add a flag to indicate this came from cache
+        data.forEach(item => item._fromCache = true);
+        return res.status(200).json(data);
+      }
+    } catch (error) {
+      console.log(`[Cache] MISS: Load-more cache not found or error: ${error.message}`);
+    }
 
     try {
       // Fetch the designs for the given category, page, and size
@@ -231,6 +284,18 @@ module.exports = () => {
       });
 
       if (designsData && designsData.designs) {
+        try {
+          const cacheFilename = `cat_${categoryId}_page_${page}_size_${sizeName}.json`;
+          const cachePath = await getCachePath(req.user._id, cacheFilename);
+          console.log(`[Cache] Writing load-more data to cache at: ${cachePath}`);
+          await fs.promises.writeFile(
+            cachePath,
+            JSON.stringify(designsData.designs)
+          );
+          console.log(`[Cache] SUCCESS: Load-more data cached.`);
+        } catch (error) {
+          console.log(`[Cache] ERROR: Failed to write load-more cache: ${error.message}`);
+        }
         return res.status(200).json(designsData.designs);
       } else {
         return res.status(500).json({ error: "No designs found." });
@@ -249,6 +314,24 @@ module.exports = () => {
     }).lean();
 
     const effectiveId = mapping && mapping.project_id ? parseInt(mapping.project_id) : parseInt(req.params.id);
+
+    // Cache logic for previews
+    // Only cache if there is no session content (standard browsing)
+    const useCache = !req.session.content;
+    if (useCache) {
+      try {
+        const cacheFilename = `preview_${effectiveId}.txt`;
+        const cachePath = await getCachePath(req.user._id, cacheFilename);
+        console.log(`[Cache] Checking preview cache at: ${cachePath}`);
+        const cachedData = await fs.promises.readFile(cachePath, "utf8");
+        if (cachedData) {
+          console.log(`[Cache] HIT: Preview ${effectiveId} loaded from cache.`);
+          return res.status(200).send(cachedData);
+        }
+      } catch (error) {
+        console.log(`[Cache] MISS: Preview ${effectiveId} cache not found.`);
+      }
+    }
 
     const variables = {
       user: req.user,
@@ -279,6 +362,19 @@ module.exports = () => {
         brandedDesignData.brandedDesign &&
         brandedDesignData.brandedDesign.preview
       ) {
+        if (useCache) {
+          try {
+            const cacheFilename = `preview_${effectiveId}.txt`;
+            const cachePath = await getCachePath(req.user._id, cacheFilename);
+            console.log(`[Cache] Writing preview ${effectiveId} to cache.`);
+            await fs.promises.writeFile(
+              cachePath,
+              brandedDesignData.brandedDesign.preview
+            );
+          } catch (error) {
+            console.log(`[Cache] ERROR: Failed to write preview cache: ${error.message}`);
+          }
+        }
         return res.status(200).send(brandedDesignData.brandedDesign.preview);
       }
 
@@ -355,6 +451,30 @@ module.exports = () => {
 
     const favoritesData = await getUserFavorites(userEmail);
     const favoriteIds = favoritesData.map((fav) => fav.id);
+
+    try {
+      const cacheFilename = `category_view_${categoryId}.json`;
+      const cachePath = await getCachePath(req.user._id, cacheFilename);
+      console.log(`[Cache] Checking category view cache at: ${cachePath}`);
+      const cachedData = await fs.promises.readFile(cachePath, "utf8");
+      if (cachedData) {
+        console.log(`[Cache] HIT: Category view loaded from cache.`);
+        categorizedDesigns = JSON.parse(cachedData);
+        categorizedDesigns._fromCache = true;
+        return res.render("templates", {
+          sizes,
+          templates: categorizedDesigns,
+          row: { templates: [] },
+          cache: true,
+          filename: "templates",
+          loading: false,
+          plan_name: req.user.account.plan_name,
+          payment_failed: req.user.account.payment_failed
+        });
+      }
+    } catch (error) {
+      console.log(`[Cache] MISS: Category view cache not found or error: ${error.message}`);
+    }
 
     try {
       const designsData = await getDesigns({
@@ -466,6 +586,19 @@ module.exports = () => {
       })
     );
 
+    try {
+      const cacheFilename = `category_view_${categoryId}.json`;
+      const cachePath = await getCachePath(req.user._id, cacheFilename);
+      console.log(`[Cache] Writing category view to cache at: ${cachePath}`);
+      await fs.promises.writeFile(
+        cachePath,
+        JSON.stringify(categorizedDesigns)
+      );
+      console.log(`[Cache] SUCCESS: Category view cached.`);
+    } catch (error) {
+      console.log(`[Cache] ERROR: Failed to write category view cache: ${error.message}`);
+    }
+
     return res.render("templates", {
       sizes, // This could be a separate query if needed
       templates: categorizedDesigns,
@@ -473,6 +606,8 @@ module.exports = () => {
       cache: true,
       filename: "templates",
       loading: false,
+      plan_name: req.user.account.plan_name,
+      payment_failed: req.user.account.payment_failed
     });
   });
 
@@ -513,6 +648,28 @@ async function handleResize(req, res) {
   const sizes = req.session.sizes;
   const { row, size } = req.query; // 'row' is the category ID, 'size' is the desired size ID
   let newRow = {};
+
+  try {
+    const cacheFilename = `resize_cat_${row}_size_${size}.json`;
+    const cachePath = await getCachePath(req.user._id, cacheFilename);
+    console.log(`[Cache] Checking resize cache at: ${cachePath}`);
+    const cachedData = await fs.promises.readFile(cachePath, "utf8");
+    if (cachedData) {
+      console.log(`[Cache] HIT: Resize data loaded from cache.`);
+      newRow = JSON.parse(cachedData);
+      newRow._fromCache = true; // Add flag
+      return res.render("templates", {
+        sizes, // Pass the size array for the frontend to use
+        row: newRow, // Pass the newRow object containing designs in the new size and size options
+        templates: [],
+        cache: true,
+        filename: "templates",
+        loading: false,
+      });
+    }
+  } catch (error) {
+    console.log(`[Cache] MISS: Resize cache not found or error: ${error.message}`);
+  }
 
   try {
     // First, find the name of the size the user wants to switch to
@@ -607,6 +764,16 @@ async function handleResize(req, res) {
 
     // Filter out null values and populate newRow.sizes
     newRow.sizes = sizesWithCounts.filter(Boolean);
+
+    try {
+      const cacheFilename = `resize_cat_${row}_size_${size}.json`;
+      const cachePath = await getCachePath(req.user._id, cacheFilename);
+      console.log(`[Cache] Writing resize data to cache at: ${cachePath}`);
+      await fs.promises.writeFile(cachePath, JSON.stringify(newRow));
+      console.log(`[Cache] SUCCESS: Resize data cached.`);
+    } catch (error) {
+      console.log(`[Cache] ERROR: Failed to write resize cache: ${error.message}`);
+    }
   } catch (error) {
     console.error("Error fetching designs for new size:", error);
     return res.status(500).send("An error occurred while resizing.");
@@ -620,4 +787,18 @@ async function handleResize(req, res) {
     filename: "templates",
     loading: false,
   });
+}
+
+async function getCachePath(userId, filename) {
+  const cacheDir = path.join(
+    __dirname,
+    "../site_static/templates",
+    userId.toString()
+  );
+  try {
+    await fs.promises.mkdir(cacheDir, { recursive: true });
+  } catch (err) {
+    console.error("Error creating cache directory:", err);
+  }
+  return path.join(cacheDir, filename);
 }

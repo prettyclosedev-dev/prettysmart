@@ -54,7 +54,22 @@
         <% } %>
           <div class="list-wrapper <%= (typeof ai_input != 'undefined' && typeof ai_placeholder != 'undefined' && ai_input.length && ai_placeholder.length && ai_input !== 'marketing' && ai_input !== 'facts') ? 'd-none' : '' %>">
             <div id="templates_container">
-              <%- include('partials/templates-content', { templates: templates, sizes: sizes }) %>
+              <% if (typeof templates !== 'undefined' && templates._fromCache) { %>
+                <script>console.log("[Frontend Cache] HIT: Initial templates loaded from cache.");</script>
+              <% } else if (typeof templates !== 'undefined' && templates.length > 0) { %>
+                <script>console.log("[Frontend Cache] MISS: Initial templates loaded from server.");</script>
+              <% } %>
+              <% if (typeof row !== 'undefined' && row._fromCache) { %>
+                <script>console.log("[Frontend Cache] HIT: Resized templates loaded from cache.");</script>
+              <% } else if (typeof row !== 'undefined' && row.templates && row.templates.length > 0) { %>
+                <script>console.log("[Frontend Cache] MISS: Resized templates loaded from server.");</script>
+              <% } %>
+
+              <% if (typeof cachedTemplatesHtml !== 'undefined' && cachedTemplatesHtml) { %>
+                <%- cachedTemplatesHtml %>
+              <% } else { %>
+                <%- include('partials/templates-content', { templates: templates, sizes: sizes }) %>
+              <% } %>
             </div>
             <div class="single-swiper-wrapper swiper-wrapper">
               <!-- Slides -->
